@@ -70,8 +70,6 @@ alias tracert=traceroute
 alias where='type -a'
 alias which='where'
 
-
-
 # Start with BSD-safe LS_OPTIONS.
 # We'll augment them if we find GNU coreutils below.
 # These LSCOLORS are designed to match the GNU defaults.
@@ -112,7 +110,6 @@ __use-gnu-coreutils() {
             ;;
         
         Darwin)
-            
             local coreutils=/usr/local/opt/coreutils/libexec
             if [ ! -d $coreutils ]; then
                 # core utils have not been installed
