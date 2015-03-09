@@ -17,7 +17,7 @@
 (unless window-system
   (menu-bar-mode -1))
 
-;; no tool ba
+;; no tool bar
 (if (fboundp 'tool-bar-mode)
     (tool-bar-mode -1))
 
@@ -54,6 +54,7 @@
                      (,(cadr names) (cadr __p)))
          ,body
          (setq __p (cddr __p))))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ELPA Packages
@@ -119,6 +120,7 @@ locate PACKAGE."
         (require-package package)))
   (defun package-installed-p (p) nil))
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Theme
 
@@ -131,6 +133,7 @@ locate PACKAGE."
       (if (find-font (font-spec :name "Consolas"))
           (add-to-list 'default-frame-alist '(font . "Consolas-14")))
       (setq frame-title-format '(buffer-file-name "%f" ("%b")))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Aliases
@@ -323,9 +326,9 @@ forward."
         (delete-window window))
     (kill-buffer buffer)))
 
-;; I bind this to C-x C-k -- And it's for those times when another window
-;; has popped up and you want it to just go away and keep working in the
-;; main window.
+;; I bind this to C-x C-k -- it's for those times when another window
+;; has popped up and you want it to just go away and keep working in
+;; the main window.
 (defun ng/kill-other-buffer-and-window ()
   "Kill the buffer in the other window and delete its window."
   (interactive)
