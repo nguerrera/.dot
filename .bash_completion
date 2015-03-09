@@ -1,0 +1,20 @@
+# Smarts around cd in /etc/bash_completion break cd $VAR/<TAB> even
+# when direxpand shopt is set. Just use the default directory
+# completion. Go ahead and add the -o bashdefault (see below) here too
+# because compopt isn't available on older versions of bash and cd
+# completion is the most annoying thing to not have working perfectly.
+complete -o bashdefault -d cd
+complete -o bashdefault -d pushd
+
+# Issue: after /etc/bash_completion is sourced, *Foo*<TAB> stops
+# completing entries matching *Foo* for certain commands.
+#
+# Workaround: loop through every command that has custom completion
+# and add the bashdefault fallback.
+type -t compopt > /dev/null || return
+for cmd in $(complete | egrep -v '(-d -G)' | awk '{print $(NF)}'); do 
+    compopt -o bashdefault $cmd
+done
+
+# -*- mode: shell -*-
+
