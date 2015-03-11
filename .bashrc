@@ -148,5 +148,4 @@ __use-gnu-coreutils() {
 if __use-gnu-coreutils; then
     LS_OPTIONS="$LS_OPTIONS --group-directories-first --color=auto"
 fi
-__use-gnu-coreutils
 unset -f __use-gnu-coreutils
