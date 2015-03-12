@@ -254,6 +254,13 @@ locate PACKAGE."
 (if (package-installed-p 'ace-jump-mode)
     (ng/set-keys "C-j" ace-jump-mode))
 
+;; For older versions of emacs
+(unless (fboundp 'use-region-p)
+  (defun use-region-p ()
+    (and transient-mark-mode
+         mark-active
+         (> (region-end) (region-begninng)))))
+
 ;; Designed to be bound to C-a
 (defun ng/move-or-mc-edit-beginning-of-line (&optional arg)
   "If there's an active region, create cursors at the end of each
@@ -283,9 +290,7 @@ interactive search term. Otherwise, interactively search
 forward."
   (interactive)
   (if (use-region-p)
-      (if (> (point) (mark)) ;; mc/mark-all-in-region doesn't like
-          (mc/mark-all-in-region (mark) (point))
-        (mc/mark-all-in-region (point) (mark)))
+      (mc/mark-all-in-region (region-beginning) (region-end))
     (isearch-forward)))
 
 ;; Designed to be bound to Alt-F4 to match standard Windows behaviour
@@ -303,7 +308,7 @@ forward."
   "If there is an active region, kill it. Otherwise, kill the preceding word."
   (interactive "p")
   (if (use-region-p)
-      (kill-region (point) (mark))
+      (kill-region (region-beginning) (region-end))
     (backward-kill-word arg)))
 
 ;; Designed to be bound to C-k -- it keeps its standard behaviour when
@@ -314,7 +319,7 @@ forward."
   "If there is an active region, kill it. Otherwise, kill the following line."
   (interactive "p")
   (if (use-region-p)
-      (kill-region (point) (mark))
+      (kill-region (region-beginning) (region-end))
     (kill-line arg)))
 
 ;; Designed to be bound to C-x k -- similar to standard behacvior, but
