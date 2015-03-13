@@ -233,8 +233,8 @@ locate PACKAGE."
  "C-k"      ng/kill-region-or-kill-line
  "C-w"      ng/kill-region-or-backward-kill-word
  "C-x C-b"  ibuffer
- "M-n"      scroll-up-command
- "M-p"      scroll-down-command
+ "M-n"      cua-scroll-up
+ "M-p"      cua-scroll-down
  "<M-f4>"   ng/delete-frame-or-exit
  "C-x C-k"  ng/kill-other-buffer-and-window
  "C-x k"    ng/kill-this-buffer-and-window
