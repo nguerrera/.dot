@@ -13,7 +13,6 @@
 ;; never use tabs to indent
 (setq-default indent-tabs-mode nil)
 
-
 ;; follow symlinks to source-controlled locations without prompting
 (setq vc-follow-symlinks t)
 
