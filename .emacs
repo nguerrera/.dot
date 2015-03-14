@@ -119,28 +119,27 @@ locate PACKAGE."
 
 ;; if the package feature is available, install the packages above,
 ;; otherwise stub-out package-installed-p to always return nil.
-(if (featurep 'package)
-    (progn
-      (ng/dopairs (name url) ng/package-archives
-        (add-to-list 'package-archives (cons name url) t))
-      (package-initialize)
-      (dolist (package ng/packages)
-        (require-package package)))
+(when (featurep 'package)
+  (ng/dopairs (name url) ng/package-archives
+    (add-to-list 'package-archives (cons name url) t))
+  (package-initialize)
+  (dolist (package ng/packages)
+    (require-package package)))
+
+(unless (fboundp 'package-installed-p)
   (defun package-installed-p (p) nil))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Theme
 
-(if window-system
-    (progn
-      (if (package-installed-p 'solarized-theme)
-          (progn
-            (setq solarized-contrast 'high)
-            (load-theme 'solarized-dark t)))
-      (if (find-font (font-spec :name "Consolas"))
-          (add-to-list 'default-frame-alist '(font . "Consolas-14")))
-      (setq frame-title-format '(buffer-file-name "%f" ("%b")))))
+(when window-system
+  (when (package-installed-p 'solarized-theme)
+    (setq solarized-contrast 'high)
+    (load-theme 'solarized-dark t))
+  (when (find-font (font-spec :name "Consolas"))
+      (add-to-list 'default-frame-alist '(font . "Consolas-14")))
+  (setq frame-title-format '(buffer-file-name "%f" ("%b"))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
