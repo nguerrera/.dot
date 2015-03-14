@@ -263,7 +263,7 @@ locate PACKAGE."
      ))
 
 (if (package-installed-p 'expand-region)
-    (ng/set-keys "C-," er/expand-region))
+    (ng/set-keys "C-." er/expand-region))
 
 (if (package-installed-p 'ace-jump-mode)
     (ng/set-keys "C-j" ace-jump-mode))
