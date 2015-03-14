@@ -161,13 +161,6 @@ locate PACKAGE."
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Aliases
-
-(defalias 'qr  'query-replace)
-(defalias 'qrr 'query-replace-regexp)
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Auto Save (without polluting file system)
 ;; http://www.emacswiki.org/emacs/BackupDirectory
 
