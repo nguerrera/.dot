@@ -105,11 +105,11 @@ locate PACKAGE."
  ng/packages
  '(
    ace-jump-mode
-   solarized-theme
    csharp-mode
    expand-region
    markdown-mode
    multiple-cursors
+   solarized-theme
    ))
 
 ;; if the package feature is available, install the packages above,
