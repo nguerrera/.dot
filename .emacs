@@ -107,8 +107,13 @@ locate PACKAGE."
    ace-jump-mode
    csharp-mode
    expand-region
+   flx-ido
+   ido-vertical-mode
    markdown-mode
+   magit
    multiple-cursors
+   projectile
+   smex
    solarized-theme
    ))
 
