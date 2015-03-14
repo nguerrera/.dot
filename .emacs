@@ -40,10 +40,6 @@
 (if (fboundp 'goto-address-mode)
     (add-hook 'find-file-hook 'goto-address-mode))
 
-;; ido-mode: better interactive completion
-;; http://emacswiki.org/InteractivelyDoThings
-(ido-mode 1)
-
 ;; triple productivity Homer Simpson style :)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -128,6 +124,28 @@ locate PACKAGE."
 
 (unless (fboundp 'package-installed-p)
   (defun package-installed-p (p) nil))
+
+;; ido-mode: better interactive completion
+;; http://emacswiki.org/InteractivelyDoThings
+(ido-mode 1)
+(ido-everywhere 1)
+(setq ido-enable-flex-matching t)
+
+;; make ido fuzzy match like sublime
+;; https://github.com/lewang/flx
+(when (fboundp 'flx-ido-mode)
+  (flx-ido-mode 1)
+  (setq ido-use-faces nil))
+
+;; make ido vertical
+;; https://github.com/gempesaw/ido-vertical-mode.el
+(when (fboundp 'ido-vertical-mode)
+  (ido-vertical-mode 1))
+
+;; project interaction
+;; https://github.com/bbatsov/projectile
+(when (fboundp 'projectile-global-mode)
+  (projectile-global-mode 1))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -256,6 +274,9 @@ locate PACKAGE."
 
 (if (package-installed-p 'ace-jump-mode)
     (ng/set-keys "C-j" ace-jump-mode))
+
+(if (package-installed-p 'smex)
+    (ng/set-keys "M-x" smex))
 
 ;; For older versions of emacs
 (unless (fboundp 'use-region-p)
