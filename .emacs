@@ -105,8 +105,8 @@ locate PACKAGE."
    expand-region
    flx-ido
    ido-vertical-mode
-   markdown-mode
    magit
+   markdown-mode
    multiple-cursors
    projectile
    smex
