@@ -96,7 +96,7 @@ locate PACKAGE."
  ng/package-archives
  '(
    "marmalade"  "http://marmalade-repo.org/packages/"
-   "melpa"      "http://melpa.milkbox.net/packages/"
+   "melpa"      "http://melpa.org/packages/"
    ))
 
 
