@@ -141,6 +141,12 @@ re-downloaded in order to locate PACKAGE."
 (setq ls-lisp-use-insert-directory-program nil)
 (setq ls-lisp-dirs-first t)
 
+;; hide dired details by default
+(add-hook
+ 'dired-mode-hook
+ (lambda ()
+   (when (fboundp 'dired-hide-details-mode)
+     (dired-hide-details-mode 1))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Theme
