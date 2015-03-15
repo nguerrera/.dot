@@ -152,6 +152,13 @@ re-downloaded in order to locate PACKAGE."
 ;; open magit status in same window
 (setq magit-status-buffer-switch-function 'switch-to-buffer)
 
+;; don't open ediff control in new frame
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+
+;; use side-by-side ediff by default
+(setq ediff-split-window-function 'split-window-horizontally)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Theme
 
