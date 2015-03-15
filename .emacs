@@ -135,6 +135,12 @@ re-downloaded in order to locate PACKAGE."
 (when (fboundp 'projectile-global-mode)
   (projectile-global-mode 1))
 
+;; use ls-lisp everywhere to portably group directories first
+;; and get away from "ls does not support --dired" warnings
+(require 'ls-lisp)
+(setq ls-lisp-use-insert-directory-program nil)
+(setq ls-lisp-dirs-first t)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Theme
