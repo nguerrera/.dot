@@ -148,6 +148,9 @@ re-downloaded in order to locate PACKAGE."
    (when (fboundp 'dired-hide-details-mode)
      (dired-hide-details-mode 1))))
 
+;; open magit status in same window
+(setq magit-status-buffer-switch-function 'switch-to-buffer)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Theme
 
