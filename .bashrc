@@ -1,9 +1,6 @@
 # do nothing if not running interactively
 [ -z "$PS1" ] && return
 
-# stub in case global locations below don't provide __git_ps1
-__git_ps1 () { return; }
-
 # source global /etc/bashrc and /etc/bash_completion if available
 for etc in /etc /usr/local/etc; do
     for config in bashrc bash_completion; do
@@ -16,16 +13,19 @@ done
 # shell on the old version of emacs that ships with Mac OS X.)
 __set-prompt () {
     local colors=$(tput colors 2> /dev/null)
-    if [ ${colors} -ge 8 ] 2> /dev/null; then
+    if [ ${colors} -ge 8 ] 2> /dev/null || [ "$TERM" == "cygwin" ]; then
         local cyan='\e[36m'
         local yellow='\e[33m'
         local plain='\e[0m'
     fi
 
     local ps1_dir='\n\u@\h:\w'
-    local ps1_git='$(__git_ps1 " (%s)")'
-    local ps1_prompt='\n\$ '
 
+    if [ "$(type -t __git_ps1)" == "function" ]; then
+        local ps1_git='$(__git_ps1 " (%s)")'
+    fi
+
+    local ps1_prompt='\n\$ '
     PS1="${cyan}${ps1_dir}${yellow}${ps1_git}${plain}${ps1_prompt}"
 }
 __set-prompt
@@ -104,7 +104,7 @@ LS_OPTIONS='-h -F'
 #
 __use-gnu-coreutils() {
     case $(uname) in
-        GNU*|Linux)
+        GNU*|Linux|MINGW*)
             # GNU coreutils provided by the system
             return 0
             ;;
@@ -146,6 +146,9 @@ __use-gnu-coreutils() {
 }
 
 if __use-gnu-coreutils; then
-    LS_OPTIONS="$LS_OPTIONS --group-directories-first --color=auto"
+    LS_OPTIONS="$LS_OPTIONS --color=auto"
+    if ls ~/ --group-directories-first > /dev/null 2> /dev/null; then
+        LS_OPTIONS="$LS_OPTIONS --group-directories-first"
+    fi
 fi
 unset -f __use-gnu-coreutils
