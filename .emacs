@@ -159,7 +159,9 @@ re-downloaded in order to locate PACKAGE."
     (setq solarized-contrast 'high)
     (load-theme 'solarized-dark t))
   (when (find-font (font-spec :name "Consolas"))
-      (add-to-list 'default-frame-alist '(font . "Consolas-14")))
+    (lexical-let ((consolas (if (eq window-system 'w32)
+                                "Consolas-11" "Consolas-14")))
+      (add-to-list 'default-frame-alist (cons 'font consolas))))
   (setq frame-title-format '(buffer-file-name "%f" ("%b"))))
 
 
