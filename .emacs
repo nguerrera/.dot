@@ -257,6 +257,8 @@ re-downloaded in order to locate PACKAGE."
  "<M-f4>"   ng/delete-frame-or-exit
  "C-x C-k"  ng/kill-other-buffer-and-window
  "C-x k"    ng/kill-this-buffer-and-window
+ "<C-tab>"  next-buffer
+ "<C-S-tab>" previous-buffer
  )
 
 (if (package-installed-p 'multiple-cursors)
