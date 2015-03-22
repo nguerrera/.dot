@@ -1,6 +1,17 @@
 ;; use common lisp extensions below
 (eval-when-compile (require 'cl))
 
+;; start server for emacsclient
+(when window-system
+  (condition-case nil
+      (let ((warning-minimum-level :error))
+        (server-start))
+    (error nil)))
+
+;; go ahead and kill clients without prompting
+(remove-hook 'kill-buffer-query-functions
+             'server-kill-buffer-query-function)
+
 ;; disable startup message
 (setq inhibit-startup-message t)
 
@@ -262,7 +273,9 @@ re-downloaded in order to locate PACKAGE."
  "C-x C-b"  ibuffer
  "M-n"      cua-scroll-up
  "M-p"      cua-scroll-down
- "<M-f4>"   ng/delete-frame-or-exit
+ "<M-f4>"   ng/quit
+ "s-q"      ng/quit
+ "C-x C-c"  ng/quit
  "C-x C-k"  ng/kill-other-buffer-and-window
  "C-x k"    ng/kill-this-buffer-and-window
  "<C-tab>"  next-buffer
@@ -325,14 +338,6 @@ forward."
       (mc/mark-all-in-region (region-beginning) (region-end))
     (isearch-forward)))
 
-;; Designed to be bound to Alt-F4 to match standard Windows behaviour
-(defun ng/delete-frame-or-exit ()
-  "Delete the current frame. Exit if it is the only frame."
-  (interactive)
-  (if multiple-frames
-      (delete-frame)
-    (save-buffers-kill-terminal)))
-
 ;; Designed to be bound to C-w -- it keeps its standard behaviour when
 ;; there's an active region, it erases the previous word like it does
 ;; in other UNIX programs.
@@ -383,3 +388,35 @@ forward."
       (unless (eq new-window old-window)
         (delete-window new-window)))))
 
+;; make exit commands kill extra frames without quitting and when
+;; there's only one frame left, hide without exiting. The idea is
+;; to keep emacs alive for emacsclient.
+(defun ng/quit ()
+  (interactive)
+
+  ;; if we have more than one frame, just delete the current frame.
+  (when multiple-frames
+    (delete-frame)
+    (return))
+
+  ;; if we're not in a Mac OS X GUI frame, exit
+  (when (or (not window-system)
+            (not (eq system-type 'darwin)))
+    (save-buffers-kill-terminal)
+    (return))
+
+  ;; if we are in a Mac OS GUI frame, kill all buffers and hide.
+  (save-some-buffers)
+  (dolist (b (buffer-list))
+    (kill-buffer b))
+
+  (do-applescript
+   (concat
+    "tell application \"System Events\" "
+          "to tell process \"Emacs\" "
+          "to set visible to false")))
+
+(defadvice handle-delete-frame (around ng/hdf activate)
+  (if multiple-frames
+      ad-do-it
+    (ng/quit)))
