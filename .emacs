@@ -339,8 +339,8 @@ forward."
     (isearch-forward)))
 
 ;; Designed to be bound to C-w -- it keeps its standard behaviour when
-;; there's an active region, it erases the previous word like it does
-;; in other UNIX programs.
+;; there's an active region. Otherwise, it erases the previous word
+;; like it does in other UNIX programs.
 (defun ng/kill-region-or-backward-kill-word (&optional arg)
   "If there is an active region, kill it. Otherwise, kill the preceding word."
   (interactive "p")
