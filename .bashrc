@@ -50,6 +50,21 @@ shopt -s globstar 2> /dev/null
 # ignore case when globbing
 shopt -s nocaseglob 2> /dev/null
 
+# emacs as editor
+if [ -d /Applications/Emacs.app ]; then
+    export ALTERNATE_EDITOR=/Applications/Emacs.app/Contents/MacOS/Emacs
+    export EDITOR=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
+elif type -t emacsclient 2> /dev/null && type -t emacs 2> /dev/null; then
+    export ALTERNATE_EDITOR=emacs
+    export EDITOR=emacsclient
+fi
+
+if [ "$EDITOR" ]; then
+    alias e='$EDITOR -n'
+else
+    alias e=vi
+fi
+
 # aliases
 alias -- -='cd -'
 alias ..='cd ..'
@@ -64,6 +79,8 @@ alias ln='ln -i'
 alias ls='ls $LS_OPTIONS'
 alias md=mkdir
 alias mv='mv -i'
+alias n=e
+alias notepad=e
 alias rd=rmdir
 alias rm='rm -i'
 alias ren=mv
