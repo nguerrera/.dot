@@ -260,12 +260,6 @@ re-downloaded in order to locate PACKAGE."
   (ng/dopairs (key function) pairs
     (global-set-key (eval `(kbd ,key)) function)))
 
-;; Coming up with non-standard keybindings is tough because they
-;; inevitably conflict with other useful things or are too cumbersome
-;; to type. I borrow a trick from cua-mode and make standard keys take
-;; on new meaning based on whether or not there is an active
-;; region. It also helps to choose good mnemonics.
-
 (ng/set-keys
  "C-m"      newline-and-indent
  "C-k"      ng/kill-region-or-kill-line
@@ -305,6 +299,12 @@ re-downloaded in order to locate PACKAGE."
     (and transient-mark-mode
          mark-active
          (> (region-end) (region-beginning)))))
+
+;; Coming up with non-standard keybindings is tough because they
+;; inevitably conflict with other useful things or are too cumbersome
+;; to type. I borrow a trick from cua-mode and make standard keys take
+;; on new meaning based on whether or not there is an active
+;; region. It also helps to choose good mnemonics.
 
 ;; Designed to be bound to C-a
 (defun ng/move-or-mc-edit-beginning-of-line (&optional arg)
