@@ -304,7 +304,7 @@ re-downloaded in order to locate PACKAGE."
   (defun use-region-p ()
     (and transient-mark-mode
          mark-active
-         (> (region-end) (region-begninng)))))
+         (> (region-end) (region-beginning)))))
 
 ;; Designed to be bound to C-a
 (defun ng/move-or-mc-edit-beginning-of-line (&optional arg)
