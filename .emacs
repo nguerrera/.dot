@@ -6,6 +6,7 @@
 
 ;; no beeping
 (setq visible-bell t)
+(setq ring-bell-function 'ignore)
 
 ;; leave the scratch buffer empty by default
 (setq initial-scratch-message nil)
@@ -93,7 +94,7 @@ re-downloaded in order to locate PACKAGE."
    expand-region
    flx-ido
    ido-vertical-mode
-   magit
+   ;;magit
    markdown-mode
    multiple-cursors
    projectile
