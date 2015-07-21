@@ -3,6 +3,7 @@ set prefer-visible-bell on
 set skip-completed-text on
 set visible-stats on
 set colored-stats on
+set bell-style none
 
 # Cycle through completions with Tab/Shift-Tab Windows console style.
 TAB: menu-complete
