@@ -3,7 +3,7 @@ name = Nick Guerrera
 
 ; This will force git to ask me who I am per repo.
 ; See for-fun and for-work aliases. 
-email = (none)
+useconfigonly = true
 
 [alias]
 for-fun  = config user.email "nick@technogenic.net"
