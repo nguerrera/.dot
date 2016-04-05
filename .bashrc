@@ -22,7 +22,8 @@ __set-prompt () {
     local ps1_dir='\n\u@\h:\w'
 
     if [ "$(type -t __git_ps1)" == "function" ]; then
-        local ps1_git='$(__git_ps1 " (%s)")'
+        # using $(...) instead of `...` here does not work in MSYS2
+        local ps1_git='`__git_ps1 " (%s)"`'
     fi
 
     local ps1_prompt='\n\$ '
