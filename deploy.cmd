@@ -3,6 +3,10 @@
 
 @echo off
 
+if not defined HOME (
+    set HOME=%USERPROFILE%
+)
+
 setx HOME %HOME%
 
 for %%f in (%~dp0.\.*) do (
