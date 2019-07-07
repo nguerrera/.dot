@@ -4,7 +4,16 @@
 # source global /etc/bashrc and /etc/bash_completion if available
 for etc in /etc /usr/local/etc; do
     for config in bashrc bash_completion; do
-        [ -f $etc/$config ] && source $etc/$config
+        if [ -f $etc/$config ]; then
+           source $etc/$config
+           continue
+        fi
+
+        if [ -d $etc/$config.d ]; then
+            for f in $etc/$config.d/*; do
+                source $f;
+            done
+        fi
     done
 done
 
