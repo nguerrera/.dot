@@ -402,7 +402,9 @@ forward."
   ;; if we're not in a Mac OS X GUI frame, exit
   (when (or (not window-system)
             (not (eq system-type 'darwin)))
-    (save-buffers-kill-terminal)
+    (if (fboundp 'save-buffers-kill-terminal)
+        (save-buffers-kill-terminal)
+      (save-buffers-kill-emacs))
     (return))
 
   ;; if we are in a Mac OS GUI frame, kill all buffers and hide.
