@@ -63,7 +63,7 @@ shopt -s nocaseglob 2> /dev/null
 if [ -d /Applications/Emacs.app ]; then
     export ALTERNATE_EDITOR=/Applications/Emacs.app/Contents/MacOS/Emacs
     export EDITOR=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
-elif type -t emacsclient 2> /dev/null && type -t emacs 2> /dev/null; then
+elif (type -t emacsclient && type -t emacs) > /dev/null 2>&1; then
     export ALTERNATE_EDITOR=emacs
     export EDITOR=emacsclient
 fi
