@@ -16,7 +16,7 @@ set menu-complete-display-prefix on
 # Most of the time, the above is enough and I don't need to ever see
 # the list of possible completions. This gives me the option to see it
 # by pressing C-Space on the rare occasions that I'm stuck or
-# curious.can be used to see them if I'm stuck or curious.
+# curious.
 C-SPACE: possible-completions
 
 # This makes F8 behave like Windows, search history for in reverse for
