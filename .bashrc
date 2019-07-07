@@ -104,6 +104,10 @@ export CLICOLOR=1
 export LSCOLORS=exgxbxdxcxegedabagacad
 LS_OPTIONS='-h -F'
 
+if type -t hub > /dev/null 2>&1; then
+  alias git=hub
+fi
+
 # Use GNU coreutils where possible
 #
 # I greatly prefer GNU coreutils over the spartan BSD equivalents.
