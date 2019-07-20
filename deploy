@@ -5,15 +5,26 @@
 
 cd $(dirname $0) || exit $?
 
-for file in $(pwd)/.*; do
-    name=$(basename $file)  
-    case $name in
-        .|..|.git)
-            :
+function run {
+    echo "> $*"
+    $* || exit $?
+    echo
+}
+
+if [ ! -d ~/.config ]; then
+    run mkdir ~/.config
+fi
+
+for file in .* .config/*; do
+    case $file in
+        .|..|.git|.config)
+            :    
             ;;
         *)
-            /bin/ln -i -s ${file#~/} ~/$name || exit $?
+	    if [ -d ~/$file ]; then
+	        run rm -i -r ~/$file || exit $?
+	    fi
+	    run ln -i -s $(pwd)/$file ~/$file || exit $?
             ;;
     esac
 done
-
