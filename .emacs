@@ -180,6 +180,8 @@ re-downloaded in order to locate PACKAGE."
     (lexical-let ((consolas (if (eq window-system 'w32)
                                 "Consolas-11" "Consolas-14")))
       (add-to-list 'default-frame-alist (cons 'font consolas))))
+  (when (find-font (font-spec :name "DejaVu Sans Mono"))
+    (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11.5")))
   (setq frame-title-format '(buffer-file-name "%f" ("%b"))))
 
 
