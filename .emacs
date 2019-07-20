@@ -52,10 +52,10 @@
 (if (fboundp 'goto-address-mode)
     (add-hook 'find-file-hook 'goto-address-mode))
 
-;; triple productivity Homer Simpson style :)
+;; triple productivity, Homer Simpson style :)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-;; see usage  below -- saves on parentheses :)
+;; see usage below -- saves on parentheses :)
 (defmacro ng/dopairs (names pairs body)
   "Process list in pairs."
   (declare (indent 2))
@@ -91,7 +91,6 @@ re-downloaded in order to locate PACKAGE."
 (setq
  ng/package-archives
  '(
-;   "marmalade"  "http://marmalade-repo.org/packages/"
    "melpa"      "http://melpa.org/packages/"
    ))
 
