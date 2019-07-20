@@ -1,7 +1,7 @@
 # do nothing if not running interactively
 [ -z "$PS1" ] && return
 
-#  the given command is available
+# Determine if the given command is available
 have() {
     type -t $1 > /dev/null 2>&1
 }
