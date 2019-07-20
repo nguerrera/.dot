@@ -95,7 +95,6 @@ re-downloaded in order to locate PACKAGE."
    "melpa"      "http://melpa.org/packages/"
    ))
 
-
 ;; packages to install
 (setq
  ng/packages
@@ -174,16 +173,25 @@ re-downloaded in order to locate PACKAGE."
 ;; Theme
 
 (when window-system
-  (when (package-installed-p 'solarized-theme)
+  (when (and (eq window-system 'x)
+             (package-installed-p 'solarized-theme))
     (setq solarized-contrast 'high)
     (load-theme 'solarized-dark t))
+
   (when (find-font (font-spec :name "Consolas"))
-    (lexical-let ((consolas (if (eq window-system 'w32)
-                                "Consolas-11" "Consolas-14")))
-      (add-to-list 'default-frame-alist (cons 'font consolas))))
+    (lexical-let
+        ((consolas
+          (if (eq window-system 'w32)
+              "Consolas-11" "Consolas-14")))
+      (add-to-list 'default-frame-alist
+                   (cons 'font consolas))))
+
   (when (find-font (font-spec :name "DejaVu Sans Mono"))
-    (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11.5")))
-  (setq frame-title-format '(buffer-file-name "%f" ("%b"))))
+    (add-to-list 'default-frame-alist
+                 '(font . "DejaVu Sans Mono-11.5")))
+
+  (setq frame-title-format
+        '(buffer-file-name "%f" ("%b"))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
