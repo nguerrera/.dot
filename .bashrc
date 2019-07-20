@@ -1,6 +1,11 @@
 # do nothing if not running interactively
 [ -z "$PS1" ] && return
 
+#  the given command is available
+have() {
+    type -t $1 > /dev/null 2>&1
+}
+
 # source global /etc/bashrc and /etc/bash_completion if available
 for etc in /etc /usr/local/etc; do
     for config in bashrc bash_completion; do
@@ -63,7 +68,7 @@ shopt -s nocaseglob 2> /dev/null
 if [ -d /Applications/Emacs.app ]; then
     export ALTERNATE_EDITOR=/Applications/Emacs.app/Contents/MacOS/Emacs
     export EDITOR=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
-elif (type -t emacsclient && type -t emacs) > /dev/null 2>&1; then
+elif have emacsclient && have emacs; then
     export ALTERNATE_EDITOR=emacs
     export EDITOR=emacsclient
 fi
@@ -104,7 +109,7 @@ export CLICOLOR=1
 export LSCOLORS=exgxbxdxcxegedabagacad
 LS_OPTIONS='-h -F'
 
-if type -t hub > /dev/null 2>&1; then
+if have hub; then
   alias git=hub
 fi
 
@@ -143,7 +148,7 @@ __use-gnu-coreutils() {
         Darwin)
             local coreutils=/usr/local/opt/coreutils/libexec
             if [ ! -d $coreutils ]; then
-                # core utils have not been installed
+                # coreutils have not been installed
                 return 1
             fi
 
@@ -178,8 +183,9 @@ __use-gnu-coreutils() {
 
 if __use-gnu-coreutils; then
     LS_OPTIONS="$LS_OPTIONS --color=auto"
-    if ls ~/ --group-directories-first > /dev/null 2> /dev/null; then
+    if ls ~/ --group-directories-first > /dev/null 2>&1; then
         LS_OPTIONS="$LS_OPTIONS --group-directories-first"
     fi
 fi
+
 unset -f __use-gnu-coreutils
