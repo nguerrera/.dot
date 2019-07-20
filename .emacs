@@ -25,6 +25,9 @@
 ;; never use tabs to indent
 (setq-default indent-tabs-mode nil)
 
+;; truncate long lines, don't wrap
+(setq-default truncate-lines t)
+
 ;; follow symlinks to source-controlled locations without prompting
 (setq vc-follow-symlinks t)
 
@@ -218,6 +221,8 @@ re-downloaded in order to locate PACKAGE."
  mouse-wheel-follow-mouse         t            
  scroll-step                      1
  scroll-preserve-screen-position  1
+ hscroll-margin                   0
+ hscroll-step                     1
  )
 
 
