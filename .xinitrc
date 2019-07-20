@@ -2,7 +2,7 @@
 
 xrdb -merge ~/.Xresources
 
-if have prlcc; then
+if type -t prlcc > /dev/null 2>&1; then
     prlcc &
 fi
 
