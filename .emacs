@@ -160,7 +160,7 @@ re-downloaded in order to locate PACKAGE."
      (dired-hide-details-mode 1))))
 
 ;; open magit status in same window
-(setq magit-status-buffer-switch-function 'switch-to-buffer)
+(setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
 
 ;; don't open ediff control in new frame
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
