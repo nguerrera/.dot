@@ -1,11 +1,6 @@
 # do nothing if not running interactively
 [ -z "$PS1" ] && return
 
-# Determine if the given command is available
-have() {
-    type -t $1 > /dev/null 2>&1
-}
-
 # source global /etc/bashrc and /etc/bash_completion if available
 for etc in /etc /usr/local/etc; do
     for config in bashrc bash_completion; do
@@ -21,6 +16,12 @@ for etc in /etc /usr/local/etc; do
         fi
     done
 done
+
+# Determine if the given command is available
+have() {
+    type -t $1 > /dev/null 2>&1
+}
+
 
 # Set up the prompt with some defense against dumb terminals
 # that don't understand the color escape sequences (e.g. M-x
