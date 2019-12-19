@@ -22,7 +22,6 @@ have() {
     type -t $1 > /dev/null 2>&1
 }
 
-
 # Set up the prompt with some defense against dumb terminals
 # that don't understand the color escape sequences (e.g. M-x
 # shell on the old version of emacs that ships with Mac OS X.)
@@ -71,20 +70,31 @@ shopt -s globstar 2> /dev/null
 # ignore case when globbing
 shopt -s nocaseglob 2> /dev/null
 
-# emacs as editor
-if [ -d /Applications/Emacs.app ]; then
+# editor
+if have code-insiders; then
+    alias code=code-insiders
+    alias e=code
+    export EDITOR='code-insiders -w'
+elif have code; then
+    alias e=code
+    export EDITOR='code -w'
+elif [ -d /Applications/Emacs.app ]; then
     export ALTERNATE_EDITOR=/Applications/Emacs.app/Contents/MacOS/Emacs
     export EDITOR=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
+    export e='$EDITOR -n'
 elif have emacsclient && have emacs; then
+    export e='emacs -n'
     export ALTERNATE_EDITOR=emacs
     export EDITOR=emacsclient
+else
+    alias e='"vi"'
 fi
 
-if [ "$EDITOR" ]; then
-    alias e='$EDITOR -n'
-else
-    alias e=vi
-fi
+# hijack all muscle memory to chosen editor
+alias n=e
+alias vi=e
+alias vim=e
+alias notepad=e
 
 # aliases
 alias -- -='cd -'
@@ -100,14 +110,17 @@ alias ln='ln -i'
 alias ls='ls $LS_OPTIONS'
 alias md=mkdir
 alias mv='mv -i'
-alias n=e
-alias notepad=e
 alias rd=rmdir
 alias rm='rm -i'
 alias ren=mv
 alias tracert=traceroute
 alias where='type -a'
 alias which='where'
+
+if have powershell.exe; then
+    alias start='powershell.exe -command start'
+    alias open=start
+fi
 
 # Start with BSD-safe LS_OPTIONS.
 # We'll augment them if we find GNU coreutils below.
