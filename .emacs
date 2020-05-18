@@ -111,7 +111,6 @@ re-downloaded in order to locate PACKAGE."
    multiple-cursors
    projectile
    smex
-   solarized-theme
    ))
 
 ;; if the package feature is available, install the packages above,
@@ -175,11 +174,6 @@ re-downloaded in order to locate PACKAGE."
 ;; Theme
 
 (when window-system
-  (when (and (eq window-system 'x)
-             (package-installed-p 'solarized-theme))
-    (setq solarized-contrast 'high)
-    (load-theme 'solarized-dark t))
-
   (when (find-font (font-spec :name "Consolas"))
     (lexical-let
         ((consolas
