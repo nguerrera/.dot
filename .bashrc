@@ -81,9 +81,9 @@ elif have code; then
 elif [ -d /Applications/Emacs.app ]; then
     export ALTERNATE_EDITOR=/Applications/Emacs.app/Contents/MacOS/Emacs
     export EDITOR=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
-    export e='$EDITOR -n'
+    alias e='$EDITOR -n'
 elif have emacsclient && have emacs; then
-    export e='emacs -n'
+    alias e='emacsclient -n'
     export ALTERNATE_EDITOR=emacs
     export EDITOR=emacsclient
 else
