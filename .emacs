@@ -1,5 +1,4 @@
-;; use common lisp extensions below
-(eval-when-compile (require 'cl))
+;; -*- lexical-binding: t; -*-
 
 ;; start server for emacsclient
 (when window-system
@@ -62,10 +61,10 @@
 (defmacro ng/dopairs (names pairs body)
   "Process list in pairs."
   (declare (indent 2))
-  `(lexical-let ((__p ,pairs))
+  `(let ((__p ,pairs))
      (while __p
-       (lexical-let ((,(car  names) (car  __p))
-                     (,(cadr names) (cadr __p)))
+       (let ((,(car  names) (car  __p))
+             (,(cadr names) (cadr __p)))
          ,body
          (setq __p (cddr __p))))))
 
@@ -75,7 +74,6 @@
 
 ;; require-package by Steve Purcell
 ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-elpa.el
-
 (defun require-package (package &optional min-version no-refresh)
   "Install given PACKAGE, optionally requiring MIN-VERSION.
 If NO-REFRESH is non-nil, the available package lists will not be
@@ -106,6 +104,7 @@ re-downloaded in order to locate PACKAGE."
    expand-region
    flx-ido
    ido-vertical-mode
+   ido-completing-read+
    magit
    markdown-mode
    multiple-cursors
@@ -129,6 +128,7 @@ re-downloaded in order to locate PACKAGE."
 ;; http://emacswiki.org/InteractivelyDoThings
 (ido-mode 1)
 (ido-everywhere 1)
+(ido-ubiquitous-mode 1)
 (setq ido-enable-flex-matching t)
 
 ;; make ido fuzzy match like sublime
@@ -144,8 +144,8 @@ re-downloaded in order to locate PACKAGE."
 
 ;; project interaction
 ;; https://github.com/bbatsov/projectile
-(when (fboundp 'projectile-global-mode)
-  (projectile-global-mode 1))
+(when (fboundp 'projectile-mode)
+  (projectile-mode 1))
 
 ;; use ls-lisp everywhere to portably group directories first
 ;; and get away from "ls does not support --dired" warnings
@@ -168,17 +168,14 @@ re-downloaded in order to locate PACKAGE."
 
 (when window-system
   (when (find-font (font-spec :name "Consolas"))
-    (lexical-let
-        ((consolas
-          (if (eq window-system 'w32)
-              "Consolas-11" "Consolas-14")))
+    (let ((consolas
+           (if (eq window-system 'w32)
+               "Consolas-11" "Consolas-14")))
       (add-to-list 'default-frame-alist
                    (cons 'font consolas))))
-
   (when (find-font (font-spec :name "DejaVu Sans Mono"))
     (add-to-list 'default-frame-alist
                  '(font . "DejaVu Sans Mono-11.5")))
-
   (setq frame-title-format
         '(buffer-file-name "%f" ("%b"))))
 
@@ -262,127 +259,110 @@ re-downloaded in order to locate PACKAGE."
     (global-set-key (eval `(kbd ,key)) function)))
 
 (ng/set-keys
- "C-m"      newline-and-indent
- "C-k"      ng/kill-region-or-kill-line
- "C-w"      ng/kill-region-or-backward-kill-word
- "C-x C-b"  ibuffer
- "M-n"      cua-scroll-up
- "M-p"      cua-scroll-down
- "C-x C-k"  ng/kill-other-buffer-and-window
- "C-x k"    ng/kill-this-buffer-and-window
- "<C-tab>"  next-buffer
+ "C-a"       ng/home
+ "M-m"       ng/home
+ "<home>"    ng/home
+ "C-e"       ng/end
+ "<end>"     ng/end
+ "C-m"       newline-and-indent
+ "C-k"       ng/C-k
+ "C-w"       ng/C-w
+ "C-x C-b"   ibuffer
+ "M-n"       cua-scroll-up
+ "M-p"       cua-scroll-down
+ "C-x C-k"   ng/kill-other-buffer-and-window
+ "C-x k"     ng/kill-this-buffer-and-window
+ "<C-tab>"   next-buffer
  "<C-S-tab>" previous-buffer
+ "C-;"       comment-line
  )
 
-(if (package-installed-p 'multiple-cursors)
-    (ng/set-keys
-     "C-a" ng/move-or-mc-edit-beginning-of-line
-     "C-e" ng/move-or-mc-edit-end-of-line
-     "C-s" ng/isearch-forward-or-mc-mark-all-in-region
-     "M-m" ng/move-or-mc-edit-back-to-indentation     
-     ))
-
 (if (package-installed-p 'expand-region)
-    (ng/set-keys "C-." er/expand-region))
-
+    (ng/set-keys
+     "<C-S-right>" er/expand-region
+     "<C-S-left>"  er/contract-region))
+  
 (if (package-installed-p 'ace-jump-mode)
     (ng/set-keys "C-j" ace-jump-mode))
 
 (if (package-installed-p 'smex)
     (ng/set-keys "M-x" smex))
 
-;; For older versions of emacs
-(unless (fboundp 'use-region-p)
-  (defun use-region-p ()
-    (and transient-mark-mode
-         mark-active
-         (> (region-end) (region-beginning)))))
-
-;; Coming up with non-standard keybindings is tough because they
-;; inevitably conflict with other useful things or are too cumbersome
-;; to type. I borrow a trick from cua-mode and make standard keys take
-;; on new meaning based on whether or not there is an active
-;; region. It also helps to choose good mnemonics.
-
-;; Designed to be bound to C-a
-(defun ng/move-or-mc-edit-beginning-of-line (&optional arg)
-  "If there's an active region, create cursors at the end of each
-line in the region. Otherwise, move to the end of the current line."
+(when (package-installed-p 'projectile)  
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (ng/set-keys "C-," projectile-find-file))
+  
+(defun ng/home (&optional arg)
+  "Move back to indentation. If already there, move to beginning
+of line. If a region is selected, create multiple cursors in the
+selected lines before moving."
   (interactive "p")
-  (if (use-region-p) (mc/edit-lines))
-  (move-beginning-of-line arg))
+  (setq arg (or arg 1))
+  (if (/= arg 1)
+      (move-beginning-of-line arg)
+    (progn
+      (if (and (use-region-p) (fboundp 'mc/edit-lines))
+          (mc/edit-lines))
+      (if (ng/at-indentation-p)
+          (move-beginning-of-line 1)
+        (back-to-indentation)))))
 
-;; Designed to be bound to C-e
-(defun ng/move-or-mc-edit-end-of-line (&optional arg)
-  "If there's an active region, create cursors at the end of each
-line in the region. Otherwise, move to the end of the current line."
+(defun ng/end (&optional arg)
+  "Move back to indentation. If already there, move to beginning
+of line. If a region is selected, create multiple cursors in the
+selected lines before moving."
   (interactive "p")
-  (if (use-region-p) (mc/edit-lines))
-  (move-end-of-line arg))
+  (setq arg (or arg 1))
+  (if (/= arg 1)
+      (move-end-of-line arg)
+    (if (and (use-region-p) (fboundp 'mc/edit-lines))
+        (mc/edit-lines))
+    (move-end-of-line 1)))
 
-;; Designed to be bound to M-m
-(defun ng/move-or-mc-edit-back-to-indentation (&optional arg)
-  (interactive "p")
-  (if (use-region-p) (mc/edit-lines))
-  (back-to-indentation))
-
-;; Designed to be bound to C-s
-(defun ng/isearch-forward-or-mc-mark-all-in-region ()
-  "If there's an active region, create cursors based on the
-interactive search term. Otherwise, interactively search
-forward."
+(defun ng/at-indentation-p ()
+  "Check if the cursor is already back to indentation."
   (interactive)
-  (if (use-region-p)
-      (mc/mark-all-in-region (region-beginning) (region-end))
-    (isearch-forward)))
+  (let ((old-column (current-column)))    
+    (save-excursion
+      (back-to-indentation)
+      (= old-column (current-column)))))
 
-;; Designed to be bound to C-w -- it keeps its standard behaviour when
-;; there's an active region. Otherwise, it erases the previous word
-;; like it does in other UNIX programs.
-(defun ng/kill-region-or-backward-kill-word (&optional arg)
-  "If there is an active region, kill it. Otherwise, kill the preceding word."
+(defun ng/C-w (&optional arg)
+  "If there is an active region, kill it. Otherwise, kill the
+preceding word. Allows C-w to backward-kill-word like it does on
+the terminal, but still kill-region when something is selected."
   (interactive "p")
   (if (use-region-p)
       (kill-region (region-beginning) (region-end))
     (backward-kill-word arg)))
 
-;; Designed to be bound to C-k -- it keeps its standard behaviour when
-;; there's no active region, but becomes an alias for kill-region when
-;; there is. This strengthens the k == kill, y == yank mnemonic in my
-;; mind.
-(defun ng/kill-region-or-kill-line (&optional arg)
-  "If there is an active region, kill it. Otherwise, kill the following line."
+(defun ng/C-k (&optional arg)
+  "If there is an active region, kill it. Otherwise, kill the
+following line. Strengthens the mnemonic k==kill:y==yank."
   (interactive "p")
   (if (use-region-p)
       (kill-region (region-beginning) (region-end))
     (kill-line arg)))
 
-;; Designed to be bound to C-x k -- similar to standard behacvior, but
-;; kills current buffer without prompting and deletes the window if
-;; it's not the only one. Note that I use ibuffer to kill anything but
-;; the current buffer.
 (defun ng/kill-this-buffer-and-window ()
   "Kill the current buffer and delete its window."
   (interactive)
-  (lexical-let ((window (selected-window))
+  (let ((window (selected-window))
                 (buffer (current-buffer)))
     (if (window-parent window)
         (delete-window window))
     (kill-buffer buffer)))
 
-;; I bind this to C-x C-k -- it's for those times when another window
-;; has popped up and you want it to just go away and keep working in
-;; the main window.
 (defun ng/kill-other-buffer-and-window ()
   "Kill the buffer in the other window and delete its window."
   (interactive)
-  (lexical-let ((old-window (selected-window))
-                (old-buffer (current-buffer)))
+  (let ((old-window (selected-window))
+        (old-buffer (current-buffer)))
     (other-window 1)
-    (lexical-let ((new-window (selected-window))
-                  (new-buffer (current-buffer)))
+    (let ((new-window (selected-window))
+          (new-buffer (current-buffer)))
       (unless (eq new-buffer old-buffer)
         (kill-buffer new-buffer))
       (unless (eq new-window old-window)
         (delete-window new-window)))))
-
+  
