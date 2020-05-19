@@ -277,6 +277,7 @@ re-downloaded in order to locate PACKAGE."
  "<C-tab>"   next-buffer
  "<C-S-tab>" previous-buffer
  "C-;"       comment-line
+ "C-c C-c"   ng/done
  )
 
 (if (package-installed-p 'expand-region)
@@ -367,4 +368,11 @@ following line. Strengthens the mnemonic k==kill:y==yank."
         (kill-buffer new-buffer))
       (unless (eq new-window old-window)
         (delete-window new-window)))))
-  
+
+(defun ng/done ()
+  "Save the current buffer, kill it, and delete its window."
+  (interactive)
+  (save-buffer)
+  (if server-buffer-clients
+      (server-done)
+    (ng/kill-this-buffer-and-window)))
