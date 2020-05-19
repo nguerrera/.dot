@@ -10,6 +10,8 @@
 ;; go ahead and kill clients without prompting
 (remove-hook 'kill-buffer-query-functions
              'server-kill-buffer-query-function)
+(remove-hook 'kill-emacs-query-functions
+             'server-kill-emacs-query-function)
 
 ;; disable startup message
 (setq inhibit-startup-message t)
