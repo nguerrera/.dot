@@ -109,6 +109,7 @@ re-downloaded in order to locate PACKAGE."
    ido-completing-read+
    magit
    markdown-mode
+   move-text
    multiple-cursors
    projectile
    smex
@@ -261,24 +262,41 @@ re-downloaded in order to locate PACKAGE."
     (global-set-key (eval `(kbd ,key)) function)))
 
 (ng/set-keys
- "C-a"       ng/home
- "M-m"       ng/home
- "<home>"    ng/home
- "C-e"       ng/end
- "<end>"     ng/end
- "C-m"       newline-and-indent
- "C-k"       ng/C-k
- "C-w"       ng/C-w
- "C-x C-b"   ibuffer
- "M-n"       cua-scroll-up
- "M-p"       cua-scroll-down
- "C-x C-k"   ng/kill-other-buffer-and-window
- "C-x k"     ng/kill-this-buffer-and-window
- "<C-tab>"   next-buffer
- "<C-S-tab>" previous-buffer
- "C-;"       comment-line
- "C-c C-c"   ng/done
+ "C-a"         ng/home
+ "M-m"         ng/home
+ "<home>"      ng/home
+ "C-e"         ng/end
+ "<end>"       ng/end
+ "C-m"         newline-and-indent
+ "C-k"         ng/C-k
+ "C-w"         ng/C-w
+ "C-x C-b"     ibuffer
+ "M-n"         cua-scroll-up
+ "M-p"         cua-scroll-down
+ "C-x C-k"     ng/kill-other-buffer-and-window
+ "C-x k"       ng/kill-this-buffer-and-window
+ "<C-tab>"     next-buffer
+ "<C-S-tab>"   previous-buffer
+ "C-;"         comment-line
+ "C-c C-c"     ng/done
+ "C-x SPC"     cua-rectangle-mark-mode
+ "<M-up>"      move-text-up
+ "<M-down>"    move-text-down
+ "<M-S-up>"    ng/rectangle-mark-up
+ "<M-S-down>"  ng/rectangle-mark-down
+ "<M-S-left>"  ng/rectangle-mark-left
+ "<M-S-right>" ng/rectangle-mark-right
  )
+
+;; disable archaic "secondary selection" on alt clicks, which we'll
+;; replace with modern multiple cursor/rectangle functionality
+(global-unset-key (kbd "M-<drag-mouse-1>"))
+(global-unset-key (kbd "M-<mouse-1>"))
+(global-unset-key (kbd "M-<mouse-2>"))
+(global-unset-key (kbd "M-<mouse-3>"))
+
+(if (package-installed-p 'multiple-cursors)
+  (ng/set-keys "M-<mouse-1>" mc/add-cursor-on-click))
 
 (if (package-installed-p 'expand-region)
     (ng/set-keys
@@ -291,7 +309,7 @@ re-downloaded in order to locate PACKAGE."
 (if (package-installed-p 'smex)
     (ng/set-keys "M-x" smex))
 
-(when (package-installed-p 'projectile)  
+(when (package-installed-p 'projectile)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (ng/set-keys "C-," projectile-find-file))
   
@@ -329,6 +347,26 @@ selected lines before moving."
     (save-excursion
       (back-to-indentation)
       (= old-column (current-column)))))
+
+(defun ng/rectangle-mark-down (&optional arg)
+  (interactive "p")          
+  (unless cua--rectangle (cua-set-rectangle-mark))
+  (cua-resize-rectangle-down arg))
+                             
+(defun ng/rectangle-mark-up (&optional arg)
+  (interactive "p")          
+  (unless rectangle (cua-set-rectangle-mark))
+  (cua-resize-rectangle-up arg))
+
+(defun ng/rectangle-mark-left (&optional arg)
+  (interactive "p")
+  (unless cua--rectangle (cua-set-rectangle-mark))
+  (cua-resize-rectangle-left arg))
+
+(defun ng/rectangle-mark-right (&optional arg)
+  (interactive "p")
+  (unless cua--rectangle (cua-set-rectangle-mark))
+  (cua-resize-rectangle-right arg))
 
 (defun ng/C-w (&optional arg)
   "If there is an active region, kill it. Otherwise, kill the
