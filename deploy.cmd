@@ -13,5 +13,5 @@ for %%f in (%~dp0.\.*) do (
     if exist %HOME%\%%~nxf (
         del /P %HOME%\%%~nxf
     )
-    mklink /h %HOME%\%%~nxf %%f
+    mklink %HOME%\%%~nxf %%f
 )
