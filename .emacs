@@ -291,6 +291,7 @@ re-downloaded in order to locate PACKAGE."
 ;; disable archaic "secondary selection" on alt clicks, which we'll
 ;; replace with modern multiple cursor/rectangle functionality
 (global-unset-key (kbd "M-<drag-mouse-1>"))
+(global-unset-key (kbd "M-<down-mouse-1>"))
 (global-unset-key (kbd "M-<mouse-1>"))
 (global-unset-key (kbd "M-<mouse-2>"))
 (global-unset-key (kbd "M-<mouse-3>"))
