@@ -10,8 +10,12 @@ if not defined HOME (
 setx HOME %HOME%
 
 for %%f in (%~dp0.\.*) do (
-    if exist %HOME%\%%~nxf (
-        del /P %HOME%\%%~nxf
+    if  "%%~nxf" neq ".gitconfig" (
+        if exist %HOME%\%%~nxf (
+            del /P %HOME%\%%~nxf
+        )
+        mklink %HOME%\%%~nxf %%f
     )
-    mklink %HOME%\%%~nxf %%f
 )
+
+git config --global include.path %~dp0.gitconfig
