@@ -1,0 +1,4 @@
+# ignore all the transient stuff in .emacs.d/...
+# track only *.el in the root
+.emacs.d/*
+!.emacs.d/*.el
