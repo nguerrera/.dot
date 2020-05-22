@@ -1,0 +1,11 @@
+[user]
+	name = Nick Guerrera
+	useconfigonly = true
+[alias]
+	for-fun = config user.email "nick@technogenic.net"
+	for-work = config user.email "nicholg@microsoft.com"
+	bash = !bash
+	get = !~/.dot/git/git-get
+	config-shared = !git config --file ~/.dot/git/shared.gitconfig
+	config-win = !git config --file ~/.dot/git/win.gitconfig
+	config-unix = !git config --file ~/.dot/git/unix.gitconfig

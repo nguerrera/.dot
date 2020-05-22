@@ -1,0 +1,249 @@
+#!/usr/bin/env bash
+help() {
+cat <<EOF
+
+git-get - fast-forward upstream -> origin -> local
+
+Usage: git get [<branch>]
+
+If no <branch> is specified. The default is 'master'.
+
+Works by convention when origin remote is a github fork of upstream
+remote. After successful 'git get' both the fork and the local version
+of <branch> are fast-forwarded to the upstream.
+
+Also works fine if there is no upstream remote or upstream does not
+have a matching branch.
+
+Everything is fast-forward only assuming the convention that your own
+changes are generally kept in distinct topic branches.  If a merge is
+required, you need to intervene manually.
+
+You can get a different branch than the current one without checking
+it out since only fast-forward merges are performed on your behalf.
+This enables a flow where you can stay in your topic branch and merge
+upstream changes with ease.
+
+* Work on feature
+    > git checkout -b awesome-feature
+    > notepad AwesomeClass.cs
+    > git commit -a -m "Made AwesomeClass more awesome"
+
+* Merge what others have done...
+    > git get
+    > git merge master
+
+* ...or rebase your changes on top.
+    > git get
+    > git rebase master
+    
+NOTE:
+  - This is not a built-in git command.
+  - See $0 for implementation.
+EOF
+
+exit 0
+}
+
+manual_merge_required() {
+cat <<EOF
+error: cannot get because $1 and $2 have diverged.
+
+Avoid this by not commiting straight to $branch. Always
+do your work in topic branches and send pull requests.
+EOF
+
+exit 1
+}
+
+
+dry_run=
+debug=
+
+while true; do
+    case "$1" in
+        -h|--help)
+            help
+            ;;
+
+        -n|--dry-run)
+            dry_run=--dry-run
+            shift
+            ;;
+
+        --debug)
+            debug=1
+            shift
+            ;;
+
+        *)
+            break
+            ;;
+    esac
+done
+
+branch=${1-master}
+
+debug_log() {
+    [ ! "$debug" ] || echo $1
+}
+
+debug_log_truth() {
+    if [ "$debug" ]; then
+        if [ $1 -eq 0 ]; then
+            debug_log ">> true"
+        else
+            debug_log ">> false (exit code: $1)"
+        fi
+   fi
+}
+
+# attempt the given git command. abort if it fails.
+git_try() {
+   debug_log ">>>> git $*"
+   git $* || exit $?
+}
+
+# same as above, but capture output in $git_out 
+git_try_get() {
+   debug_log ">>>>> git $*"
+   git_out=$(git $*)
+   exit_code=$?
+   debug_log "$git_out"
+   [ $exit_code -eq 0 ] || exit $exit_code
+}
+
+# run a git command where non-zero just means false to a query
+# and not something that should abort the get.
+git_test() {
+    debug_log ">>>> git $*"
+    git $*
+    exit_code=$?
+    debug_log_truth $exit_code
+    [ $exit_code -eq 0 ]
+}
+
+# same as above but redirect any output to /dev/null unless --debug
+# was passed.
+git_test_quiet() {
+    debug_log ">>>> git $*"
+    
+    if [ "$debug" ]; then
+        git $*
+    else
+        git $* > /dev/null 2> /dev/null
+    fi
+    
+    exit_code=$?
+    debug_log_truth $exit_code
+    [ $exit_code -eq 0 ]
+}
+
+has_local_branch() {
+    debug_log ">> has_local_branch($1)"
+    git_test show-ref --quiet --verify "refs/heads/$1"
+}
+
+has_remote() {
+    debug_log ">> has_remote($1)"    
+    git_test_quiet config --get "remote.$1.url"
+}
+
+has_remote_branch() {
+    debug_log ">> has_remote_branch($1, $2)"
+    git_test show-ref --quiet --verify "refs/remotes/$1/$2"
+}
+
+# Can the the $1 branch be fast-forwarded to the $2 branch?
+is_ancestor() {
+    debug_log ">> is_ancestor($1, $2)"
+    
+    git_try_get rev-parse "$1"
+    left="$git_out"
+    
+    git_try_get rev-parse "$2"
+    right="$git_out"
+    
+    git_test merge-base --is-ancestor "$left" "$right"
+}
+
+# Log an error and abort
+error() {
+    echo
+    echo "error: $1"
+    exit 1
+}
+
+if ! has_remote origin; then
+    error "there is no origin remote."
+fi
+
+git_try fetch --prune origin
+
+if has_remote upstream; then
+    git_try fetch --prune upstream
+fi
+
+if ! has_remote_branch origin "$branch" && ! has_remote_branch upstream "$branch"; then
+    error "neither origin nor upstream remote has a '$branch' branch."
+fi
+
+pushed=
+
+# Fast-forward origin to upstream
+# (skip if there is no upstream or it has no matching branch)
+if has_remote_branch upstream "$branch"; then
+    if ! has_remote_branch origin "$branch"; then
+        git_try push $dry_run origin "upstream/$branch:refs/heads/$branch"
+        pushed=1
+
+    elif is_ancestor "upstream/$branch" "origin/$branch"; then
+        debug_log ">>>>>> origin/$branch is already at or ahead of upstream/$branch."
+
+    elif is_ancestor "origin/$branch" "upstream/$branch"; then
+        git_try push $dry_run origin "upstream/$branch:$branch"
+        pushed=1
+
+    else
+        manual_merge_required "origin/$branch" "upstream/$branch"
+    fi
+fi
+
+origin=origin
+
+if [ "$dry_run" -a "$pushed" ]; then
+    origin=upstream
+    echo
+    echo "[dry-run] Real run would fetch or merge from origin next, but" 
+    echo "          but since origin update above was simulated, using"
+    echo "          upstream to show progress."
+    echo    
+fi
+
+# Fast-forward local to origin
+if ! has_local_branch "$branch"; then
+    git_try fetch $dry_run $origin "$branch:$branch"
+    if [ ! "$dry_run" ]; then
+        git branch "$branch" --set-upstream-to origin/$branch
+    fi
+
+elif is_ancestor "$origin/$branch" "$branch"; then
+    debug_log ">>>>>> $branch is already at or ahead of origin/$branch."
+
+elif is_ancestor "$branch" "$origin/$branch"; then
+    git_try_get rev-parse --abbrev-ref HEAD
+    current_branch="$git_out"
+    if [ "$current_branch" != "$branch" ]; then
+        git_try fetch $dry_run $origin "$branch:$branch"
+    elif [ "$dry_run" ]; then
+        echo
+        echo "[dry run] Real run would 'git merge --ff-only origin/$branch'"
+        echo "          now but can't simulate that."
+        echo
+    else
+        git_try merge --ff-only "$origin/$branch"
+    fi
+
+else
+    manual_merge_required "$branch" "origin/$branch"
+fi

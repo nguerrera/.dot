@@ -1,30 +1,22 @@
 #!/usr/bin/env bash
 
-# Symbolically link to all of the dot files in this directory from the
-# home directory.
+# Symbolically link to all of the dot files in this directory from the home
+# directory. Chain in more git configuration layers.
 
 cd $(dirname $0) || exit $?
+git config --global include.path ~/.dot/git/unix.gitconfig
 
-function run {
-    echo "> $*"
-    $* || exit $?
-    echo
-}
-
-if [ ! -d ~/.config ]; then
-    run mkdir ~/.config
-fi
-
-for file in .* .config/*; do
+for file in .*; do
     case $file in
-        .|..|.git|.config)
+        .|..|.git*)
             :    
             ;;
         *)
-	    if [ -d ~/$file ]; then
-	        run rm -i -r ~/$file || exit $?
-	    fi
-	    run ln -i -s $(pwd)/$file ~/$file || exit $?
-            ;;
+            if [ -e ~/$file ]; then
+                echo "warning: ~/$file already exists, not overwriting"
+            else
+                ln -i -s -v $(pwd)/$file ~/$file || exit $?
+            fi
+        ;;
     esac
 done

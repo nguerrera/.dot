@@ -1,0 +1,4 @@
+[include]
+	path = shared.gitconfig
+[url "git@github.com:"]
+	pushinsteadof = https://github.com/

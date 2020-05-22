@@ -1,23 +1,15 @@
+:: Symbolically link to all of the dot files in this directory from the home
+:: directory. Chain in more git configuration layers.
 @echo off
 
 :: set HOME=%USERPROFILE% permanently
 :: emacs uses %APPDATA% otherwise
 set HOME=%USERPROFILE%
 setx HOME %HOME% >nul
-
 setlocal enabledelayedexpansion
-
-:: chain .gitconfig, allowing machine specific settings to be maintained using
-:: `git config --global` while keeping only the settings that apply to all
-:: machines in this repo
-git config --global include.path %~dp0.gitconfig
-
-:: make symbolic links to files
+git config --global include.path %~dp0git\win.gitconfig
 call :make_links
-
-:: make junctions to directories
 call :make_links /d /j
-
 goto :eof
 
 :make_links
