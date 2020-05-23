@@ -9,3 +9,5 @@
 	config-shared = !git config --file ~/.dot/git/shared.gitconfig
 	config-win = !git config --file ~/.dot/git/win.gitconfig
 	config-unix = !git config --file ~/.dot/git/unix.gitconfig
+[hub]
+	protocol = https
