@@ -1,5 +1,27 @@
 ;; -*- lexical-binding: t; -*-
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Use auto-save and backups, but keep them out of my working
+;; directories...
+;;  https://www.emacswiki.org/emacs/BackupDirectory
+;;
+;; ...and don't bother with lock files, which can't be moved
+;; https://www.emacswiki.org/emacs/LockFiles
+;;
+;; Set this up before anything else to reduce the risk of a failed
+;; init causing these files to show up in working directories while
+;; I fix things.
+(setq
+ auto-save-file-name-transforms '((".*" "~/.emacs.d/saves/" t))
+ backup-directory-alist         '(("." . "~/.emacs.d/saves/"))
+ backup-by-copying              t
+ create-lock-files              nil
+ delete-old-versions            t
+ kept-new-versions              5
+ kept-old-versions              0
+ version-control                t
+ )
+
 ;; start server for emacsclient
 (when window-system
   (condition-case nil
@@ -183,18 +205,6 @@ re-downloaded in order to locate PACKAGE."
         '(buffer-file-name "%f" ("%b"))))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Auto Save (without polluting file system)
-;; http://www.emacswiki.org/emacs/BackupDirectory
-
-(setq
- backup-directory-alist   '(("." . "~/.saves"))   
- backup-by-copying        t
- delete-old-versions      t
- kept-new-versions        5
- kept-old-versions        0
- version-control          t
- )
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
