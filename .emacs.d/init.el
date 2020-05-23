@@ -356,7 +356,7 @@ selected lines before moving."
                              
 (defun ng/rectangle-mark-up (&optional arg)
   (interactive "p")          
-  (unless rectangle (cua-set-rectangle-mark))
+  (unless cua--rectangle (cua-set-rectangle-mark))
   (cua-resize-rectangle-up arg))
 
 (defun ng/rectangle-mark-left (&optional arg)
