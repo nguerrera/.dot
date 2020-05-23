@@ -3,7 +3,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Use auto-save and backups, but keep them out of my working
 ;; directories...
-;;  https://www.emacswiki.org/emacs/BackupDirectory
+;; https://www.emacswiki.org/emacs/BackupDirectory
 ;;
 ;; ...and don't bother with lock files, which can't be moved
 ;; https://www.emacswiki.org/emacs/LockFiles
