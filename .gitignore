@@ -2,3 +2,6 @@
 # track only *.el in the root
 .emacs.d/*
 !.emacs.d/*.el
+
+# temporarily ignore custom.el until I start using it
+.emacs.d/custom.el

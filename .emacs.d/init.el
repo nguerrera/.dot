@@ -22,6 +22,16 @@
  version-control                t
  )
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Save automatic customizations in their own file
+;; https://www.emacswiki.org/emacs/CustomFile
+(setq custom-file "~/.emacs.d/custom.el")
+
+;; Intentionally not loading custom.el yet because it is writing
+;; package stuff I shouldn't need
+;; (if (file-exists-p custom-file)
+;;     (load custom-file))
+
 ;; start server for emacsclient
 (when window-system
   (condition-case nil
