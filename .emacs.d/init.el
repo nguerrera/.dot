@@ -381,7 +381,7 @@ the terminal, but still kill-region when something is selected."
 (defun ng/C-k (&optional arg)
   "If there is an active region, kill it. Otherwise, kill the
 following line. Strengthens the mnemonic k==kill:y==yank."
-  (interactive "p")
+  (interactive "P")
   (if (use-region-p)
       (kill-region (region-beginning) (region-end))
     (kill-line arg)))
