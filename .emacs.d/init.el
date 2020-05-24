@@ -137,7 +137,7 @@ re-downloaded in order to locate PACKAGE."
    csharp-mode
    expand-region
    flx-ido
-   ido-vertical-mode
+   ido-grid-mode
    ido-completing-read+
    magit
    markdown-mode
@@ -172,10 +172,19 @@ re-downloaded in order to locate PACKAGE."
   (flx-ido-mode 1)
   (setq ido-use-faces nil))
 
-;; make ido vertical
-;; https://github.com/gempesaw/ido-vertical-mode.el
-(when (fboundp 'ido-vertical-mode)
-  (ido-vertical-mode 1))
+;; make ido completions vertical and navigable
+;; https://github.com/larkery/ido-grid-mode.el
+(when (fboundp 'ido-grid-mode)
+  (setq
+   ido-grid-mode-max-columns  1
+   ido-grid-mode-max-rows     8
+   ido-grid-mode-min-rows     8
+   ido-grid-mode-scroll-down  #'ido-grid-mode-next-row
+   ido-grid-mode-scroll-up    #'ido-grid-mode-previous-row
+   ido-grid-mode-scroll-wrap  nil
+   ido-grid-mode-order        nil
+   )
+  (ido-grid-mode 1))
 
 ;; project interaction
 ;; https://github.com/bbatsov/projectile
