@@ -64,9 +64,8 @@
 ;; follow symlinks to source-controlled locations without prompting
 (setq vc-follow-symlinks t)
 
-;; no menu bar on console
-(unless window-system
-  (menu-bar-mode -1))
+;; no menu bar
+(menu-bar-mode -1)
 
 ;; no tool bar
 (if (fboundp 'tool-bar-mode)
