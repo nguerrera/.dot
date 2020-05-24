@@ -188,15 +188,22 @@ re-downloaded in order to locate PACKAGE."
 (setq ls-lisp-use-insert-directory-program nil)
 (setq ls-lisp-dirs-first t)
 
-;; open magit status in same window
-(setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
 
-;; don't open ediff control in new frame
-(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+(when (package-installed-p 'magit)
+  ;; eagerly load magit so that it engages if emacs is started from
+  ;; `git commit`
+  (require 'magit)
 
-;; use side-by-side ediff by default
-(setq ediff-split-window-function 'split-window-horizontally)
-
+  ;; open magit status in same window
+  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+  
+  ;; don't open ediff control in new frame
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+  
+  ;; use side-by-side ediff by default
+  (setq ediff-split-window-function 'split-window-horizontally)
+  )
+  
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Theme
@@ -308,6 +315,12 @@ re-downloaded in order to locate PACKAGE."
  "<M-S-right>" ng/rectangle-mark-right
  )
 
+;; remove minor mode conflicts with C-c C-c
+(require 'bat-mode)
+(define-key bat-mode-map (kbd "C-c C-c") nil)
+(require 'conf-mode)
+(define-key conf-mode-map (kbd "C-c C-c") nil)
+
 ;; disable archaic "secondary selection" on alt clicks, which we'll
 ;; replace with modern multiple cursor/rectangle functionality
 (global-unset-key (kbd "M-<drag-mouse-1>"))
@@ -316,8 +329,11 @@ re-downloaded in order to locate PACKAGE."
 (global-unset-key (kbd "M-<mouse-2>"))
 (global-unset-key (kbd "M-<mouse-3>"))
 
+(if (package-installed-p 'magit)
+    (ng/set-keys "C-x g" magit-status))
+
 (if (package-installed-p 'multiple-cursors)
-  (ng/set-keys "M-<mouse-1>" mc/add-cursor-on-click))
+    (ng/set-keys "M-<mouse-1>" mc/add-cursor-on-click))
 
 (if (package-installed-p 'expand-region)
     (ng/set-keys
@@ -435,3 +451,4 @@ following line. Strengthens the mnemonic k==kill:y==yank."
   (if server-buffer-clients
       (server-done)
     (ng/kill-this-buffer-and-window)))
+

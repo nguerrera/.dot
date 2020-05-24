@@ -9,4 +9,4 @@
 [mergetool "bc"]
 	path = C:/Program Files/Beyond Compare 4/BComp.exe
 [core]
-	editor = C:/Users/nicholg/.dot/git/git-emacs-editor.cmd
+	editor = C:/Users/nicholg/.dot/cmd/emacs.cmd -c
