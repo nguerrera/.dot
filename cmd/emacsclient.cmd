@@ -5,7 +5,6 @@ set emacsDir=C:\Program Files\Emacs\bin
 set startArgs=
 set clientArgs=%*
 set createFrame=0
-set noWait=0
 set fileArg=0
 
 :ParseArgs
@@ -33,11 +32,10 @@ if not "%arg%" == "" (
 )
 
 :Main
-
 :: if not given a file and not told to create a frame, bring emacs into focus
 if %fileArg% equ 0 (
     if %createFrame% equ 0 (
-        set clientArgs=--eval "(select-frame-set-input-focus (selected-frame))"
+        set clientArgs=-e "(raise-frame)"
     )
 )
 
