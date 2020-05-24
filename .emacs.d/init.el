@@ -15,7 +15,7 @@
  auto-save-file-name-transforms '((".*" "~/.emacs.d/saves/" t))
  backup-directory-alist         '(("." . "~/.emacs.d/saves/"))
  backup-by-copying              t
- create-lock-files              nil
+ create-lockfiles              nil
  delete-old-versions            t
  kept-new-versions              5
  kept-old-versions              0
