@@ -83,6 +83,9 @@
 ;; no cursor blinking
 (blink-cursor-mode -1)
 
+;; refresh unsaved files
+(global-auto-revert-mode 1)
+
 ;; make links in text clickable
 (if (fboundp 'goto-address-mode)
     (add-hook 'find-file-hook 'goto-address-mode))
