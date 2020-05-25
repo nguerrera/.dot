@@ -38,7 +38,8 @@
 (global-set-key (kbd "C-z") nil)
 
 ;; Also do UI changes early so that there isn't a jarring change from the
-;; default UI to the customized one
+;; default UI to the customized one during load.
+
 ;; hide menu bar and tool bar
 (progn
   (menu-bar-mode -1)
