@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 (defmacro ng/dopairs (names pairs body)
   "Process list in pairs."
   (declare (indent 2))

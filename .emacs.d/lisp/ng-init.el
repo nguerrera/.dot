@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 ;; disable startup message
 (setq inhibit-startup-message t)
 

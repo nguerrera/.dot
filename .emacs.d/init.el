@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;; See lisp/ng-*.el for the main configuration
 ;;
 ;; init.el's responsibilities:

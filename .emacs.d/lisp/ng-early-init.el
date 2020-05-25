@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 ;; Prevent Emacs from making #auto-save#, .#lock and backup~ files all
 ;; over the bloody place. We do this first to avoid making a mess when
 ;; hacking on a broken init.
