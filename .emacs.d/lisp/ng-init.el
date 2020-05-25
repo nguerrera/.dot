@@ -54,11 +54,13 @@
 
 ;; start server for emacsclient
 ;; https://www.emacswiki.org/emacs/EmacsClient
-(when window-system
-  (server-start)
-  ;; don't nag about live clients when killing buffers or exiting emacs
-  (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
-  (remove-hook 'kill-emacs-query-functions 'server-kill-emacs-query-function))
+(progn
+  (require 'server)
+  (when (and window-system (not (server-running-p)))
+    (server-start)
+    ;; don't nag about live clients when killing buffers or exiting emacs
+    (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
+    (remove-hook 'kill-emacs-query-functions 'server-kill-emacs-query-function)))
 
 (require 'use-package)
 (require 'ng-lib)
