@@ -56,7 +56,6 @@ reused when the config files have not changed.")
 (defun ng/load-package-lock-file ()
   "Restore package-alist and load-path from lock file and adds
 package directories to load-path."
-  (require 'package)
   (load ng/package-lock-file))
 
 (defun ng/package-lock-file-up-to-date-p ()
