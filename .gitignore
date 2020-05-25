@@ -1,13 +1,15 @@
+# ignore emacs backup/auto-save/lock files
 *~
 *#
 .#*
 
-# ignore all the transient stuff in .emacs.d/...
-# track only *.el in the root
-.emacs.d/*
-!.emacs.d/*.el
-!.emacs.d/lisp/
+# ignore byte-compiled elisp
 *.elc
 
-# temporarily ignore custom.el until I start using it
-.emacs.d/custom.el
+# ignore all the transient stuff in .emacs.d/
+.emacs.d/*
+!.emacs.d/init.el
+!.emacs.d/custom.el
+!.emacs.d/.mc-lists.el
+!.emacs.d/lisp/
+
