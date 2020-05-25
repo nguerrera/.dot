@@ -1,13 +1,31 @@
 ;; See lisp/ng-*.el for the main configuration
-;; 
-;; init.el's only job is to bootstrap use-package:
-;; https://github.com/jwiegley/use-package
 ;;
-;; We do so while avoiding calling (package-initialize), which is
-;; slow, when the configuration is unchanged. The approach is inspired
-;; by https://github.com/nilcons/emacs-use-package-fast, but simpler.
-;; We don't bother with byte compilation, and instead write out a lock
-;; file to remember the load path from a prior initialization.
+;; init.el's responsibilities:
+;;
+;; 1. Bootstrap https://github.com/jwiegley/use-package
+;;
+;; 2. Load day-to-day manual configuration from lisp/ng-*.el
+;;
+;; 3. Redirect automatically generated custom loading
+;;
+;; 4. Cache package load path to avoid running slow
+;;    (package-initialize) when configuration hasn't changed.
+;;
+;; Performance optimization techniques inspired by:
+;;
+;; * https://github.com/nilcons/emacs-use-package-fast
+;;
+;;   But we don't bother with byte compilation, which is cumbersome
+;;   and didn't make a dent for me in practice. Instead, write out a
+;;   plain text lock file to remember the load path from a prior
+;;   initialization.
+;;
+;; *  https://blog.d46.us/advanced-emacs-startup/
+;;
+;;   Startup time logging lifted from there. I played with GC settings
+;;   and they weren't material so I left it alone. I also removed the
+;;   GC count logging as it just led to playing golf with the count
+;;   without a perceptible speedup.
 
 (defvar ng/early-init-file "~/.emacs.d/lisp/ng-early-init.el"
   "The configuration file where package-archives are set and any
@@ -31,6 +49,15 @@ reused when the config files have not changed.")
 ;; Don't initialize packages at startup, see the pains we go through
 ;; below to avoid this slow step.
 (setq package-enable-at-startup nil)
+
+;; Log startup time
+;; Use a hook so the message doesn't get clobbered by other messages.
+(add-hook
+ 'emacs-startup-hook
+ (lambda ()
+   (message
+    "Startup Time: %.2f seconds"
+    (float-time (time-subtract after-init-time before-init-time)))))
 
 ;; load early config
 (load ng/early-init-file)
