@@ -1,4 +1,4 @@
-;; See lisp/ng-config.el for the main configuration
+;; See lisp/ng-*.el for the main configuration
 ;; 
 ;; init.el's only job is to bootstrap use-package:
 ;; https://github.com/jwiegley/use-package
@@ -12,17 +12,26 @@
 (setq package-enable-at-startup nil)
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
+(defvar ng/early-config-file "~/.emacs.d/lisp/ng-early-config.el"
+  "The configuration file where package-archives are set and any
+other configuration that would like to happen early before we
+potentially hit the network.")
+
 (defvar ng/config-file  "~/.emacs.d/lisp/ng-config.el"
   "The configuration file where package-archives are defined and
-use-package calls are made.  Package load paths are cached when
-this file has not changed since a prior init.")
+use-package calls are made.")
 
 (defvar ng/package-lock-file "~/.emacs.d/.ng-packages.lock"
-  "The generated file where package load-paths are cached.")
+  "The generated file where package load-paths are cached to be
+reused when the config files have not changed.")
 
-;; check if we have an up-to-date lock file and load it if
+(load ng/early-config-file)
+
+;; Check if we have an up-to-date lock file and load it
+;; if so. If not, boot using package.el.
 (if (and (file-exists-p ng/package-lock-file)
-         (file-newer-than-file-p ng/package-lock-file ng/config-file))
+         (file-newer-than-file-p ng/package-lock-file ng/early-config-file)
+	 (file-newer-than-file-p ng/package-lock-file ng/config-file))
     (load ng/package-lock-file)
   (progn
     (require 'package)

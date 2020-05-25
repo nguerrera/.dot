@@ -1,33 +1,3 @@
-;; Prevent Emacs from making #auto-save#, .#lock and backup~ files all
-;; over the bloody place. We do this first to avoid making a mess when
-;; hacking on a broken init.
-;;
-;; https://www.emacswiki.org/emacs/BackupDirectory
-;; https://www.emacswiki.org/emacs/LockFiles
-
-;; auto-save and backups are nice, but keep them out of sight
-(setq
- auto-save-file-name-transforms '((".*" "~/.emacs.d/saves/" t))
- backup-directory-alist         '(("." . "~/.emacs.d/saves/"))
- backup-by-copying              t
- delete-old-versions            t
- kept-new-versions              5
- kept-old-versions              0
- version-control                t
- )
-
-;; but lockfiles are terrible and can't be moved, so disable them
-(setq create-lockfiles nil)
-
-(setq package-archives
-      '(("melpa-stable" . "https://stable.melpa.org/packages/")
-        ("elpa"         . "https://elpa.gnu.org/packages/")
-        ("melpa"        . "https://melpa.org/packages/"))
-      package-archive-priorities
-      '(("melpa-stable" . 10)
-        ("elpa"         . 5)
-        ("melpa"        . 0)))
-
 ;; disable startup message
 (setq inhibit-startup-message t)
 
@@ -56,11 +26,6 @@
 
 ;; highlight matching parens
 (show-paren-mode 1)
-
-;; hide menu bar and tool bar
-(progn
-  (menu-bar-mode -1)
-  (tool-bar-mode -1))
 
 ;; show line and column numbers
 (progn
@@ -97,15 +62,6 @@
   ;; don't nag about live clients when killing buffers or exiting emacs
   (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
   (remove-hook 'kill-emacs-query-functions 'server-kill-emacs-query-function))
-
-;; set font
-(when window-system
-  (cl-dolist (font '("Consolas-11" "DejaVu Sans Mono-11.5"))
-    (when (find-font (font-spec :name font))
-      (add-to-list 'default-frame-alist `(font . ,font))
-      (set-frame-font font) ;; not strictly necessary, but makes UI
-                            ;; look nicer sooner
-      (cl-return))))
 
 (require 'use-package)
 (require 'ng-lib)
