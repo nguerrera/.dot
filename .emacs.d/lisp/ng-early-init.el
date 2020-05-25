@@ -31,6 +31,12 @@
         ("gnu"          . 5)
         ("melpa"        . 0)))
 
+;; If there's one thing I can't stand, it's hitting C-z reflexively to
+;; undo and having it minimize my window. Make sure it's never bound
+;; to that even if cua-mode is off. Do this early too to avoid screaming
+;; when trying to fix a failed init.
+(global-set-key (kbd "C-z") nil)
+
 ;; Also do UI changes early so that there isn't a jarring change from the
 ;; default UI to the customized one
 ;; hide menu bar and tool bar
