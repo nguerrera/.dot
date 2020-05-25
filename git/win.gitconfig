@@ -10,3 +10,7 @@
 	path = C:/Program Files/Beyond Compare 4/BComp.exe
 [core]
 	editor = C:/Users/nicholg/.dot/cmd/emacsclient.cmd -c
+	preloadindex = true
+	fscache = true
+[gc]
+	auto = 256
