@@ -43,8 +43,8 @@
   "If the given font is found, sets it as the font for the
 current frame and all future frames."
   (when (find-font (font-spec :name font))
-    (add-to-list 'default-frame-alist `(font . "Consolas-11"))
-    (set-frame-font "Consolas-11")))
+    (add-to-list 'default-frame-alist `(font . ,font))
+    (set-frame-font font)))
 
 (when window-system
   (or (ng/try-set-font "Consolas-11")
