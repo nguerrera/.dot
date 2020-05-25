@@ -175,17 +175,15 @@
 
 ;; https://magit.vc/
 (use-package magit
+  :mode
+  ("/COMMIT_EDITMSG\\'"  . git-commit-mode)
+  ("/git-rebase-todo\\'" . git-rebase-mode)
   :bind
   ("C-x g" . magit-status)
   :init
-  ;; open magit status in same window
-  (setq magit-display-buffer-function 'magit-display-buffer-fullframe-status-v1))
-
-;; https://www.emacswiki.org/emacs/EdiffMode
-(use-package ediff
-  :after magit
-  :init
   (setq
+   ;; open magit status in same window
+   magit-display-buffer-function 'magit-display-buffer-fullframe-status-v1
    ;; don't open ediff control in new frame
    ediff-window-setup-function 'ediff-setup-windows-plain
    ;; use side-by-side ediff by default
