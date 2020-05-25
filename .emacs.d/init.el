@@ -9,12 +9,12 @@
 ;; We don't bother with byte compilation, and instead write out a lock
 ;; file to remember the load path from a prior initialization.
 
-(defvar ng/early-config-file "~/.emacs.d/lisp/ng-early-config.el"
+(defvar ng/early-init-file "~/.emacs.d/lisp/ng-early-init.el"
   "The configuration file where package-archives are set and any
 other configuration that would like to happen early before we
 potentially hit the network.")
 
-(defvar ng/config-file  "~/.emacs.d/lisp/ng-config.el"
+(defvar ng/init-file  "~/.emacs.d/lisp/ng-init.el"
   "The configuration file where package-archives are defined and
 use-package calls are made.")
 
@@ -33,13 +33,13 @@ reused when the config files have not changed.")
 (setq package-enable-at-startup nil)
 
 ;; load early config
-(load ng/early-config-file)
+(load ng/early-init-file)
 
 ;; Check if we have an up-to-date lock file and load it
 ;; if so. If not, boot using package.el.
 (if (and (file-exists-p ng/package-lock-file)
-         (file-newer-than-file-p ng/package-lock-file ng/early-config-file)
-	 (file-newer-than-file-p ng/package-lock-file ng/config-file))
+         (file-newer-than-file-p ng/package-lock-file ng/early-init-file)
+	 (file-newer-than-file-p ng/package-lock-file ng/init-file))
     (load ng/package-lock-file)
   (progn
     (require 'package)
@@ -51,7 +51,7 @@ reused when the config files have not changed.")
     (delete-file ng/package-lock-file)))  
 
 ;; load main config
-(load ng/config-file)
+(load ng/init-file)
 
 ;; save lock file to speed up future inits
 (when use-package-always-ensure
