@@ -132,12 +132,14 @@
 ;; https://github.com/DarwinAwardWinner/ido-completing-read-plus
 (use-package ido-completing-read+
   :requires ido
+  :defer 2
   :config
   (ido-ubiquitous-mode 1))
 
 ;; https://github.com/lewang/flx
 (use-package flx-ido
   :requires ido
+  :defer 1
   :init
   (setq ido-use-faces nil)
   :config
