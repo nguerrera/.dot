@@ -60,6 +60,8 @@ goto :Wait
 
 :Ready
 "%emacsDir%\emacsclient.exe" %clientArgs%
+exit /b %ERRORLEVEL%
+goto :Eof
 
 :Ping
 "%emacsDir%\emacsclient.exe" -e nil >nul 2>nul
