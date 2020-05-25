@@ -1,7 +1,13 @@
+*~
+*#
+.#*
+
 # ignore all the transient stuff in .emacs.d/...
 # track only *.el in the root
 .emacs.d/*
 !.emacs.d/*.el
+!.emacs.d/lisp/
+*.elc
 
 # temporarily ignore custom.el until I start using it
 .emacs.d/custom.el
