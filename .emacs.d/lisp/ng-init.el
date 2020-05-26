@@ -122,6 +122,9 @@
   ("<M-up>"   . move-text-up)
   ("<M-down>" . move-text-down))
 
+(use-package markdown-mode
+  :mode "\\.md\\'")
+
 ;; https://www.emacswiki.org/emacs/GotoAddress
 (use-package goto-addr
   :hook ((find-file . goto-address-mode)))
