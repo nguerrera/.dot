@@ -51,9 +51,12 @@
 (defun ng/try-set-font (font)
   "If the given font is found, sets it as the font for the
 current frame and all future frames."
-  (when (find-font (font-spec :name font))
-    (add-to-list 'default-frame-alist `(font . ,font))
-    (set-frame-font font)))
+  (if (find-font (font-spec :name font))
+      (progn
+        (add-to-list 'default-frame-alist `(font . ,font))
+        (set-frame-font font)
+        t)
+    nil))
 
 (when window-system
   (or (ng/try-set-font "Consolas-11")
