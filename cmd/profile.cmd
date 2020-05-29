@@ -50,7 +50,15 @@ set "PATH=%~dp0;%PATH%"
 
 :: add Beyond Compare to path if found
 if exist "%ProgramW6432%\Beyond Compare 4" (
-  set "PATH=%ProgramW6432%\Beyond Compare 4;%PATH%"
+  set "PATH=%PATH%;%ProgramW6432%\Beyond Compare 4"
+)
+
+:: add Git to path if found
+if exist "%ProgramW6432%\Git\mingw64\bin" (
+  :: at the end to avoid conflicts such as find.exe breaking Windows things
+  set "PATH=%PATH%;%ProgramW6432%\Git\mingw64\bin;%ProgramW6432%\Git\usr\bin"
+  :: but let me type find interactively and get the UNIX find
+  doskey find="%ProgramW6432%\Git\usr\bin\find.exe" $*
 )
 
 :: add hub to path if found, and alias git to itz
