@@ -59,6 +59,7 @@ current frame and all future frames."
     nil))
 
 (when window-system
-  (or (ng/try-set-font "Consolas-11")
-      (ng/try-set-font "DejaVu Sans Mono-11.5")))
-
+  (or
+   (ng/try-set-font "Cascadia Mono-11")
+   (ng/try-set-font "Consolas-11")
+   (ng/try-set-font "DejaVu Sans Mono-11")))
