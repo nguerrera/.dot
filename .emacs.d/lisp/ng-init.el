@@ -125,6 +125,12 @@
 (use-package markdown-mode
   :mode "\\.md\\'")
 
+(use-package powershell
+  :mode ("\\.psm?1\\'" . powershell-mode))
+
+(use-package yaml-mode
+  :mode "\\.ya?ml\\'")
+
 ;; https://www.emacswiki.org/emacs/GotoAddress
 (use-package goto-addr
   :hook ((find-file . goto-address-mode)))
