@@ -208,6 +208,8 @@
   ("C-j" . ace-jump-mode))
 
 (use-package smex
+  :init
+  (setq smex-save-file "~/.emacs.d/.smex-items")
   :bind
   ("M-x" . smex))
 
