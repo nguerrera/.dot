@@ -17,6 +17,12 @@ Set-PSReadLineOption -EditMode Emacs -BellStyle Visual
 Set-PSReadlineKeyHandler -Key Tab -Function TabCompleteNext
 Set-PSReadlineKeyHandler -Key Shift+Tab -Function TabCompletePrevious
 
+# Clean up after prior invocations
+if (!$Env:__PRIORPATH__) {
+    $Env:__PRIORPATH__ = $Env:PATH
+}
+$Env:PATH = $Env:__PRIORPATH__
+
 function Test-Command {
     param($command)
     Get-Command -ErrorAction SilentlyContinue $Command | Out-Null
@@ -87,6 +93,7 @@ function _alias {
     Set-Alias -Scope Global -Option Private -Name $command -Value "${command}-alias" | Out-Null
 }
 
+# TODO: Clean up environment when switching VS envs
 # Load VS developer environment
 #
 # NOTE: This is slow and I don't need it so much these days, so tuck it behind a
