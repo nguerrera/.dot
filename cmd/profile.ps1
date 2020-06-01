@@ -119,8 +119,7 @@ if (Test-Path "${Env:ProgramW6432}\Beyond Compare 4") {
 }
 
 # add this directory to PATH
-$THIS_DIR = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
-$Env:PATH="$THIS_DIR;${Env:PATH}"
+$Env:PATH="${Env:USERPROFILE}\.dot\cmd;${Env:PATH}"
 
 # add Git directory to PATH
 $GIT_DIR=$null
