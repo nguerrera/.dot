@@ -173,7 +173,7 @@ _alias which Get-Command -All
     ls ls.exe --color -h -F --ignore="ntuser.*" --ignore="NTUSER.*" --ignore="*fil*.sys"
 
 # Nor cmd dir, which can be much faster when recursive
-_alias dir cmd /c dir
+_alias dir cmd /c dir /o:gn
 
 # Nor cmd rd, which is also much faster when recursive
 _alias rd cmd /c rd
