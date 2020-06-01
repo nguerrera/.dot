@@ -143,6 +143,24 @@ function _where {
     }
 }
 
+# This overrides the tgit from posh-git, which doesn't do /path for you
+function tgit {
+    param (
+        [Parameter(Mandatory=$true, Position=0)]
+        $command,
+
+        [Parameter(Position=1)]
+        $path,
+
+        [Parameter(ValueFromRemainingArguments=$true)]
+        $args
+    )
+    if ($path) {
+        $path="/path:$path"
+    }
+    & $Global:TortoiseGitSettings.TortoiseGitPath /command:$command $path @args
+}
+
 function .. { Set-Location .. }
 
 # TODO: These don't find my private aliases due to scoping
