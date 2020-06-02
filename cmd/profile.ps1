@@ -115,7 +115,7 @@ function vsenv {
 
 # add Beyond Compare to path if found
 if (Test-Path "${Env:ProgramW6432}\Beyond Compare 4") {
-  $Env:PATH="${Env:PATH};%ProgramW6432%\Beyond Compare 4"
+  $Env:PATH="${Env:PATH};${Env:ProgramW6432}\Beyond Compare 4"
 }
 
 # add this directory to PATH
