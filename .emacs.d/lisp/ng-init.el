@@ -50,9 +50,10 @@
 
 ;; use ls-lisp everywhere to portably group directories first and get
 ;; away from "ls does not support --dired" warnings
-(setq ls-lisp-use-insert-directory-program nil)
-(setq ls-lisp-dirs-first t)
-(require 'ls-lisp)
+(progn
+  (setq ls-lisp-use-insert-directory-program nil)
+  (setq ls-lisp-dirs-first t)
+  (require 'ls-lisp))
 
 ;; start server for emacsclient
 ;; https://www.emacswiki.org/emacs/EmacsClient
