@@ -149,7 +149,8 @@ function _where {
     }
 }
 
-# This overrides the tgit from posh-git, which doesn't do /path for you
+# NOTE: This intentionally overrides the tgit from posh-git, which
+# doesn't do /path for you and doesn't default to repo root.
 function tgit {
     param (
         [Parameter(Mandatory=$true, Position=0)]
@@ -161,10 +162,15 @@ function tgit {
         [Parameter(ValueFromRemainingArguments=$true)]
         $args
     )
-    if ($path) {
-        $path="/path:$path"
+
+    if (!$path) {
+        $path=git rev-parse --show-toplevel
+        if ($LASTEXITCODE -ne 0) {
+            return
+        }
     }
-    & $Global:TortoiseGitSettings.TortoiseGitPath /command:$command $path @args
+
+    & $Global:TortoiseGitSettings.TortoiseGitPath /command:$command /path:$path @args
 }
 
 function .. { Set-Location .. }
