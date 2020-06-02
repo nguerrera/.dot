@@ -79,18 +79,18 @@ function _alias {
     }
 
     if ($args.Length -eq 1) {
-        Set-Alias -Scope Global -Option Private -Name $command -Value $args[0]
+        Set-Alias -Scope Global -Option Private -Name "$command" -Value $args[0]
         return;
     }
 
     # PowerShell aliases can't have args, so generate a function to pass the
     # args and alias that
-    if (Test-Path "Function:\global:${command}-shim") {
-        Remove-Item "Function:\global:${command}-shim"
+    if (Test-Path "Function:\global:${command}_alias") {
+        Remove-Item "Function:\global:${command}_alias"
     }
     $block = [scriptblock]::Create("& $args @args")
-    New-Item "Function:\global:${command}-alias" -Value $block | Out-Null
-    Set-Alias -Scope Global -Option Private -Name $command -Value "${command}-alias" | Out-Null
+    New-Item "Function:\global:${command}_alias" -Value $block | Out-Null
+    Set-Alias -Scope Global -Option Private -Name "$command" -Value "${command}_alias" | Out-Null
 }
 
 # TODO: Clean up environment when switching VS envs
@@ -203,10 +203,10 @@ _alias h history
 _alias du du -h
 _alias df df -h
 _alias emacs emacsclient.cmd -n @args
-_alias e emacs-alias
-_alias vi emacs-alias
-_alias n emacs-alias
-_alias notepad emacs-alias
+_alias e emacs_alias
+_alias vi emacs_alias
+_alias n emacs_alias
+_alias notepad emacs_alias
 _alias ms emacsclient.cmd `-e '"(progn (magit-status) (raise-frame))"'
 
 
