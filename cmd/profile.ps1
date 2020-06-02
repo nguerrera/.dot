@@ -190,6 +190,9 @@ _alias dir cmd /c dir /o:gn
 # Nor cmd rd, which is also much faster when recursive
 _alias rd cmd /c rd
 
+# Nor cmd set, which is nice for listing matching environment vars
+_alias set cmd /c set
+
 # wrist friendlier gci since we took back dir and ls above
 _alias ll Get-ChildItem 
 
