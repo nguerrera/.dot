@@ -1,17 +1,4 @@
 Import-Module posh-git
-Import-Module oh-my-posh
-Set-Theme Paradox
-
-$global:DefaultUser='nicholg'
-
-# Disable slow file status on prompt
-$GitPromptSettings.EnableFileStatus = $false
-
-# Disable icon that misleads when file status is disabled
-$ThemeSettings.GitSymbols.BranchUntrackedSymbol = ''
-
-# Don't change the window title when I change directories
-$ThemeSettings.Options.ConsoleTitle = $false
 
 Set-PSReadLineOption -EditMode Emacs -BellStyle Visual
 Set-PSReadlineKeyHandler -Key Tab -Function TabCompleteNext
@@ -27,6 +14,25 @@ function Test-Command {
     param($command)
     Get-Command -ErrorAction SilentlyContinue $Command | Out-Null
     $?
+}
+
+# NOTE: Avoid flickering and sluggishness of posh-git prompt:
+#  - Don't use git status (branch info is enough)
+#  - Return a single string, don't make independent calls to Write-Host
+function prompt {
+    $cyan="`e[36m"
+    $yellow="`e[33m"
+    $plain="`e[0m"
+
+    $prompt = "`n${cyan}$(Get-Location)"
+
+    $branch = Get-GitBranch
+    if ($branch) {
+        $prompt += " ${yellow}(${branch})"
+    }
+
+    $prompt += "${plain}`n> "
+    return $prompt
 }
 
 # Helper to define aliases in a more bash-like way
