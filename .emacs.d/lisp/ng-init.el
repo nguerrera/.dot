@@ -132,6 +132,9 @@
 (use-package yaml-mode
   :mode "\\.ya?ml\\'")
 
+(use-package typescript-mode
+  :mode "\\.ts\\'")
+
 ;; https://www.emacswiki.org/emacs/GotoAddress
 (use-package goto-addr
   :hook ((find-file . goto-address-mode)))
