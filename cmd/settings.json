@@ -17,8 +17,8 @@
       "blue": "#61afef",
       "purple": "#c678dd",
       "cyan": "#56b6c2",
-      "white": "#dcdfe4",
-      "brightBlack": "#cacaca",
+      "white": "#abb2bf",
+      "brightBlack": "#8d8c8c",
       "brightRed": "#e06c75",
       "brightGreen": "#98c379",
       "brightYellow": "#e5c07b",
@@ -27,7 +27,7 @@
       "brightCyan": "#56b6c2",
       "brightWhite": "#dcdfe4",
       "background": "#282c34",
-      "foreground": "#dcdfe4"
+      "foreground": "#abb2bf",
     }
   ],
   "profiles": {

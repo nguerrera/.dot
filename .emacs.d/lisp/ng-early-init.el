@@ -26,12 +26,14 @@
 ;; NOTE: package archives must be defined in the early config file
 (setq package-archives
       '(("melpa-stable" . "https://stable.melpa.org/packages/")
-        ("gnu"          . "https://elpa.gnu.org/packages/")
-        ("melpa"        . "https://melpa.org/packages/"))
+        ;;below are currently unused, disable to speed things up
+        ;;("gnu"        . "https://elpa.gnu.org/packages/")
+        ;;("melpa"      . "https://melpa.org/packages/")
+        )
       package-archive-priorities
       '(("melpa-stable" . 10)
-        ("gnu"          . 5)
-        ("melpa"        . 0)))
+        ("gnu"        . 5)
+        ("melpa"      . 0)))
 
 ;; If there's one thing I can't stand, it's hitting C-z reflexively to
 ;; undo and having it minimize my window. Make sure it's never bound
@@ -47,18 +49,43 @@
   (menu-bar-mode -1)
   (tool-bar-mode -1))
 
+;; color theme: atom one dark with a few customizations for contrast
+(progn
+  (setq atom-one-dark-colors-alist
+        '(("atom-one-dark-accent"   . "#528BFF")
+          ("atom-one-dark-fg"       . "#ABB2BF")
+          ("atom-one-dark-bg"       . "#282C34")
+          ("atom-one-dark-bg-1"     . "#121417")
+          ("atom-one-dark-bg-hl"    . "#2F343D")
+          ("atom-one-dark-mono-1"   . "#ABB2BF")
+          ("atom-one-dark-mono-2"   . "#828997")
+          ("atom-one-dark-mono-3"   . "#8d8c8C")
+          ("atom-one-dark-cyan"     . "#56B6C2")
+          ("atom-one-dark-blue"     . "#61AFEF")
+          ("atom-one-dark-purple"   . "#C678DD")
+          ("atom-one-dark-green"    . "#98C379")
+          ("atom-one-dark-red-1"    . "#E06C75")
+          ("atom-one-dark-red-2"    . "#BE5046")
+          ("atom-one-dark-orange-1" . "#D19A66")
+          ("atom-one-dark-orange-2" . "#E5C07B")
+          ("atom-one-dark-gray"     . "#3E4451")
+          ("atom-one-dark-silver"   . "#AAAAAA")
+          ("atom-one-dark-black"    . "#0F1011")))
+  (if (featurep 'atom-one-dark-theme)
+      (require 'atom-one-dark-theme)))
+
 ;; set font
-(defun ng/try-set-font (font)
+(when window-system
+  (defun ng/try-set-font (font)
   "If the given font is found, sets it as the font for the
 current frame and all future frames."
-  (if (find-font (font-spec :name font))
-      (progn
-        (add-to-list 'default-frame-alist `(font . ,font))
-        (set-frame-font font)
-        t)
-    nil))
-
-(when window-system
+    (if (find-font (font-spec :name font))
+        (progn
+          (add-to-list 'default-frame-alist `(font . ,font))
+          (set-frame-font font)
+          t)
+      nil))
   (or
+   (ng/try-set-font "Cascadia Mono-12")
    (ng/try-set-font "Consolas-12")
-   (ng/try-set-font "DejaVu Sans Mono-11")))
+   (ng/try-set-font "DejaVu Sans Mono-12")))
