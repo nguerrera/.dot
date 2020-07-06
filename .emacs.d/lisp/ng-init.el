@@ -115,9 +115,6 @@
   (global-unset-key (kbd "M-<mouse-2>"))
   (global-unset-key (kbd "M-<mouse-3>")))
 
-;; configured in ng-early-init.el to avoid delay in changing appearance
-(use-package atom-one-dark-theme)
-
 (use-package esup
   :commands esup)
 

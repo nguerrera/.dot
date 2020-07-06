@@ -85,8 +85,9 @@ up future inits."
   (if use-package-always-ensure
       (ng/write-package-lock-file)))
 
-;; Set up load path for personal *.el files
+;; Set up load paths
 (add-to-list 'load-path "~/.emacs.d/lisp")
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 
 ;; Keep generated config in its own file (loaded at the end of this file)
 (setq custom-file "~/.emacs.d/custom.el")

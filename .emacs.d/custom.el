@@ -5,7 +5,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (csharp-mode smex ace-jump-mode expand-region multiple-cursors magit projectile ido-grid-mode flx-ido ido-completing-read+ typescript-mode yaml-mode powershell markdown-mode move-text esup atom-one-dark-theme use-package))))
+    (yaml-mode use-package typescript-mode smex projectile powershell multiple-cursors move-text markdown-mode magit ido-grid-mode ido-completing-read+ flx-ido expand-region esup csharp-mode ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

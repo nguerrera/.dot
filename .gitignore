@@ -12,4 +12,5 @@
 !.emacs.d/custom.el
 !.emacs.d/.mc-lists.el
 !.emacs.d/lisp/
+!.emacs.d/themes/
 
