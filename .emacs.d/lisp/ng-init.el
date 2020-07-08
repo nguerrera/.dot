@@ -141,22 +141,22 @@
 
 ;; http://emacswiki.org/InteractivelyDoThings
 (use-package ido
+  :defer 2
   :init
+  (setq ido-enable-flex-matching t)
+  :config
   (ido-mode 1)
-  (ido-everywhere 1)
-  (setq ido-enable-flex-matching t))
+  (ido-everywhere 1))
 
 ;; https://github.com/DarwinAwardWinner/ido-completing-read-plus
 (use-package ido-completing-read+
-  :requires ido
-  :defer 2
+  :after ido
   :config
   (ido-ubiquitous-mode 1))
 
 ;; https://github.com/lewang/flx
 (use-package flx-ido
-  :requires ido
-  :defer 1
+  :after ido
   :init
   (setq ido-use-faces nil)
   :config
@@ -164,7 +164,7 @@
 
 ;; https://github.com/larkery/ido-grid-mode.el
 (use-package ido-grid-mode
-  :requires ido
+  :after ido
   :init
   (setq
    ido-grid-mode-max-columns  1
