@@ -2,7 +2,6 @@
 @echo off
 setlocal
 
-:: BC4Dir is setup by profile.cmd and added to path
 set BC4Dir=%ProgramW6432%\Beyond Compare 4
 if not exist "%BC4Dir%" (
   echo Beyond Compare 4 not found.

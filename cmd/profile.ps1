@@ -5,17 +5,67 @@ Set-PSReadlineKeyHandler -Key Tab -Function TabCompleteNext
 Set-PSReadlineKeyHandler -Key Shift+Tab -Function TabCompletePrevious
 
 # Clean up after prior invocations
-if (!$Env:__PRIORPATH__) {
-    $Env:__PRIORPATH__ = $Env:PATH
+if (!$Env:PathBeforeProfile) {
+    $Env:PathBeforeProfile = $Env:PATH
 }
-$Env:PATH = $Env:__PRIORPATH__
+$Env:PATH = $Env:PathBeforeProfile
 
+# add beyond compare to the path
+if (Test-Path "${Env:ProgramW6432}\Beyond Compare 4") {
+    $Env:PATH="${Env:PATH};${Env:ProgramW6432}\Beyond Compare 4"
+}
+
+# add this directory to PATH
+$Env:PATH="${Env:USERPROFILE}\.dot\cmd;${Env:PATH}"
+
+# add Git directory to PATH
+if (Test-Path "${Env:ProgramW6432}\Git") {
+    $GIT_DIR="${Env:ProgramW6432}\Git"
+    # at the end to avoid conflicts such as find.exe breaking Windows things
+    $Env:PATH="${Env:PATH};$GIT_DIR\mingw64\bin;$GIT_DIR\usr\bin"
+    Set-Alias gfind "$GIT_DIR\usr\bin\find.exe"
+}
+
+# use hub as alias for git if available
+if (Test-Path "${Env:UserProfile}\OneDrive\Tools\Hub\bin") {
+    Set-Alias git "${Env:UserProfile}\OneDrive\Tools\Hub\bin\hub.exe"
+}
+
+# Check if a given command is available
 function Test-Command {
     param($command)
     Get-Command -ErrorAction SilentlyContinue $Command | Out-Null
     $?
 }
 
+# Check if we're running as admin
+function Test-Admin {
+    $principal = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
+    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')
+}
+
+# Check if given string looks like a unix arg (--something or -x)
+function Test-UnixArg {
+    param([string]$arg)
+    Write-Host $arg
+    return $arg.StartsWith('--') -or (($arg.Length -eq 2) -and $arg[0] -eq '-')
+}
+
+# Check if the given string looks like a cmd arg (/x)
+function Test-CmdArg {
+    param([string]$arg)
+    return ($arg.Length -eq 2) -and ($arg[0] -eq '/')
+}
+
+# Remove an alias no matter how hard powershell resists
+function Remove-Alias-WithPrejudice {
+    param($command)
+    while (Test-Path "Alias:$command") {
+        Remove-Alias -Force $command
+    }
+}
+
+# Set the prompt
 # NOTE: Avoid flickering and sluggishness of posh-git prompt:
 #  - Don't use git status (branch info is enough)
 #  - Return a single string, don't make independent calls to Write-Host
@@ -35,119 +85,84 @@ function prompt {
     return $prompt
 }
 
-# Helper to define aliases in a more bash-like way
-#
-# Usage: `_alias somecommand someothercommand a b c`
-#
-# This will turn `somecommand x y z` into `someothercommand a b c x y z` when
-# run interactively at the top level.
-#
-# However, we go to great pain to avoid changing behavior of arbitrary functions
-# or scripts that use them. As such, we can alias common commands like ls, and
-# (barring bugs below and extreme edge cases), scripts will continue to behave
-# as before.
-#
-# Incidentally, this is call _alias, not alias because `alias` is implicitly
-# Get-Alias by default and I didn't want to break that either.
-#
-# NOTE: This must be called from top-level or the resulting alias won't be visible.
-#       Use -if to condition.
-function _alias {
-    param(
-        $if = $true,
-
-        [Parameter(Mandatory=$true, Position=0)]
-        $command, 
-        
-        [Parameter(Mandatory=$true, Position=1, ValueFromRemainingArguments=$true)]
-        [string[]]
-        $args
-    )
-
-    if (!$if) {
-        return;
-    }
-
-    if ((Test-Path "Alias:$command") -and !(Test-Path "Function:\global:$command")) {
-        # When there's already an alias, convert it to a wrapper function. This
-        # is what scripts will see after we replace the alias with a private
-        # one.
-        $currentAlias = Get-Alias $command
-        $currentTarget = $currentAlias.ResolvedCommand
-        $block = [scriptblock]::create("process { `$_ | & $currentTarget @args }");
-        New-Item "Function:\global:$command" -Value $block | Out-Null
-    }
-
-    # Remove any existing aliases. Some aliases are hard to kill. If they have
-    # AllScope, it takes more than one go at it, and ReadOnly requires -Force.
-    while (Test-Path "Alias:$command") {
-        Remove-Alias -Force $command
-    }
-
-    if ($args.Length -eq 1) {
-        Set-Alias -Scope Global -Option Private -Name "$command" -Value $args[0]
-        return;
-    }
-
-    # PowerShell aliases can't have args, so generate a function to pass the
-    # args and alias that
-    if (Test-Path "Function:\global:${command}_alias") {
-        Remove-Item "Function:\global:${command}_alias"
-    }
-    $block = [scriptblock]::Create("& $args @args")
-    New-Item "Function:\global:${command}_alias" -Value $block | Out-Null
-    Set-Alias -Scope Global -Option Private -Name "$command" -Value "${command}_alias" | Out-Null
-}
-
-# TODO: Clean up environment when switching VS envs
 # Load VS developer environment
+#
+# Accepts vswhere args to pick which VS to use, defaults to -latest -prerelease
 #
 # NOTE: This is slow and I don't need it so much these days, so tuck it behind a
 # helper function that can be invoked when needed.
-function vsenv {
+function VSEnv {
+    Clear-VSEnv
+
     $vswhere = 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe'
+    $vswhereArgs = $args
     if ($args.Length -eq 0) {
-        $args = @('-latest', '-prerelease')
+        $vswhereArgs = @('-latest', '-prerelease')
     }
 
     if (Test-Path $vswhere) {
-        $installPath = & $vswhere @args -property installationPath
+        $installPath = & $vswhere @vswhereArgs -property installationPath
         if ($installPath) { 
-          Import-Module (Join-Path $installPath 'Common7\Tools\Microsoft.VisualStudio.DevShell.dll')
-          Enter-VsDevShell -VsInstallPath $installPath -SkipAutomaticLocation
+            Import-Module (Join-Path $installPath 'Common7\Tools\Microsoft.VisualStudio.DevShell.dll')
+            Enter-VsDevShell -VsInstallPath $installPath -SkipAutomaticLocation
         }
     }
 }
 
-# add Beyond Compare to path if found
-if (Test-Path "${Env:ProgramW6432}\Beyond Compare 4") {
-  $Env:PATH="${Env:PATH};${Env:ProgramW6432}\Beyond Compare 4"
-}
+# Clear previous invocation of VSEnv
+function Clear-VSEnv {
+    if (!$Env:PathBeforeVSEnv) {
+        $Env:PathBeforeVSEnv = $Env:PATH
+    }
 
-# add this directory to PATH
-$Env:PATH="${Env:USERPROFILE}\.dot\cmd;${Env:PATH}"
-
-# add Git directory to PATH
-$GIT_DIR=$null
-if (Test-Path "${Env:ProgramW6432}\Git") {
-    $GIT_DIR="${Env:ProgramW6432}\Git"
-    # at the end to avoid conflicts such as find.exe breaking Windows things
-    $Env:PATH="${Env:PATH};$GIT_DIR\mingw64\bin;$GIT_DIR\usr\bin"
+    $Env:Path = $Env:PathBeforeVSEnv
+    $Env:CommandPromptType = ''
+    $Env:DevEnvDir = ''
+    $Env:ExtensionSdkDir = ''
+    $Env:Framework40Version = ''
+    $Env:FrameworkDir = ''
+    $Env:FrameworkDir32 = ''
+    $Env:FrameworkVersion = ''
+    $Env:FrameworkVersion32 = ''
+    $Env:FSHARPINSTALLDIR = ''
+    $Env:INCLUDE = ''
+    $Env:LIB = ''
+    $Env:LIBPATH = ''
+    $Env:NETFXSDKDir = ''
+    $Env:UCRTVersion = ''
+    $Env:UniversalCRTSdkDir = ''
+    $Env:VCIDEInstallDir = ''
+    $Env:VCINSTALLDIR = ''
+    $Env:VCToolsInstallDir = ''
+    $Env:VCToolsRedistDir = ''
+    $Env:VCToolsVersion = ''
+    $Env:VisualStudioVersion = ''
+    $Env:VS160COMNTOOLS = ''
+    $Env:VSCMD_ARG_app_plat = ''
+    $Env:VSCMD_ARG_HOST_ARCH = ''
+    $Env:VSCMD_ARG_TGT_ARCH = ''
+    $Env:VSCMD_VER = ''
+    $Env:VSINSTALLDIR = ''
+    $Env:WindowsLibPath = ''
+    $Env:WindowsSdkBinPath = ''
+    $Env:WindowsSdkDir = ''
+    $Env:WindowsSDKLibVersion = ''
+    $Env:WindowsSdkVerBinPath = ''
+    $Env:WindowsSDKVersion = ''
+    $Env:WindowsSDK_ExecutablePath_x64 = ''
+    $Env:WindowsSDK_ExecutablePath_x86 = ''
+    $Env:__DOTNET_ADD_32BIT = ''
+    $Env:__DOTNET_PREFERRED_BITNESS = ''
+    $Env:__VSCMD_PREINIT_PATH = ''
+    $Env:__VSCMD_script_err_count = ''
 }
- 
-# use hub as alias for git if available
-$HUB_DIR=$null
-if (Test-Path "${Env:UserProfile}\OneDrive\Tools\Hub\bin") {
-    $HUB_DIR="${Env:UserProfile}\OneDrive\Tools\Hub\bin"
-}
-_alias -if $HUB_DIR git "$HUB_DIR\hub.exe"
-
 
 # Same as Where-Object except when called with no pipeline input and no switches,
 # then it behaves like bash type or windows where.exe.
-function _where {
+Remove-Alias-WithPrejudice where
+function where {
     process {
-        if ($_ || $args.Length -ne 1 || $args[0].StartsWith('-')) {
+        if ($_ -or ($args.Length -ne 1) -or ($args[0].StartsWith('-'))) {
             $_ | Where-Object @args
         } else {
             Get-Command -All @args
@@ -167,7 +182,7 @@ function tgit {
 
         [Parameter(ValueFromRemainingArguments=$true)]
         $args
-    )
+        )
 
     if (!$path) {
         $path=git rev-parse --show-toplevel
@@ -179,44 +194,111 @@ function tgit {
     & $Global:TortoiseGitSettings.TortoiseGitPath /command:$command /path:$path @args
 }
 
+# Overload ls to GNU ls when given unix-like arguments
+# Otherwise, behave as Get-ChildItem as usual
+Remove-Alias-WithPrejudice ls
+function ls {
+    process {
+        if ($_ -or ($args.Length -eq 0) -or !(Test-UnixArg $args[0])) {
+            $_ | Get-ChildItem @args
+        } else {
+            gls @args
+        }
+    }
+}
+
+# Overload dir to cmd dir when given cmd-like arguments
+# Otherwise, behave as Get-ChildItem as usual
+Remove-Alias-WithPrejudice dir
+function dir {
+    process {
+        if ($_ -or ($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
+            $_ | Get-ChildItem @args
+        } else {
+            cmd /c dir /o:gn @args
+        }
+    }
+}
+
+# Overload rd to cmd rd when given cmd-like arguments
+# Otherwise, behave as Remove-Item as usual
+Remove-Alias-WithPrejudice rd
+function rd {
+    process {
+        if ($_ -or ($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
+            $_ | Remove-Item @args
+        } else {
+            /c rd @args
+        }
+    }
+}
+
+# Mimic cmd set when given
+#  no args: list all environment variable
+#  on arg with no '=': list all environment variables with given prefix
+#  1 arg with '=': set environment variable
+# Otherwise, behave as Set-Variable as usual
+Remove-Alias-WithPrejudice set
+function set {
+    if ($_ -or ($args.Length -gt 1)) {
+        $_ | Set-Variable @args
+    } else {
+        $equalIndex = $args[0].IndexOf('=')
+        if ($equalIndex -cge 0) {
+            $variable = $args[0].Substring(0, $equalIndex)
+            $value = $args[0].Substring($equalIndex + 1)
+            New-Item "Env:\$variable" -Value $value
+        } else {
+            cmd /c set @args
+        }
+    }
+}
+
+# Mimic unix xargs in a way that works better on Windows and PowerShell
+# Process one line at a time, allowing spaces, don't munge backslashes
+function xargs {
+    param($command)
+    process { & $command @args $_ }
+}
+
+# Mimic unix sudo
+function sudo {
+    param ($command)
+    if (Test-Admin) {
+        & $command @args
+    } else {
+        $argumentList = $null
+        if ($args) {
+            $quotedArgs = $args | ForEach-Object { if ($_.Contains(' ')) { "`"$_`"" } else { $_ } }
+            $argumentList = [String]::Join(' ', $quotedArgs)
+        }
+        Start-Process -Verb RunAs -FilePath $command -ArgumentList $argumentList -WorkingDirectory (Get-Location)
+    }
+}
+
+# alias-like functions
 function .. { Set-Location .. }
+function /c { cmd /c @args }
+function du { du.exe -h @args }
+function df { df.exe -h @args }
+function emacs { emacsclient.cmd -n @args }
+function ms { emacsclient.cmd `-e '"(progn (magit-status) (raise-frame))"' }
+function which { Get-Command -All @args }
+function gls { ls.exe --color -h -F --ignore="ntuser.*" --ignore="NTUSER.*" --ignore="*fil*.sys" @args }
+function ver { cmd /c ver }
 
-# TODO: These don't find my private aliases due to scoping
-_alias where _where
-_alias type Get-Command -All
-_alias which Get-Command -All
+# aliases
+Set-Alias h history
+Set-Alias e emacs
+Set-Alias vi vim
+Set-Alias n notepad 
 
-# Don't hide unix ls from me
- _alias -if (Test-Command ls.exe) `
-    ls ls.exe --color -h -F --ignore="ntuser.*" --ignore="NTUSER.*" --ignore="*fil*.sys"
+# Prefer VS Code Insiders
+if (Test-Command code-insiders) {
+    Set-Alias code code-insiders
+}
 
-# Nor cmd dir, which can be much faster when recursive
-_alias dir cmd /c dir /o:gn
-
-# Nor cmd rd, which is also much faster when recursive
-_alias rd cmd /c rd
-
-# Nor cmd set, which is nice for listing matching environment vars
-_alias set cmd /c set
-
-# wrist friendlier gci since we took back dir and ls above
-_alias ll Get-ChildItem 
-
-# Prefer code-insiders over code
-_alias -if (Test-Command code-insiders) code code-insiders
-
-# Prefer unix find over windows find
-_alias -if $GIT_DIR find "$GIT_DIR\usr\bin\find.exe"
-_alias wfind "${Env:SystemRoot}\system32\find.exe"
-_alias h history
-_alias du du -h
-_alias df df -h
-_alias emacs emacsclient.cmd -n @args
-_alias e emacs_alias
-_alias vi emacs_alias
-_alias n emacs_alias
-_alias notepad emacs_alias
-_alias ms emacsclient.cmd `-e '"(progn (magit-status) (raise-frame))"'
-
-
-
+if (Test-Command code) {
+    Set-Alias n code
+    Set-Alias notepad code
+}
