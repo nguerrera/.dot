@@ -228,7 +228,20 @@ function rd {
         if ($_ -or ($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
             $_ | Remove-Item @args
         } else {
-            /c rd @args
+            cmd /c rd @args
+        }
+    }
+}
+
+# Overload del to cmd del when given cmd-like arguments
+# Otherwise, behave as Remove-Item as usual
+Remove-Alias-WithPrejudice del
+function del {
+    process {
+        if ($_ -or ($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
+            $_ | Remove-Item @args
+        } else {
+            cmd /c del @args
         }
     }
 }
