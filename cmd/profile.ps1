@@ -263,18 +263,23 @@ function del {
 # Otherwise, behave as Set-Variable as usual
 Remove-Alias-WithPrejudice set
 function set {
-    if ($_) {
-        $_ | Set-Variable @args
-    } elseif ($args.Length -gt 1) {
-        Set-Variable @args
-    } else {
-        $equalIndex = $args[0].IndexOf('=')
-        if ($equalIndex -cge 0) {
-            $variable = $args[0].Substring(0, $equalIndex)
-            $value = $args[0].Substring($equalIndex + 1)
-            Set-Item "Env:\$variable" -Value $value
-        } else {
-            cmd /c set @args
+    process {
+        # TODO: Does not work to forward to Set-Variable as it is now local in scope.
+        if ($_) {
+            $_ | Set-Variable @args
+        }
+        elseif ($args.Length -gt 1) {
+            Set-Variable @args
+        }
+        else {
+            $equalIndex = $args[0].IndexOf('=')
+            if ($equalIndex -cge 0) {
+                $variable = $args[0].Substring(0, $equalIndex)
+                $value = $args[0].Substring($equalIndex + 1)
+                Set-Item "Env:\$variable" -Value $value
+            } else {
+                cmd /c set @args
+            }
         }
     }
 }
