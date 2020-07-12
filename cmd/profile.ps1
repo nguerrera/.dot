@@ -162,8 +162,10 @@ function Clear-VSEnv {
 Remove-Alias-WithPrejudice where
 function where {
     process {
-        if ($_ -or ($args.Length -ne 1) -or ($args[0].StartsWith('-'))) {
+        if ($_) {
             $_ | Where-Object @args
+        } elseif (($args.Length -ne 1) -or ($args[0].StartsWith('-'))) {
+            Where-Object @args
         } else {
             Get-Command -All @args
         }
@@ -199,8 +201,10 @@ function tgit {
 Remove-Alias-WithPrejudice ls
 function ls {
     process {
-        if ($_ -or ($args.Length -eq 0) -or !(Test-UnixArg $args[0])) {
+        if ($_) {
             $_ | Get-ChildItem @args
+        } elseif (($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
+            Get-ChildItem @args
         } else {
             gls @args
         }
@@ -212,8 +216,10 @@ function ls {
 Remove-Alias-WithPrejudice dir
 function dir {
     process {
-        if ($_ -or ($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
+        if ($_) {
             $_ | Get-ChildItem @args
+        } elseif (($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
+            Get-ChildItem @args
         } else {
             cmd /c dir /o:gn @args
         }
@@ -225,8 +231,10 @@ function dir {
 Remove-Alias-WithPrejudice rd
 function rd {
     process {
-        if ($_ -or ($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
+        if ($_) {
             $_ | Remove-Item @args
+        } elseif (($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
+            Remove-Item @args
         } else {
             cmd /c rd @args
         }
@@ -238,8 +246,10 @@ function rd {
 Remove-Alias-WithPrejudice del
 function del {
     process {
-        if ($_ -or ($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
+        if ($_) {
             $_ | Remove-Item @args
+        } elseif (($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
+            Remove-Item @args
         } else {
             cmd /c del @args
         }
@@ -253,8 +263,10 @@ function del {
 # Otherwise, behave as Set-Variable as usual
 Remove-Alias-WithPrejudice set
 function set {
-    if ($_ -or ($args.Length -gt 1)) {
+    if ($_) {
         $_ | Set-Variable @args
+    } elseif ($args.Length -gt 1) {
+        Set-Variable @args
     } else {
         $equalIndex = $args[0].IndexOf('=')
         if ($equalIndex -cge 0) {
