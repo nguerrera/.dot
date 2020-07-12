@@ -307,16 +307,18 @@ function /c { cmd /c @args }
 function du { du.exe -h @args }
 function df { df.exe -h @args }
 function emacs { emacsclient.cmd -n @args }
-function ms { emacsclient.cmd `-e '"(progn (magit-status) (raise-frame))"' }
-function which { Get-Command -All @args }
 function gls { ls.exe --color -h -F --ignore="ntuser.*" --ignore="NTUSER.*" --ignore="*fil*.sys" @args }
+function ll { gls -l @args }
+function ms { emacsclient.cmd `-e '"(progn (magit-status) (raise-frame))"' }
 function ver { cmd /c ver }
+function which { Get-Command -All @args }
 
 # aliases
-Set-Alias h history
 Set-Alias e emacs
+Set-Alias h history
+Set-Alias n notepad
+Set-Alias traceroute tracert
 Set-Alias vi vim
-Set-Alias n notepad 
 
 # Prefer VS Code Insiders
 if (Test-Command code-insiders) {
