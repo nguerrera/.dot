@@ -203,7 +203,7 @@ function ls {
     process {
         if ($_) {
             $_ | Get-ChildItem @args
-        } elseif (($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
+        } elseif (($args.Length -eq 0) -or (!(Test-UnixArg $args[0]) -and $args[0] -ne '-al')) {
             Get-ChildItem @args
         } else {
             gls @args
