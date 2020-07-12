@@ -272,7 +272,7 @@ function set {
         if ($equalIndex -cge 0) {
             $variable = $args[0].Substring(0, $equalIndex)
             $value = $args[0].Substring($equalIndex + 1)
-            New-Item "Env:\$variable" -Value $value
+            Set-Item "Env:\$variable" -Value $value
         } else {
             cmd /c set @args
         }
