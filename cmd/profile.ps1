@@ -1,5 +1,8 @@
-Import-Module posh-git
+using namespace System.Management.Automation
+using namespace System.Management.Automation.Language
+using namespace Microsoft.PowerShell
 
+Import-Module posh-git
 Set-PSReadLineOption -EditMode Emacs -BellStyle Visual
 Set-PSReadlineKeyHandler -Key Tab -Function TabCompleteNext
 Set-PSReadlineKeyHandler -Key Shift+Tab -Function TabCompletePrevious
@@ -9,6 +12,116 @@ if (!$Env:PathBeforeProfile) {
     $Env:PathBeforeProfile = $Env:PATH
 }
 $Env:PATH = $Env:PathBeforeProfile
+
+# Check if a given command is available
+function Test-Command {
+    param($command)
+    Get-Command -ErrorAction SilentlyContinue $Command | Out-Null
+    return $?
+}
+
+# Check if we're running as admin
+function Test-Admin {
+    $principal = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
+    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')
+}
+
+# Check if given string looks like a unix arg (--something or -x)
+function Test-UnixArg {
+    param([string]$arg)
+    return $arg -and ($arg.StartsWith('--') -or (($arg.Length -eq 2) -and $arg[0] -eq '-'))
+}
+
+# Check if the given string looks like a cmd arg (/x)
+function Test-CmdArg {
+    param([string]$arg)
+    return ($arg -and $arg.Length -eq 2 -and $arg[0] -eq '/')
+}
+
+# Register a macro to replace the given command when it appears as the first
+# token of command line is $command, replace it with $replacement.
+#
+# $replacement can be a string or a scriptblock taking three args: command being
+# replaced, first argument to command, and total number of arguments that
+# returns replacement dynamically, or opts out of replacing by returning $null.
+#
+# TODO: It would be more elegant if the replacment block took an array of args
+#       instead of first arg and arg count.
+#
+# These macros are invisible to scripts or in position beyond the start of the
+# command line. This allows us to customize built-in commands without breaking
+# anything.
+#
+$Macros = @{}
+function Set-Macro {
+    param ([string]$command, $replacement)
+    $Macros[$command] = $replacement
+}
+
+# Replace command line according to registered macro
+function Expand-Macros {
+    $tokens = Get-PSReadLineTokens
+    if ($tokens.Count -eq 0) {
+        return
+    }
+
+    $extent = $tokens[0].Extent
+    $command = $extent.Text
+    $replacement = $Macros[$command]
+    if (!$replacement) {
+        return
+    }
+
+    # argument count minus command itself and end token
+    $count = $tokens.Length - 2
+    $arg = $null
+    if ($count -gt 0) {
+        $arg = $tokens[1].Extent.Text
+    }
+
+    if ($replacement -is [scriptblock]) {
+        $replacement = & $replacement $command $arg $count
+    }
+
+    if ($replacement) {
+        [PSConsoleReadLine]::Replace($extent.StartOffset, $extent.EndOffset - $extent.StartOffset, $replacement)
+    }
+}
+
+# Helper to get just the tokens from PSReadLine buffer state
+function Get-PSReadLineTokens {
+    $ast = $null
+    $tokens = $null
+    $errors = $null
+    $cursor = $null
+    [PSConsoleReadLine]::GetBufferState([ref]$ast, [ref]$tokens, [ref]$errors, [ref]$cursor)
+    return $tokens
+}
+
+# On enter key press, expand macros and accept line
+Set-PSReadLineKeyHandler -Key Enter -BriefDescription 'ExpandMacrosAndAcceptLine' -ScriptBlock {
+    param($key, $arg)
+    Expand-Macros
+    [PSConsoleReadLine]::AcceptLine($key, $arg)
+}
+
+# Set the prompt, avoid flickering and sluggishness of posh-git default
+#  - Don't use git status (branch info is enough)
+#  - Return a single string, don't make independent calls to Write-Host
+function prompt {
+    $cyan="`e[36m"
+    $yellow="`e[33m"
+    $plain="`e[0m"
+
+    $prompt = "`n${cyan}$(Get-Location)"
+    $branch = Get-GitBranch
+    if ($branch) {
+        $prompt += " ${yellow}(${branch})"
+    }
+
+    $prompt += "${plain}`n> "
+    return $prompt
+}
 
 # add beyond compare to the path
 if (Test-Path "${Env:ProgramW6432}\Beyond Compare 4") {
@@ -23,66 +136,15 @@ if (Test-Path "${Env:ProgramW6432}\Git") {
     $GIT_DIR="${Env:ProgramW6432}\Git"
     # at the end to avoid conflicts such as find.exe breaking Windows things
     $Env:PATH="${Env:PATH};$GIT_DIR\mingw64\bin;$GIT_DIR\usr\bin"
+    # but make find available as gfind
     Set-Alias gfind "$GIT_DIR\usr\bin\find.exe"
+    # and use it interactively as just find
+    Set-Macro find gfind
 }
 
 # use hub as alias for git if available
 if (Test-Path "${Env:UserProfile}\OneDrive\Tools\Hub\bin") {
     Set-Alias git "${Env:UserProfile}\OneDrive\Tools\Hub\bin\hub.exe"
-}
-
-# Check if a given command is available
-function Test-Command {
-    param($command)
-    Get-Command -ErrorAction SilentlyContinue $Command | Out-Null
-    $?
-}
-
-# Check if we're running as admin
-function Test-Admin {
-    $principal = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
-    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')
-}
-
-# Check if given string looks like a unix arg (--something or -x)
-function Test-UnixArg {
-    param([string]$arg)
-    Write-Host $arg
-    return $arg.StartsWith('--') -or (($arg.Length -eq 2) -and $arg[0] -eq '-')
-}
-
-# Check if the given string looks like a cmd arg (/x)
-function Test-CmdArg {
-    param([string]$arg)
-    return ($arg.Length -eq 2) -and ($arg[0] -eq '/')
-}
-
-# Remove an alias no matter how hard powershell resists
-function Remove-Alias-WithPrejudice {
-    param($command)
-    while (Test-Path "Alias:$command") {
-        Remove-Alias -Force $command
-    }
-}
-
-# Set the prompt
-# NOTE: Avoid flickering and sluggishness of posh-git prompt:
-#  - Don't use git status (branch info is enough)
-#  - Return a single string, don't make independent calls to Write-Host
-function prompt {
-    $cyan="`e[36m"
-    $yellow="`e[33m"
-    $plain="`e[0m"
-
-    $prompt = "`n${cyan}$(Get-Location)"
-
-    $branch = Get-GitBranch
-    if ($branch) {
-        $prompt += " ${yellow}(${branch})"
-    }
-
-    $prompt += "${plain}`n> "
-    return $prompt
 }
 
 # Load VS developer environment
@@ -102,7 +164,7 @@ function VSEnv {
 
     if (Test-Path $vswhere) {
         $installPath = & $vswhere @vswhereArgs -property installationPath
-        if ($installPath) { 
+        if ($installPath) {
             Import-Module (Join-Path $installPath 'Common7\Tools\Microsoft.VisualStudio.DevShell.dll')
             Enter-VsDevShell -VsInstallPath $installPath -SkipAutomaticLocation
         }
@@ -113,6 +175,7 @@ function VSEnv {
 function Clear-VSEnv {
     if (!$Env:PathBeforeVSEnv) {
         $Env:PathBeforeVSEnv = $Env:PATH
+        return
     }
 
     $Env:Path = $Env:PathBeforeVSEnv
@@ -157,21 +220,6 @@ function Clear-VSEnv {
     $Env:__VSCMD_script_err_count = ''
 }
 
-# Same as Where-Object except when called with no pipeline input and no switches,
-# then it behaves like bash type or windows where.exe.
-Remove-Alias-WithPrejudice where
-function where {
-    process {
-        if ($_) {
-            $_ | Where-Object @args
-        } elseif (($args.Length -ne 1) -or ($args[0].StartsWith('-'))) {
-            Where-Object @args
-        } else {
-            Get-Command -All @args
-        }
-    }
-}
-
 # NOTE: This intentionally overrides the tgit from posh-git, which
 # doesn't do /path for you and doesn't default to repo root.
 function tgit {
@@ -196,96 +244,8 @@ function tgit {
     & $Global:TortoiseGitSettings.TortoiseGitPath /command:$command /path:$path @args
 }
 
-# Overload ls to GNU ls when given unix-like arguments
-# Otherwise, behave as Get-ChildItem as usual
-Remove-Alias-WithPrejudice ls
-function ls {
-    process {
-        if ($_) {
-            $_ | Get-ChildItem @args
-        } elseif (($args.Length -eq 0) -or (!(Test-UnixArg $args[0]) -and $args[0] -ne '-al')) {
-            Get-ChildItem @args
-        } else {
-            gls @args
-        }
-    }
-}
-
-# Overload dir to cmd dir when given cmd-like arguments
-# Otherwise, behave as Get-ChildItem as usual
-Remove-Alias-WithPrejudice dir
-function dir {
-    process {
-        if ($_) {
-            $_ | Get-ChildItem @args
-        } elseif (($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
-            Get-ChildItem @args
-        } else {
-            cmd /c dir /o:gn @args
-        }
-    }
-}
-
-# Overload rd to cmd rd when given cmd-like arguments
-# Otherwise, behave as Remove-Item as usual
-Remove-Alias-WithPrejudice rd
-function rd {
-    process {
-        if ($_) {
-            $_ | Remove-Item @args
-        } elseif (($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
-            Remove-Item @args
-        } else {
-            cmd /c rd @args
-        }
-    }
-}
-
-# Overload del to cmd del when given cmd-like arguments
-# Otherwise, behave as Remove-Item as usual
-Remove-Alias-WithPrejudice del
-function del {
-    process {
-        if ($_) {
-            $_ | Remove-Item @args
-        } elseif (($args.Length -eq 0) -or !(Test-CmdArg $args[0])) {
-            Remove-Item @args
-        } else {
-            cmd /c del @args
-        }
-    }
-}
-
-# Mimic cmd set when given
-#  no args: list all environment variable
-#  on arg with no '=': list all environment variables with given prefix
-#  1 arg with '=': set environment variable
-# Otherwise, behave as Set-Variable as usual
-Remove-Alias-WithPrejudice set
-function set {
-    process {
-        # TODO: Does not work to forward to Set-Variable as it is now local in scope.
-        if ($_) {
-            $_ | Set-Variable @args
-        }
-        elseif ($args.Length -gt 1) {
-            Set-Variable @args
-        }
-        else {
-            $equalIndex = $args[0].IndexOf('=')
-            if ($equalIndex -cge 0) {
-                $variable = $args[0].Substring(0, $equalIndex)
-                $value = $args[0].Substring($equalIndex + 1)
-                Set-Item "Env:\$variable" -Value $value
-            } else {
-                cmd /c set @args
-            }
-        }
-    }
-}
-
 # Mimic unix xargs in a way that works better on Windows and PowerShell
-# Process one line at a time, allowing spaces, don't munge backslashes
+# Process one line at a time, allowing spaces, and don't munge backslashes
 function xargs {
     param($command)
     process { & $command @args $_ }
@@ -306,9 +266,59 @@ function sudo {
     }
 }
 
-# alias-like functions
+# List all powershell commands when which or where is called interactively.
+# Morally equivalent to Windows where.exe, or bash type -a
+Set-Macro where 'gcm -all'
+Set-Macro which 'gcm -all'
+
+# Use cmd dir/rd/del when given cmd-like arguments interactively, otherwise use
+# Keeps muscle memory intact and makes and also provides terse access to faster
+# /s recursion than PowerShell equivalent.
+foreach ($each in ('dir', 'rd', 'del')) {
+    Set-Macro $each {
+        param ($command, $arg)
+        if (Test-CmdArg $arg) {
+            return "cmd /c $command"
+        }
+    }
+}
+
+# Use UNIX ls when given no arguments or unix-like arguments interactively
+Set-Macro ls {
+    param($command, $arg)
+    if (!$arg -or (Test-UnixArg $arg) -or ($arg -eq '-al')) {
+        return 'gls'
+    }
+}
+
+# Mimic cmd set
+Set-Macro set {
+    param ($command, $arg, $count)
+
+    # If we have one argument with and equal sign, set environment variable
+    # NOTE: This can't be done by shelling to cmd as it will get its own process
+    if ($count -eq 1) {
+        $equalIndex = $arg.IndexOf('=')
+        if ($equalIndex -cge 0) {
+            $variable = $arg.Substring(0, $equalIndex)
+            $value = $arg.Substring($equalIndex + 1)
+
+            # Do the replacement ourselves as return value doesn't overwrite arg, only command
+            [PSConsoleReadLine]::RevertLine()
+            [PSConsoleReadLine]::Insert("`$Env:$variable = '$value'")
+            return $null
+        }
+    }
+
+    # Otherwise, if we have one or no arguments, use cmd set
+    # No arguments will list all environment variables
+    # One arugment will list all environment variables with the given prefix
+    if ($count -lt 2) {
+        return 'cmd /c set'
+    }
+}
+
 function .. { Set-Location .. }
-function /c { cmd /c @args }
 function du { du.exe -h @args }
 function df { df.exe -h @args }
 function emacs { emacsclient.cmd -n @args }
@@ -316,9 +326,7 @@ function gls { ls.exe --color -h -F --ignore="ntuser.*" --ignore="NTUSER.*" --ig
 function ll { gls -l @args }
 function ms { emacsclient.cmd `-e '"(progn (magit-status) (raise-frame))"' }
 function ver { cmd /c ver }
-function which { Get-Command -All @args }
 
-# aliases
 Set-Alias e emacs
 Set-Alias h history
 Set-Alias n notepad
