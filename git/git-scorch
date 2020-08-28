@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# git-schorch - git clean -fdx with backup in reflog and rush shenanigans
+
+run() {
+  echo
+  echo "## $*"
+  $* || exit $?
+}
+
+repo_root=$(git rev-parse --show-toplevel)
+[ $? -eq 0 ] || exit $?
+
+run cd $repo_root
+run git add --all
+run git commit --allow-empty -m SCORCH
+run git reset HEAD~1 --hard
+
+if [ -f "rush.json" ]; then
+  run rush unlink
+  run rm -fr common/temp
+fi
+
+run git clean -fdx
