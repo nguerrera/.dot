@@ -160,7 +160,7 @@ fi
 #
 __use-gnu-coreutils() {
     case $(uname) in
-        GNU*|Linux|MINGW*)
+        GNU*|Linux|MINGW*|MSYS*)
             # GNU coreutils provided by the system
             return 0
             ;;
