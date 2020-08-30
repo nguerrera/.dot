@@ -6,6 +6,9 @@
 	for-work = config user.email "nicholg@microsoft.com"
 	bash = !bash
 	get = !~/.dot/git/git-get
+	dd = difftool --dir-diff
+	dt = difftool -y
+	ff = merge --ff-only
 	wip = !git add --all && git commit -n -m WIP
 	save = !git add --all && git commit -n -m SAVE && git reset HEAD~1
 	wipe = !git add --all && git commit -n -m WIPE && git reset HEAD~1 --hard
