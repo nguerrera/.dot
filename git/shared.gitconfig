@@ -6,9 +6,9 @@
 	for-work = config user.email "nicholg@microsoft.com"
 	bash = !bash
 	get = !~/.dot/git/git-get
-	wip = !git add --all && git commit -m WIP
-	save = !git add --all && git commit -m SAVE && git reset HEAD~1
-	wipe = !git add --all && git commit -m WIPE && git reset HEAD~1 --hard
+	wip = !git add --all && git commit -n -m WIP
+	save = !git add --all && git commit -n -m SAVE && git reset HEAD~1
+	wipe = !git add --all && git commit -n -m WIPE && git reset HEAD~1 --hard
 	scorch = !~/.dot/git/git-scorch
 	config-shared = !git config --file ~/.dot/git/shared.gitconfig
 	config-win = !git config --file ~/.dot/git/win.gitconfig

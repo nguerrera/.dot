@@ -12,7 +12,7 @@ repo_root=$(git rev-parse --show-toplevel)
 
 run cd $repo_root
 run git add --all
-run git commit --allow-empty -m SCORCH
+run git commit -n --allow-empty -m SCORCH
 run git reset HEAD~1 --hard
 
 if [ -f "rush.json" ]; then
