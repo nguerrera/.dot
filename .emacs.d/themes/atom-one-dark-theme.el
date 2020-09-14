@@ -25,6 +25,10 @@
 
 ;; An Emacs port of the Atom One Dark theme from Atom.io.
 
+;; Minor changes by Nick Guerrera <nick@technogenic.net>
+;;   * dark-mono-3 color changed to be more legible at low brightness
+;;   * underline removed from matching paren face
+
 ;;; Code:
 
 (deftheme atom-one-dark
@@ -40,7 +44,7 @@
                    ("atom-one-dark-gutter"   . (if ,256color "color-239" "#4B5363"))
                    ("atom-one-dark-mono-1"   . (if ,256color "color-248" "#ABB2BF"))
                    ("atom-one-dark-mono-2"   . (if ,256color "color-244" "#828997"))
-                   ("atom-one-dark-mono-3"   . (if ,256color "color-240" "#5C6370"))
+                   ("atom-one-dark-mono-3"   . (if ,256color "color-008" "#8D8C8C"))
                    ("atom-one-dark-cyan"     . "#56B6C2")
                    ("atom-one-dark-blue"     . "#61AFEF")
                    ("atom-one-dark-purple"   . "#C678DD")
