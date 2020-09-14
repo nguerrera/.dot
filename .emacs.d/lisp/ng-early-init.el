@@ -50,11 +50,8 @@
   (if (fboundp 'tool-bar-mode)
       (tool-bar-mode -1)))
 
-;; color theme: atom one dark with a few customizations for contrast
-;; doesn't work right in windows terminal, so skip it there.
-(when (or window-system
-          (not (string-equal system-type "windows-nt")))
-  (load-theme 'atom-one-dark t))
+;; theme: patched atom one dark
+(load-theme 'ng-atom-one-dark t)
 
 ;; set font
 (when window-system

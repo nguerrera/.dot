@@ -1,4 +1,4 @@
-;;; atom-one-dark-theme.el --- Atom One Dark color theme
+;;; ng-atom-one-dark-theme.el --- Modified Atom One Dark color theme
 
 ;; Copyright 2015-2019 Jonathan Chu
 
@@ -25,53 +25,69 @@
 
 ;; An Emacs port of the Atom One Dark theme from Atom.io.
 
-;; Minor changes by Nick Guerrera <nick@technogenic.net>
-;;   * dark-mono-3 color changed to be more legible at low brightness
-;;   * underline removed from matching paren face
+;; Modified by Nick Guerrera <nick@technogenic.net>:
+;;
+;;  * adjust comment color for better contrast
+;;
+;;  * degrade gracefully down to 8 colors, respecting terminal theme
+;;
+;;  * tweak magit and dired colors
+;;
+;;  * remove underline from matching paren face
+;;
+;;  * delete blocks for some packages I don't use that had things that
+;;    conflict with above
+;;
+;;  * rename, adding ng prefix
 
 ;;; Code:
 
-(deftheme atom-one-dark
-  "Atom One Dark - An Emacs port of the Atom One Dark theme from Atom.io.")
+(deftheme ng-atom-one-dark
+  "NG Atom One Dark - Modified Emacs port of the Atom One Dark theme from Atom.io.")
 
-(defvar atom-one-dark-colors-alist
-  (let* ((256color  (eq (display-color-cells (selected-frame)) 256))
-         (colors `(("atom-one-dark-accent"   . "#528BFF")
-                   ("atom-one-dark-fg"       . (if ,256color "color-248" "#ABB2BF"))
-                   ("atom-one-dark-bg"       . (if ,256color "color-235" "#282C34"))
-                   ("atom-one-dark-bg-1"     . (if ,256color "color-234" "#121417"))
-                   ("atom-one-dark-bg-hl"    . (if ,256color "color-236" "#2C323C"))
-                   ("atom-one-dark-gutter"   . (if ,256color "color-239" "#4B5363"))
-                   ("atom-one-dark-mono-1"   . (if ,256color "color-248" "#ABB2BF"))
-                   ("atom-one-dark-mono-2"   . (if ,256color "color-244" "#828997"))
-                   ("atom-one-dark-mono-3"   . (if ,256color "color-008" "#8D8C8C"))
-                   ("atom-one-dark-cyan"     . "#56B6C2")
-                   ("atom-one-dark-blue"     . "#61AFEF")
-                   ("atom-one-dark-purple"   . "#C678DD")
-                   ("atom-one-dark-green"    . "#98C379")
-                   ("atom-one-dark-red-1"    . "#E06C75")
-                   ("atom-one-dark-red-2"    . "#BE5046")
-                   ("atom-one-dark-orange-1" . "#D19A66")
-                   ("atom-one-dark-orange-2" . "#E5C07B")
-                   ("atom-one-dark-gray"     . (if ,256color "color-237" "#3E4451"))
-                   ("atom-one-dark-silver"   . (if ,256color "color-247" "#9DA5B4"))
-                   ("atom-one-dark-black"    . (if ,256color "color-233" "#21252B"))
-                   ("atom-one-dark-border"   . (if ,256color "color-232" "#181A1F")))))
-    colors)
+(defvar ng-atom-one-dark-colors-alist
+  (let* ((color-count (display-color-cells (selected-frame)))
+         (fewer-colors (<= color-count 256))
+         (dark-black (if (< color-count 256) "black"  "color-235"))
+         (dark-gray  (if (< color-count 16)  "white"  "brightblack"))
+         (comment    (if (< color-count 16)  "yellow" "brightblack")))
+    (cl-flet ((_ (x y) (if fewer-colors x y)))
+         `(("atom-one-dark-accent"   . ,(_ "blue"     "#528BFF"))
+           ("atom-one-dark-fg"       . ,(_ "white"    "#ABB2BF"))
+           ("atom-one-dark-bg"       . ,(_ "black"    "#282C34"))
+           ("atom-one-dark-bg-1"     . ,(_ dark-black "#121417"))
+           ("atom-one-dark-bg-hl"    . ,(_ dark-black "#2C323C"))
+           ("atom-one-dark-gutter"   . ,(_ dark-black "#4B5363"))
+           ("atom-one-dark-mono-1"   . ,(_ dark-black "#ABB2BF"))
+           ("atom-one-dark-mono-2"   . ,(_ dark-black "#828997"))
+           ("atom-one-dark-mono-3"   . ,(_ dark-gray  "#8D8C8C"))
+           ("atom-one-dark-comment"  . ,(_ comment    "#8D8C8C"))
+           ("atom-one-dark-cyan"     . ,(_ "cyan"     "#56B6C2"))
+           ("atom-one-dark-blue"     . ,(_ "blue"     "#61AFEF"))
+           ("atom-one-dark-purple"   . ,(_ "magenta"  "#C678DD"))
+           ("atom-one-dark-green"    . ,(_ "green"    "#98C379"))
+           ("atom-one-dark-red-1"    . ,(_ "red"      "#E06C75"))
+           ("atom-one-dark-red-2"    . ,(_ "red"      "#BE5046"))
+           ("atom-one-dark-orange-1" . ,(_ "yellow"   "#D19A66"))
+           ("atom-one-dark-orange-2" . ,(_ "yellow"   "#E5C07B"))
+           ("atom-one-dark-gray"     . ,(_ dark-gray  "#3E4451"))
+           ("atom-one-dark-silver"   . ,(_ "white"    "#9DA5B4"))
+           ("atom-one-dark-black"    . ,(_ dark-black "#21252B"))
+           ("atom-one-dark-border"   . ,(_ dark-black "#181A1F")))))
   "List of Atom One Dark colors.")
 
-(defmacro atom-one-dark-with-color-variables (&rest body)
+(defmacro ng-atom-one-dark-with-color-variables (&rest body)
   "Bind the colors list around BODY."
   (declare (indent 0))
   `(let ((class '((class color) (min-colors 89)))
          ,@ (mapcar (lambda (cons)
                       (list (intern (car cons)) (cdr cons)))
-                    atom-one-dark-colors-alist))
+                    ng-atom-one-dark-colors-alist))
      ,@body))
 
-(atom-one-dark-with-color-variables
+(ng-atom-one-dark-with-color-variables
  (custom-theme-set-faces
-  'atom-one-dark
+  'ng-atom-one-dark
 
   `(default ((t (:foreground ,atom-one-dark-fg :background ,atom-one-dark-bg))))
   `(success ((t (:foreground ,atom-one-dark-green))))
@@ -92,7 +108,7 @@
   `(tooltip ((t (:foreground ,atom-one-dark-fg :background ,atom-one-dark-bg-1 :inherit variable-pitch))))
 
   `(font-lock-builtin-face ((t (:foreground ,atom-one-dark-cyan))))
-  `(font-lock-comment-face ((t (:foreground ,atom-one-dark-mono-3 :slant italic))))
+  `(font-lock-comment-face ((t (:foreground ,atom-one-dark-comment :slant italic))))
   `(font-lock-comment-delimiter-face ((default (:inherit (font-lock-comment-face)))))
   `(font-lock-doc-face ((t (:inherit (font-lock-string-face)))))
   `(font-lock-function-name-face ((t (:foreground ,atom-one-dark-blue))))
@@ -188,67 +204,15 @@
   `(isearch-fail ((t (:foreground ,atom-one-dark-red-2 :background nil))))
   `(lazy-highlight ((t (:foreground ,atom-one-dark-purple :background ,atom-one-dark-bg-1 :underline ,atom-one-dark-purple))))
 
-  ;; diff-hl (https://github.com/dgutov/diff-hl)
-  '(diff-hl-change ((t (:foreground "#E9C062" :background "#8b733a"))))
-  '(diff-hl-delete ((t (:foreground "#CC6666" :background "#7a3d3d"))))
-  '(diff-hl-insert ((t (:foreground "#A8FF60" :background "#547f30"))))
-
   ;; dired-mode
-  '(dired-directory ((t (:inherit (font-lock-keyword-face)))))
-  '(dired-flagged ((t (:inherit (diff-hl-delete)))))
-  '(dired-symlink ((t (:foreground "#FD5FF1"))))
+  '(dired-directory ((t (:inherit (font-lock-function-name-face)))))
+  '(dired-flagged ((t (:inherit (font-lock-type-delete)))))
+  '(dired-symlink ((t (:inherit (font-lock-constant-face)))))
 
   ;; dired-async
   `(dired-async-failures ((t (:inherit error))))
   `(dired-async-message ((t (:inherit success))))
   `(dired-async-mode-message ((t (:foreground ,atom-one-dark-orange-1))))
-
-  ;; helm
-  `(helm-header ((t (:foreground ,atom-one-dark-mono-2
-                                 :background ,atom-one-dark-bg
-                                 :underline nil
-                                 :box (:line-width 6 :color ,atom-one-dark-bg)))))
-  `(helm-source-header ((t (:foreground ,atom-one-dark-orange-2
-                                        :background ,atom-one-dark-bg
-                                        :underline nil
-                                        :weight bold
-                                        :box (:line-width 6 :color ,atom-one-dark-bg)))))
-  `(helm-selection ((t (:background ,atom-one-dark-gray))))
-  `(helm-selection-line ((t (:background ,atom-one-dark-gray))))
-  `(helm-visible-mark ((t (:background ,atom-one-dark-bg :foreground ,atom-one-dark-orange-2))))
-  `(helm-candidate-number ((t (:foreground ,atom-one-dark-green :background ,atom-one-dark-bg-1))))
-  `(helm-separator ((t (:background ,atom-one-dark-bg :foreground ,atom-one-dark-red-1))))
-  `(helm-M-x-key ((t (:foreground ,atom-one-dark-orange-1))))
-  `(helm-bookmark-addressbook ((t (:foreground ,atom-one-dark-orange-1))))
-  `(helm-bookmark-directory ((t (:foreground nil :background nil :inherit helm-ff-directory))))
-  `(helm-bookmark-file ((t (:foreground nil :background nil :inherit helm-ff-file))))
-  `(helm-bookmark-gnus ((t (:foreground ,atom-one-dark-purple))))
-  `(helm-bookmark-info ((t (:foreground ,atom-one-dark-green))))
-  `(helm-bookmark-man ((t (:foreground ,atom-one-dark-orange-2))))
-  `(helm-bookmark-w3m ((t (:foreground ,atom-one-dark-purple))))
-  `(helm-match ((t (:foreground ,atom-one-dark-orange-2))))
-  `(helm-ff-directory ((t (:foreground ,atom-one-dark-cyan :background ,atom-one-dark-bg :weight bold))))
-  `(helm-ff-file ((t (:foreground ,atom-one-dark-fg :background ,atom-one-dark-bg :weight normal))))
-  `(helm-ff-executable ((t (:foreground ,atom-one-dark-green :background ,atom-one-dark-bg :weight normal))))
-  `(helm-ff-invalid-symlink ((t (:foreground ,atom-one-dark-red-1 :background ,atom-one-dark-bg :weight bold))))
-  `(helm-ff-symlink ((t (:foreground ,atom-one-dark-orange-2 :background ,atom-one-dark-bg :weight bold))))
-  `(helm-ff-prefix ((t (:foreground ,atom-one-dark-bg :background ,atom-one-dark-orange-2 :weight normal))))
-  `(helm-buffer-not-saved ((t (:foreground ,atom-one-dark-red-1))))
-  `(helm-buffer-process ((t (:foreground ,atom-one-dark-mono-2))))
-  `(helm-buffer-saved-out ((t (:foreground ,atom-one-dark-fg))))
-  `(helm-buffer-size ((t (:foreground ,atom-one-dark-mono-2))))
-  `(helm-buffer-directory ((t (:foreground ,atom-one-dark-purple))))
-  `(helm-grep-cmd-line ((t (:foreground ,atom-one-dark-cyan))))
-  `(helm-grep-file ((t (:foreground ,atom-one-dark-fg))))
-  `(helm-grep-finish ((t (:foreground ,atom-one-dark-green))))
-  `(helm-grep-lineno ((t (:foreground ,atom-one-dark-mono-2))))
-  `(helm-grep-finish ((t (:foreground ,atom-one-dark-red-1))))
-  `(helm-grep-match ((t (:foreground nil :background nil :inherit helm-match))))
-  `(helm-swoop-target-line-block-face ((t (:background ,atom-one-dark-mono-3 :foreground "#222222"))))
-  `(helm-swoop-target-line-face ((t (:background ,atom-one-dark-mono-3 :foreground "#222222"))))
-  `(helm-swoop-target-word-face ((t (:background ,atom-one-dark-purple :foreground "#ffffff"))))
-  `(helm-locate-finish ((t (:foreground ,atom-one-dark-green))))
-  `(info-menu-star ((t (:foreground ,atom-one-dark-red-1))))
 
   ;; ivy
   `(ivy-confirm-face ((t (:inherit minibuffer-prompt :foreground ,atom-one-dark-green))))
@@ -357,13 +321,17 @@
   `(magit-section-heading ((t (:foreground ,atom-one-dark-orange-2 :weight bold))))
   `(magit-section-heading-selection ((t (:foreground ,atom-one-dark-fg :weight bold))))
   `(magit-diff-file-heading ((t (:weight bold))))
-  `(magit-diff-file-heading-highlight ((t (:background ,atom-one-dark-gray :weight bold))))
+  `(magit-diff-file-heading-highlight ((t (:background ,atom-one-dark-bg-hl :foreground ,atom-one-dark-fg :weight bold))))
   `(magit-diff-file-heading-selection ((t (:foreground ,atom-one-dark-orange-2 :background ,atom-one-dark-bg-hl :weight bold))))
   `(magit-diff-hunk-heading ((t (:foreground ,atom-one-dark-mono-2 :background ,atom-one-dark-gray))))
   `(magit-diff-hunk-heading-highlight ((t (:foreground ,atom-one-dark-mono-1 :background ,atom-one-dark-mono-3))))
   `(magit-diff-hunk-heading-selection ((t (:foreground ,atom-one-dark-purple :background ,atom-one-dark-mono-3))))
   `(magit-diff-context ((t (:foreground ,atom-one-dark-fg))))
   `(magit-diff-context-highlight ((t (:background ,atom-one-dark-bg-1 :foreground ,atom-one-dark-fg))))
+  `(magit-diff-added ((t (:foreground ,atom-one-dark-green))))
+  `(magit-diff-removed ((t (:foreground ,atom-one-dark-red-1))))
+  `(magit-diff-added-highlight ((t (:foreground ,atom-one-dark-green :background ,atom-one-dark-bg-hl))))
+  `(magit-diff-removed-highlight ((t (:foreground ,atom-one-dark-red-1 :background ,atom-one-dark-bg-hl))))
   `(magit-diffstat-added ((t (:foreground ,atom-one-dark-green))))
   `(magit-diffstat-removed ((t (:foreground ,atom-one-dark-red-1))))
   `(magit-process-ok ((t (:foreground ,atom-one-dark-green))))
@@ -548,17 +516,6 @@
   ;; flx-ido
   `(flx-highlight-face ((t (:inherit (link) :weight bold))))
 
-  ;; rpm-spec-mode
-  `(rpm-spec-tag-face ((t (:foreground ,atom-one-dark-blue))))
-  `(rpm-spec-obsolete-tag-face ((t (:foreground "#FFFFFF" :background ,atom-one-dark-red-2))))
-  `(rpm-spec-macro-face ((t (:foreground ,atom-one-dark-orange-2))))
-  `(rpm-spec-var-face ((t (:foreground ,atom-one-dark-red-1))))
-  `(rpm-spec-doc-face ((t (:foreground ,atom-one-dark-purple))))
-  `(rpm-spec-dir-face ((t (:foreground ,atom-one-dark-cyan))))
-  `(rpm-spec-package-face ((t (:foreground ,atom-one-dark-red-2))))
-  `(rpm-spec-ghost-face ((t (:foreground ,atom-one-dark-red-2))))
-  `(rpm-spec-section-face ((t (:foreground ,atom-one-dark-orange-2))))
-
   ;; guix
   `(guix-true ((t (:foreground ,atom-one-dark-green :weight bold))))
   `(guix-build-log-phase-end ((t (:inherit success))))
@@ -670,9 +627,9 @@
   `(undo-tree-visualizer-unmodified-face ((t (:foreground ,atom-one-dark-cyan))))
   ))
 
-(atom-one-dark-with-color-variables
+(ng-atom-one-dark-with-color-variables
   (custom-theme-set-variables
-   'atom-one-dark
+   'ng-atom-one-dark
    ;; fill-column-indicator
    `(fci-rule-color ,atom-one-dark-gray)
 
@@ -694,8 +651,8 @@
       ,atom-one-dark-blue ,atom-one-dark-purple ,atom-one-dark-cyan ,atom-one-dark-fg])
    ))
 
-(defvar atom-one-dark-theme-force-faces-for-mode t
-  "If t, atom-one-dark-theme will use Face Remapping to alter the theme faces for
+(defvar ng-atom-one-dark-theme-force-faces-for-mode t
+  "If t, ng-atom-one-dark-theme will use Face Remapping to alter the theme faces for
 the current buffer based on its mode in an attempt to mimick the Atom One Dark
 Theme from Atom.io as best as possible.
 The reason this is required is because some modes (html-mode, jyaml-mode, ...)
@@ -715,10 +672,10 @@ Current modes, and their faces, impacted by this variable:
 ;; Of course, this might be confusing to some when in one mode they see keywords highlighted in one face and in another
 ;; mode they see a different face.  That being said, you can set the `atom-one-dark-theme-force-faces-for-mode` variable to
 ;; `nil` to disable this feature.
-(defun atom-one-dark-theme-change-faces-for-mode ()
+(defun ng-atom-one-dark-theme-change-faces-for-mode ()
   (interactive)
-  (when (or atom-one-dark-theme-force-faces-for-mode (called-interactively-p))
-    (atom-one-dark-with-color-variables
+  (when (or ng-atom-one-dark-theme-force-faces-for-mode (called-interactively-p))
+    (ng-atom-one-dark-with-color-variables
       (cond
        ((member major-mode '(js2-mode))
         (face-remap-add-relative 'font-lock-constant-face :foreground atom-one-dark-orange-1)
@@ -728,19 +685,8 @@ Current modes, and their faces, impacted by this variable:
         (face-remap-add-relative 'font-lock-function-name-face :foreground atom-one-dark-red-1)
         (face-remap-add-relative 'font-lock-variable-name-face :foreground atom-one-dark-orange-1))))))
 
-(add-hook 'after-change-major-mode-hook 'atom-one-dark-theme-change-faces-for-mode)
+(add-hook 'after-change-major-mode-hook 'ng-atom-one-dark-theme-change-faces-for-mode)
 
-;;;###autoload
-(and load-file-name
-    (boundp 'custom-theme-load-path)
-    (add-to-list 'custom-theme-load-path
-                 (file-name-as-directory
-                  (file-name-directory load-file-name))))
-;; Automatically add this theme to the load path
+(provide-theme 'ng-atom-one-dark)
 
-(provide-theme 'atom-one-dark)
-
-;; Local Variables:
-;; no-byte-compile: t
-;; End:
-;;; atom-one-dark-theme.el ends here
+;;; ng-atom-one-dark-theme.el ends here
