@@ -70,31 +70,43 @@ shopt -s globstar 2> /dev/null
 # ignore case when globbing
 shopt -s nocaseglob 2> /dev/null
 
-# editor
+
+# prefer vs code insiders
 if have code-insiders; then
     alias code=code-insiders
-    alias e=code
-    export EDITOR='code-insiders -w'
-elif have code; then
-    alias e=code
-    export EDITOR='code -w'
-elif [ -d /Applications/Emacs.app ]; then
-    export ALTERNATE_EDITOR=/Applications/Emacs.app/Contents/MacOS/Emacs
-    export EDITOR=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
-    alias e='$EDITOR -n'
-elif have emacsclient && have emacs; then
-    alias e='emacsclient -n'
-    export ALTERNATE_EDITOR=emacs
-    export EDITOR=emacsclient
-else
-    alias e='"vi"'
 fi
 
-# hijack all muscle memory to chosen editor
-alias n=e
-alias vi=e
-alias vim=e
-alias notepad=e
+# editor
+if [ -d /Applications/Emacs.app ]; then
+    export ALTERNATE_EDITOR=/Applications/Emacs.app/Contents/MacOS/Emacs
+    export EDITOR=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
+    alias emacs='$EDITOR -n'
+    alias e=emacs
+elif have emacs; then
+    export ALTERNATE_EDITOR=emacs
+    export EDITOR=emacsclient
+    alias e=emacs
+elif have code-insiders; then
+    export EDITOR='code-insiders -w'
+    alias emacs=code-insiders
+    alias e=emacs
+elif have code; then
+    export EDITOR='code -w'
+    alias emacs=code
+    alias e=emacs
+else
+    alias emacs=vi
+    alias e=vi
+fi
+
+if have code; then
+    alias n=code
+else
+    alias n=emacs
+fi
+
+alias notepad=n
+
 
 # aliases
 alias -- -='cd -'
