@@ -130,15 +130,41 @@ alias tracert=traceroute
 alias copy=copy
 alias del=rm
 
+# WSL interop
 if have pwsh.exe; then
-    alias start='pwsh.exe -command start'
+    tgit() {
+        local patharg
+        if [ $# -lt 2 ]; then
+           patharg=$(git rev-parse --show-toplevel)
+        else
+           patharg=$2
+        fi
+        patharg=$(wslpath -a -w $patharg)
+        "/mnt/c/Program Files/TortoiseGit/bin/TortoiseGitProc.exe" /command:$1 /path:$patharg
+    }
+
+    start() {
+        local arg=$1
+        if [ -e $arg ]; then
+           arg=$(wslpath -a -w $arg)
+        fi
+        # cmd does not like being run from a network path
+        pushd /mnt/c > /dev/null
+        cmd.exe /c start $arg
+        # annoyingly, above changes terminal title
+        cmd.exe /c title Terminal
+        popd > /dev/null
+    }
+
     alias open=start
-    alias tgit='pwsh.exe -command tgit'
+    alias bcomp=~/.dot/git/bcomp-wsl
+    alias ms='emacsclient -c -e "(magit-status)"'
 fi
 
 if have hub; then
     alias git=hub
 fi
+
 
 # Start with BSD-safe LS_OPTIONS.
 # We'll augment them if we find GNU coreutils below.

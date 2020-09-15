@@ -4,3 +4,11 @@
 	path = unix.gitconfig
 [credential]
 	helper = /mnt/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-manager.exe
+[diff]
+	tool = bc
+[difftool "bc"]
+	path = /home/nicholg/.dot/git/bcomp-wsl
+[alias]
+	dd = difftool --no-symlinks --dir-diff
+	dt = difftool --no-symlinks -y
+
