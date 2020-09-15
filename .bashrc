@@ -70,12 +70,6 @@ shopt -s globstar 2> /dev/null
 # ignore case when globbing
 shopt -s nocaseglob 2> /dev/null
 
-
-# prefer vs code insiders
-if have code-insiders; then
-    alias code=code-insiders
-fi
-
 # editor
 if [ -d /Applications/Emacs.app ]; then
     export ALTERNATE_EDITOR=/Applications/Emacs.app/Contents/MacOS/Emacs
@@ -97,6 +91,11 @@ elif have code; then
 else
     alias emacs=vi
     alias e=vi
+fi
+
+# prefer vs code insiders
+if have code-insiders; then
+    alias code=code-insiders
 fi
 
 if have code; then
@@ -125,13 +124,20 @@ alias mv='mv -i'
 alias rd=rmdir
 alias rm='rm -i'
 alias ren=mv
-alias tracert=traceroute
 alias where='type -a'
 alias which='where'
+alias tracert=traceroute
+alias copy=copy
+alias del=rm
 
-if have powershell.exe; then
-    alias start='powershell.exe -command start'
+if have pwsh.exe; then
+    alias start='pwsh.exe -command start'
     alias open=start
+    alias tgit='pwsh.exe -command tgit'
+fi
+
+if have hub; then
+    alias git=hub
 fi
 
 # Start with BSD-safe LS_OPTIONS.
@@ -141,9 +147,6 @@ export CLICOLOR=1
 export LSCOLORS=exgxbxdxcxegedabagacad
 LS_OPTIONS='-h -F'
 
-if have hub; then
-  alias git=hub
-fi
 
 # Use GNU coreutils where possible
 #
