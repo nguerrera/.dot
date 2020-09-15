@@ -1,0 +1,6 @@
+[url "https://github.com/"]
+	pushinsteadof = "https://github.com/"
+[include]
+	path = unix.gitconfig
+[credential]
+	helper = /mnt/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-manager.exe

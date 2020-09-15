@@ -4,7 +4,11 @@
 # directory. Chain in more git configuration layers.
 
 cd $(dirname $0) || exit $?
-git config --global include.path ~/.dot/git/unix.gitconfig
+if [ -d /mnt/c/windows ]; then
+  git config --global include.path ~/.dot/git/wsl.gitconfig
+else
+  git config --global include.path ~/.dot/git/unix.gitconfig
+fi
 
 for file in .*; do
     case $file in
