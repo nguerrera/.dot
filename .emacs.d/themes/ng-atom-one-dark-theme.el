@@ -52,11 +52,12 @@
          (dark-black
           (if (< color-count 256) "black"  "color-235"))
          (dark-gray
-          (cond ((color-defined-p "brightblack") "brightblack")
-                ((color-defined-p "darkgray") "darkgray")
+          (cond ((color-supported-p "brightblack") "brightblack")
+                ((color-supported-p "darkgray") "darkgray")
                 (t  "white")))
          (light-gray
-          (if (color-defined-p "lightgray") "lightgray" "white")))
+          (cond ((string-equal system-type "windows-nt") "lightgray")
+                (t "white"))))
     (cl-flet ((_ (x y) (if fewer-colors x y)))
          `(("atom-one-dark-accent"   . ,(_ "blue"      "#528BFF"))
            ("atom-one-dark-fg"       . ,(_ light-gray  "#ABB2BF"))
