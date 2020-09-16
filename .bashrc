@@ -55,9 +55,6 @@ unset -f __set-prompt
 # don't include repeat commands in history 
 HISTCONTROL=ignoredups:erasedups
 
-# don't persist history
-HISTFILE=
-
 # cd to directory when given as bare command
 shopt -s autocd 2> /dev/null
 
