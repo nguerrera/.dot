@@ -131,7 +131,7 @@ alias copy=copy
 alias del=rm
 
 # WSL interop
-if have pwsh.exe; then
+if have cmd.exe; then
     tgit() {
         local patharg
         if [ $# -lt 2 ]; then
@@ -159,6 +159,12 @@ if have pwsh.exe; then
     alias open=start
     alias bcomp=~/.dot/git/bcomp-wsl
     alias ms='emacsclient -c -e "(magit-status)"'
+
+    # Make ls gnore paths that cause permission denied in WSL
+    WSL_LS_OPTIONS="--ignore=ntuser.* --ignore=NTUSER.* --ignore=*fil*.sys --ignore=DumpStack.log.tmp --ignore=Config.Msi --ignore=Recovery --ignore=System*Volume*Information'"
+
+    # Prevent ls from highlighting everything in /mnt/c
+    export LS_COLORS=$LS_COLORS:'ow=1;34:'
 fi
 
 if have hub; then
@@ -171,7 +177,7 @@ fi
 # These LSCOLORS are designed to match the GNU defaults.
 export CLICOLOR=1
 export LSCOLORS=exgxbxdxcxegedabagacad
-LS_OPTIONS='-h -F'
+LS_OPTIONS="-h -F $WSL_LS_OPTIONS"
 
 
 # Use GNU coreutils where possible
