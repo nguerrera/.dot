@@ -195,7 +195,8 @@
 (use-package goto-addr
   :hook ((find-file . goto-address-mode))
   :config
-  (setq goto-address-url-face '((t :underline t))))
+  (setq goto-address-url-face '((:underline t)))
+  (setq goto-address-url-mouse-face '((:underline t :weight bold))))
 
 ;; http://emacswiki.org/InteractivelyDoThings
 (use-package ido
@@ -237,6 +238,7 @@
 
 ;; https://github.com/bbatsov/projectile
 (use-package projectile
+  :diminish
   :bind
   ("C-," . projectile-find-file)
   :bind-keymap
