@@ -155,7 +155,7 @@ if have cmd.exe; then
 
     alias open=start
     alias bcomp=~/.dot/git/bcomp-wsl
-    alias ms='emacsclient -c -e "(magit-status)"'
+    alias ms='emacs -nw --eval "(magit-status)"'
 
     # Make ls gnore paths that cause permission denied in WSL
     WSL_LS_OPTIONS="--ignore=ntuser.* --ignore=NTUSER.* --ignore=*fil*.sys --ignore=DumpStack.log.tmp --ignore=Config.Msi --ignore=Recovery --ignore=System*Volume*Information'"
