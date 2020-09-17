@@ -120,6 +120,15 @@
   (unbind-key "M-<mouse-2>")
   (unbind-key "M-<mouse-3>"))
 
+(use-package diminish
+  :config
+  (diminish 'eldoc-mode))
+
+(use-package undo-tree
+  :diminish
+  :config
+  (global-undo-tree-mode))
+
 (use-package esup
   :commands esup)
 
@@ -147,6 +156,7 @@
   (setq rainbow-delimiters-max-face-count 1))
 
 (use-package smartparens
+  :diminish
   :hook (prog-mode . smartparens-mode)
   :config
   (setq sp-highlight-pair-overlay     nil

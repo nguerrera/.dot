@@ -26,8 +26,8 @@
 ;; NOTE: package archives must be defined in the early config file
 (setq package-archives
       '(("melpa-stable" . "https://stable.melpa.org/packages/")
-        ;;below are currently unused, disable to speed things up
-        ;;("gnu"        . "https://elpa.gnu.org/packages/")
+        ("gnu"        . "https://elpa.gnu.org/packages/")
+        ;;below is currently unused, disable to speed things up
         ;;("melpa"      . "https://melpa.org/packages/")
         )
       package-archive-priorities

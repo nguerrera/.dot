@@ -157,7 +157,7 @@
   `(mode-line ((t (:background ,darkblack :foreground ,white :box (:color ,darkblack :line-width 1)))))
   `(mode-line-buffer-id ((t (:weight bold))))
   `(mode-line-emphasis ((t (:weight bold))))
-  `(mode-line-inactive ((t (:background ,darkblack :foreground ,white :box (:color ,black :line-width 1)))))
+  `(mode-line-inactive ((t (:background ,black :foreground ,white :box (:color ,black :line-width 1)))))
 
   ;; custom
   `(custom-state ((t (:foreground ,green))))
