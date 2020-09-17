@@ -129,9 +129,11 @@
   `(link ((t (:foreground ,blue :underline t :weight bold))))
   `(link-visited ((t (:foreground ,blue :underline t :weight normal))))
   `(cursor ((t (:background ,white))))
+  `(fringe ((t (:background ,black))))
+  `(highlight ((t (:background ,magenta :foreground ,black))))
   `(region ((t (:background ,white :foreground ,black))))
-  `(vertical-border ((t (:background ,darkblack :foreground ,darkblack))))
-  `(secondary-selection ((t (:background ,darkblack))))
+  `(vertical-border ((t (:foreground ,white))))
+  `(secondary-selection ((t (:background ,blue :foreground ,black))))
   `(query-replace ((t (:inherit (isearch)))))
   `(minibuffer-prompt ((t (:foreground ,white))))
   `(font-lock-builtin-face ((t (:foreground ,cyan))))
@@ -143,10 +145,13 @@
   `(font-lock-preprocessor-face ((t (:foreground ,brightblack))))
   `(font-lock-string-face ((t (:foreground ,green))))
   `(font-lock-type-face ((t (:foreground ,yellow))))
-  `(font-lock-constant-face ((t (:foreground ,cyan))))
-  `(font-lock-variable-name-face ((t (:foreground ,red))))
+  `(font-lock-constant-face ((t (:foreground ,brightcyan))))
+  `(font-lock-variable-name-face ((t (:foreground ,cyan))))
   `(font-lock-warning-face ((t (:foreground ,brightblack :bold t))))
   `(font-lock-negation-char-face ((t (:foreground ,cyan :bold t))))
+
+  ;; cua-rectangle
+  `(cua-rectangle ((t (:foreground ,black :background ,white))))
 
   ;; mode-line
   `(mode-line ((t (:background ,darkblack :foreground ,white :box (:color ,darkblack :line-width 1)))))
@@ -166,10 +171,6 @@
   ;; ace-jump
   `(ace-jump-face-background ((t (:foreground ,brightblack :background ,black :inverse-video nil))))
   `(ace-jump-face-foreground ((t (:foreground ,red :background ,black :inverse-video nil))))
-
-  ;; ace-window
-  `(aw-background-face ((t (:inherit font-lock-comment-face))))
-  `(aw-leading-char-face ((t (:foreground ,red :weight bold))))
 
   ;; isearch
   `(isearch ((t (:foreground ,black :background ,magenta))))
@@ -250,26 +251,13 @@
   `(magit-reflog-other        ((t (:foreground ,cyan))))
 
   ;; rainbow-delimiters
-  `(rainbow-delimiters-depth-1-face ((t (:foreground ,blue))))
-  `(rainbow-delimiters-depth-2-face ((t (:foreground ,green))))
-  `(rainbow-delimiters-depth-3-face ((t (:foreground ,brightyellow))))
-  `(rainbow-delimiters-depth-4-face ((t (:foreground ,cyan))))
-  `(rainbow-delimiters-depth-5-face ((t (:foreground ,magenta))))
-  `(rainbow-delimiters-depth-6-face ((t (:foreground ,yellow))))
-  `(rainbow-delimiters-depth-7-face ((t (:foreground ,blue))))
-  `(rainbow-delimiters-depth-8-face ((t (:foreground ,green))))
-  `(rainbow-delimiters-depth-9-face ((t (:foreground ,brightyellow))))
-  `(rainbow-delimiters-depth-10-face ((t (:foreground ,cyan))))
-  `(rainbow-delimiters-depth-11-face ((t (:foreground ,magenta))))
-  `(rainbow-delimiters-depth-12-face ((t (:foreground ,yellow))))
+  `(rainbow-delimiters-depth-1-face ((t (:foreground ,brightblack))))
   `(rainbow-delimiters-unmatched-face ((t (:foreground ,red :weight bold))))
+  `(rainbow-delimiters-mismatched-face ((t (:foreground ,red :weight bold))))
 
   ;; show-paren
   `(show-paren-match ((t (:foreground ,cyan :inherit bold))))
-  `(show-paren-mismatch ((t (:foreground ,red :inherit bold :underline t))))
-
-  ;; sh-mode
-  `(sh-heredoc ((t (:inherit font-lock-string-face :slant italic))))
+  `(show-paren-mismatch ((t (:foreground ,red :inherit bold))))
 
   ;; nxml
   `(nxml-attribute-local-name ((t (:foreground ,brightyellow))))

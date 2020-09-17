@@ -1,20 +1,5 @@
 ;; -*- lexical-binding: t; -*-
 
-(defmacro ng/dopairs (names pairs body)
-  "Process list in pairs."
-  (declare (indent 2))
-  `(let ((__p ,pairs))
-     (while __p
-       (let ((,(car  names) (car  __p))
-             (,(cadr names) (cadr __p)))
-         ,body
-         (setq __p (cddr __p))))))
-
-;; helper to global-set-key in pairs with fewer parens
-(defmacro ng/set-keys (&rest pairs)
-  (ng/dopairs (key function) pairs
-    (global-set-key (eval `(kbd ,key)) function)))
-
 (defun ng/home (&optional arg)
   "Move back to indentation. If already there, move to beginning
 of line. If a region is selected, create multiple cursors in the

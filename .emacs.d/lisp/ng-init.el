@@ -24,18 +24,23 @@
  ring-bell-function 'ignore)
 
 ;; highlight matching parens
-(show-paren-mode 1)
+(progn
+  (show-paren-mode 1)
+  (setq show-paren-priority -1))
 
 ;; show line and column numbers
 (progn
   (line-number-mode 1)
   (column-number-mode 1))
 
-;; don't blink the cursor
-(blink-cursor-mode -1)
+;; use a vertical bar as cursor
+(setq-default cursor-type 'bar)
 
 ;; refresh unsaved files
 (global-auto-revert-mode 1)
+
+;; don't warn about cl being deprecated as some packages use it
+(setq byte-compile-warnings '(cl-functions))
 
 ;; http://www.emacswiki.org/SmoothScrolling
 (setq
@@ -76,44 +81,44 @@
 (setq cua-auto-tabify-rectangles nil)
 (setq cua-keep-region-after-copy t)
 
-(ng/set-keys
- "C-k"         ng/C-k
- "C-w"         ng/C-w
- "C-a"         ng/home
- "M-m"         ng/home
- "<home>"      ng/home
- "C-e"         ng/end
- "<end>"       ng/end
- "C-c C-c"     ng/done
- "C-x C-k"     ng/kill-other-buffer-and-window
- "C-x k"       ng/kill-this-buffer-and-window
- "<M-S-up>"    ng/rectangle-mark-up
- "<M-S-down>"  ng/rectangle-mark-down
- "<M-S-left>"  ng/rectangle-mark-left
- "<M-S-right>" ng/rectangle-mark-right
- "M-n"         cua-scroll-up
- "M-p"         cua-scroll-down
- "C-m"         newline-and-indent
- "C-x C-b"     ibuffer
- "<C-tab>"     next-buffer
- "<C-S-tab>"   previous-buffer
- "C-;"         comment-line
- "C-x SPC"     cua-rectangle-mark-mode
+(bind-keys
+ ("C-k"         . ng/C-k)
+ ("C-w"         . ng/C-w)
+ ("C-a"         . ng/home)
+ ("M-m"         . ng/home)
+ ("<home>"      . ng/home)
+ ("C-e"         . ng/end)
+ ("<end>"       . ng/end)
+ ("C-c C-c"     . ng/done)
+ ("C-x C-k"     . ng/kill-other-buffer-and-window)
+ ("C-x k"       . ng/kill-this-buffer-and-window)
+ ("<M-S-up>"    . ng/rectangle-mark-up)
+ ("<M-S-down>"  . ng/rectangle-mark-down)
+ ("<M-S-left>"  . ng/rectangle-mark-left)
+ ("<M-S-right>" . ng/rectangle-mark-right)
+ ("M-n"         . cua-scroll-up)
+ ("M-p"         . cua-scroll-down)
+ ("C-m"         . newline-and-indent)
+ ("C-x C-b"     . ibuffer)
+ ("<C-tab>"     . next-buffer)
+ ("<C-S-tab>"   . previous-buffer)
+ ("C-;"         . comment-line)
+ ("C-x SPC"     . cua-rectangle-mark-mode)
  )
 
 ;; remove minor mode conflicts with C-c C-c
 (progn
-  (add-hook 'bat-mode-hook (lambda () (define-key bat-mode-map (kbd "C-c C-c") nil)))
-  (add-hook 'conf-mode-hook (lambda () (define-key conf-mode-map (kbd "C-c C-c") nil))))
+  (add-hook 'bat-mode-hook (lambda () (unbind-key "C-c C-c" bat-mode-map)))
+  (add-hook 'conf-mode-hook (lambda () (unbind-key "C-c C-c" conf-mode-map))))
 
 ;; disable archaic "secondary selection" on alt clicks, which we'll
 ;; replace with modern multiple cursor/rectangle functionality
 (progn
-  (global-unset-key (kbd "M-<drag-mouse-1>"))
-  (global-unset-key (kbd "M-<down-mouse-1>"))
-  (global-unset-key (kbd "M-<mouse-1>"))
-  (global-unset-key (kbd "M-<mouse-2>"))
-  (global-unset-key (kbd "M-<mouse-3>")))
+  (unbind-key "M-<drag-mouse-1>")
+  (unbind-key "M-<down-mouse-1>")
+  (unbind-key "M-<mouse-1>")
+  (unbind-key "M-<mouse-2>")
+  (unbind-key "M-<mouse-3>"))
 
 (use-package esup
   :commands esup)
@@ -135,9 +140,26 @@
 (use-package typescript-mode
   :mode "\\.ts\\'")
 
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode)
+  :config
+  ;; not really a rainbow, just highlight matched/unmatched differently
+  (setq rainbow-delimiters-max-face-count 1))
+
+(use-package smartparens
+  :hook (prog-mode . smartparens-mode)
+  :config
+  (setq sp-highlight-pair-overlay     nil
+        sp-highlight-wrap-overlay     nil
+        sp-highlight-wrap-tag-overlay nil
+        sp-escape-quotes-after-insert nil)
+  (require 'smartparens-config))
+
 ;; https://www.emacswiki.org/emacs/GotoAddress
 (use-package goto-addr
-  :hook ((find-file . goto-address-mode)))
+  :hook ((find-file . goto-address-mode))
+  :config
+  (setq goto-address-url-face '((t :underline t))))
 
 ;; http://emacswiki.org/InteractivelyDoThings
 (use-package ido
