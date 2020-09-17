@@ -70,6 +70,32 @@
     (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
     (remove-hook 'kill-emacs-query-functions 'server-kill-emacs-query-function)))
 
+;; Use Git for Windows bash for shell-command. Fixes various issues
+;; where things assume bash syntax can be passed to shell-command
+(when (and (string= system-type "windows-nt")
+           (file-directory-p "C:/Program Files/Git"))
+  ;; add or move msys dirs to front of exec-path
+  (dolist (dir '("C:/Program Files/Git/usr/bin"
+                 "C:/Program Files/Git/mingw64/bin"))
+    (setq exec-path (cons dir (remove dir exec-path))))
+
+  ;; sync PATH to exec-path
+  (let ((path ""))
+    (dolist (p exec-path)
+      (setq path (concat (replace-regexp-in-string "/" "\\\\" path) p ";")))
+    (setenv "PATH" path))
+
+  ;; use bash for shell-command
+  (setq shell-file-name "bash")
+
+  ;; but retain cmdproxy for M-x shell because interactive bash is
+  ;; relatively broken in Emacs on Windows. Use eshell instead.
+  (setq explicit-shell-file-name "cmdproxy")
+
+  ;; with this in place, we can use projectile's fast "alien" indexing
+  ;; on windows, which is the default on other OSes
+  (setq projectile-indexing-method 'alien))
+
 (require 'use-package)
 (require 'ng-lib)
 

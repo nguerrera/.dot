@@ -26,14 +26,14 @@
 ;; NOTE: package archives must be defined in the early config file
 (setq package-archives
       '(("melpa-stable" . "https://stable.melpa.org/packages/")
-        ("gnu"        . "https://elpa.gnu.org/packages/")
+        ("gnu"          . "https://elpa.gnu.org/packages/")
         ;;below is currently unused, disable to speed things up
         ;;("melpa"      . "https://melpa.org/packages/")
         )
       package-archive-priorities
       '(("melpa-stable" . 10)
-        ("gnu"        . 5)
-        ("melpa"      . 0)))
+        ("gnu"          . 5)
+        ("melpa"        . 0)))
 
 ;; If there's one thing I can't stand, it's hitting C-z reflexively to
 ;; undo and having it minimize my window. Make sure it's never bound
@@ -44,11 +44,12 @@
 ;; Also do UI changes early so that there isn't a jarring change from
 ;; the default UI to the customized one during load.
 
-;; hide menu bar and tool bar
+;; hide menu bar, tool bar, scroll bar
 (progn
   (menu-bar-mode -1)
-  (if (fboundp 'tool-bar-mode)
-      (tool-bar-mode -1)))
+  (when window-system
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)))
 
 ;; theme: patched atom one dark
 (load-theme 'ng-atom-one-dark t)
