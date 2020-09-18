@@ -130,7 +130,7 @@
   `(link-visited ((t (:foreground ,blue :underline t))))
   `(cursor ((t (:background ,white))))
   `(fringe ((t (:background ,black))))
-  `(highlight ((t (:background ,blue :foreground ,white))))
+  `(highlight ((t (:background ,white :foreground ,black))))
   `(region ((t (:background ,white :foreground ,black))))
   `(vertical-border ((t (:foreground ,white))))
   `(secondary-selection ((t (:background ,blue :foreground ,white))))
