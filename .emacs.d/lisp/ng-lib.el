@@ -1,6 +1,6 @@
 ;; -*- lexical-binding: t; -*-
 
-(defun ng/home (&optional arg)
+(defun ng-home (&optional arg)
   "Move back to indentation. If already there, move to beginning
 of line. If a region is selected, create multiple cursors in the
 selected lines before moving."
@@ -11,11 +11,11 @@ selected lines before moving."
     (progn
       (if (and (use-region-p) (fboundp 'mc/edit-lines))
           (mc/edit-lines))
-      (if (ng/at-indentation-p)
+      (if (ng-at-indentation-p)
           (move-beginning-of-line 1)
         (back-to-indentation)))))
 
-(defun ng/end (&optional arg)
+(defun ng-end (&optional arg)
   "Move back to indentation. If already there, move to beginning
 of line. If a region is selected, create multiple cursors in the
 selected lines before moving."
@@ -27,7 +27,7 @@ selected lines before moving."
         (mc/edit-lines))
     (move-end-of-line 1)))
 
-(defun ng/at-indentation-p ()
+(defun ng-at-indentation-p ()
   "Check if the cursor is already back to indentation."
   (interactive)
   (let ((old-column (current-column)))    
@@ -35,27 +35,27 @@ selected lines before moving."
       (back-to-indentation)
       (= old-column (current-column)))))
 
-(defun ng/rectangle-mark-down (&optional arg)
+(defun ng-rectangle-mark-down (&optional arg)
   (interactive "p")          
   (unless cua--rectangle (cua-set-rectangle-mark))
   (cua-resize-rectangle-down arg))
                              
-(defun ng/rectangle-mark-up (&optional arg)
+(defun ng-rectangle-mark-up (&optional arg)
   (interactive "p")          
   (unless cua--rectangle (cua-set-rectangle-mark))
   (cua-resize-rectangle-up arg))
 
-(defun ng/rectangle-mark-left (&optional arg)
+(defun ng-rectangle-mark-left (&optional arg)
   (interactive "p")
   (unless cua--rectangle (cua-set-rectangle-mark))
   (cua-resize-rectangle-left arg))
 
-(defun ng/rectangle-mark-right (&optional arg)
+(defun ng-rectangle-mark-right (&optional arg)
   (interactive "p")
   (unless cua--rectangle (cua-set-rectangle-mark))
   (cua-resize-rectangle-right arg))
 
-(defun ng/C-w (&optional arg)
+(defun ng-C-w (&optional arg)
   "If there is an active region, kill it. Otherwise, kill the
 preceding word. Allows C-w to backward-kill-word like it does on
 the terminal, but still kill-region when something is selected."
@@ -64,7 +64,7 @@ the terminal, but still kill-region when something is selected."
       (kill-region (region-beginning) (region-end))
     (backward-kill-word arg)))
 
-(defun ng/C-k (&optional arg)
+(defun ng-C-k (&optional arg)
   "If there is an active region, kill it. Otherwise, kill the
 following line. Adds symmetry to the mnemonic C-k=kill:C-y==yank."
   (interactive "P")
@@ -72,7 +72,7 @@ following line. Adds symmetry to the mnemonic C-k=kill:C-y==yank."
       (kill-region (region-beginning) (region-end))
     (kill-line arg)))
 
-(defun ng/kill-this-buffer-and-window ()
+(defun ng-kill-this-buffer-and-window ()
   "Kill the current buffer and delete its window."
   (interactive)
   (let ((window (selected-window))
@@ -81,7 +81,7 @@ following line. Adds symmetry to the mnemonic C-k=kill:C-y==yank."
         (delete-window window))
     (kill-buffer buffer)))
 
-(defun ng/kill-other-buffer-and-window ()
+(defun ng-kill-other-buffer-and-window ()
   "Kill the buffer in the other window and delete its window."
   (interactive)
   (let ((old-window (selected-window))
@@ -94,12 +94,12 @@ following line. Adds symmetry to the mnemonic C-k=kill:C-y==yank."
       (unless (eq new-window old-window)
         (delete-window new-window)))))
 
-(defun ng/done ()
+(defun ng-done ()
   "Save the current buffer, kill it, and delete its window."
   (interactive)
   (save-buffer)
   (if server-buffer-clients
       (server-done)
-    (ng/kill-this-buffer-and-window)))
+    (ng-kill-this-buffer-and-window)))
 
 (provide 'ng-lib)

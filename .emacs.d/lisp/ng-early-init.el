@@ -8,11 +8,11 @@
 ;;
 ;; auto-save and backups are nice, but keep them out of sight
 (progn
-  (defvar ng/auto-save-dir  "~/.emacs.d/saves/")
-  (make-directory ng/auto-save-dir t)
+  (defvar ng-auto-save-dir  "~/.emacs.d/saves/")
+  (make-directory ng-auto-save-dir t)
   (setq
-   auto-save-file-name-transforms `((".*" ,ng/auto-save-dir t))
-   backup-directory-alist         `(("." .  ,ng/auto-save-dir))
+   auto-save-file-name-transforms `((".*" ,ng-auto-save-dir t))
+   backup-directory-alist         `(("." .  ,ng-auto-save-dir))
    backup-by-copying              t
    delete-old-versions            t
    kept-new-versions              5
@@ -56,7 +56,7 @@
 
 ;; set font
 (when window-system
-  (defun ng/try-set-font (font)
+  (defun ng-try-set-font (font)
   "If the given font is found, sets it as the font for the
 current frame and all future frames."
     (if (find-font (font-spec :name font))
@@ -66,6 +66,6 @@ current frame and all future frames."
           t)
       nil))
   (or
-   (ng/try-set-font "Cascadia Mono-12")
-   (ng/try-set-font "Consolas-12")
-   (ng/try-set-font "DejaVu Sans Mono-12")))
+   (ng-try-set-font "Cascadia Mono-12")
+   (ng-try-set-font "Consolas-12")
+   (ng-try-set-font "DejaVu Sans Mono-12")))

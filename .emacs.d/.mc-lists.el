@@ -3,10 +3,10 @@
 
 (setq mc/cmds-to-run-for-all
       '(
-        ng/C-k
-        ng/C-w
-        ng/end
-        ng/home
+        ng-C-k
+        ng-C-w
+        ng-end
+        ng-home
         ))
 
 (setq mc/cmds-to-run-once
