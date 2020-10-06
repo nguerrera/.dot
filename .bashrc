@@ -67,6 +67,9 @@ shopt -s globstar 2> /dev/null
 # ignore case when globbing
 shopt -s nocaseglob 2> /dev/null
 
+# add custom git commands to path
+export PATH=$PATH:$HOME/.dot/git
+
 # editor
 if [ -d /Applications/Emacs.app ]; then
     export ALTERNATE_EDITOR=/Applications/Emacs.app/Contents/MacOS/Emacs

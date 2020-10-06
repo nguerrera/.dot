@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+if [ $# -ne 1 ]; then
+  echo "Usage: git allow-push <remote>"
+  exit 1
+fi
+git config remote.$1.pushurl $(git config --get remote.$1.url)
