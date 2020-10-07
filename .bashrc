@@ -77,8 +77,7 @@ if [ -d /Applications/Emacs.app ]; then
     alias emacs='$EDITOR -n'
     alias e=emacs
 elif have emacs; then
-    export ALTERNATE_EDITOR=emacs
-    export EDITOR=emacsclient
+    export EDITOR=emacs
     alias e=emacs
 elif have code-insiders; then
     export EDITOR='code-insiders -w'
