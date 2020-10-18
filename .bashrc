@@ -183,6 +183,14 @@ if have hub; then
     alias git=hub
 fi
 
+if ! have start; then
+    if have xdg-open; then
+        alias start=xdg-open
+        alias open=start
+    elif have open; then
+        alias start=open
+    fi
+fi
 
 # Start with BSD-safe LS_OPTIONS.
 # We'll augment them if we find GNU coreutils below.
