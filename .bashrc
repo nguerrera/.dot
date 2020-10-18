@@ -138,7 +138,8 @@ alias ren=mv
 alias where='type -a'
 alias which='where'
 alias tracert=traceroute
-alias copy=copy
+alias copy=cp
+alias move=mv
 alias del=rm
 
 # WSL interop
