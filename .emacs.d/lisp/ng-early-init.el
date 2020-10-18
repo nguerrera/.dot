@@ -68,4 +68,5 @@ current frame and all future frames."
   (or
    (ng-try-set-font "Cascadia Mono-12")
    (ng-try-set-font "Consolas-12")
+   (ng-try-set-font "Noto Mono-12")
    (ng-try-set-font "DejaVu Sans Mono-12")))

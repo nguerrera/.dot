@@ -71,13 +71,13 @@ shopt -s nocaseglob 2> /dev/null
 export PATH=$PATH:$HOME/.dot/git
 
 # editor
-if [ -d /Applications/Emacs.app ]; then
-    export ALTERNATE_EDITOR=/Applications/Emacs.app/Contents/MacOS/Emacs
-    export EDITOR=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
-    alias emacs='$EDITOR -n'
-    alias e=emacs
-elif have emacs; then
-    export EDITOR=emacs
+if have emacs; then
+    if [ "$DISPLAY" != "" ]; then
+      export EDITOR='emacsclient.sh'
+      alias emacs='emacsclient.sh -n'
+    else
+      export EDITOR=emacs
+    fi
     alias e=emacs
 elif have code-insiders; then
     export EDITOR='code-insiders -w'
@@ -141,6 +141,7 @@ alias tracert=traceroute
 alias copy=cp
 alias move=mv
 alias del=rm
+alias ms='e --eval "(progn (magit-status) (raise-frame))"'
 
 # WSL interop
 if have cmd.exe; then
@@ -170,7 +171,6 @@ if have cmd.exe; then
 
     alias open=start
     alias bcomp=~/.dot/git/bcomp-wsl
-    alias ms='emacs -nw --eval "(magit-status)"'
 
     # Make ls gnore paths that cause permission denied in WSL
     WSL_LS_OPTIONS="--ignore=ntuser.* --ignore=NTUSER.* --ignore=*fil*.sys --ignore=DumpStack.log.tmp --ignore=Config.Msi --ignore=Recovery --ignore=System*Volume*Information'"
