@@ -108,7 +108,7 @@ alias notepad=n
 # install global npm packages to user dir
 if have npm; then
   if [ ! -d $HOME/.npm/g ]; then
-    mkdir $HOME/.npm/g && npm config set prefix $HOME/.npm/g
+    mkdir -p $HOME/.npm/g && npm config set prefix $HOME/.npm/g
   fi
   export PATH=$HOME/.npm/g/bin:$PATH
 fi
