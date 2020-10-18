@@ -34,8 +34,8 @@ other configuration that would like to happen early before we
 potentially hit the network.")
 
 (defvar ng-init-file  "~/.emacs.d/lisp/ng-init.el"
-  "The configuration file where package-archives are defined and
-use-package calls are made.")
+  "The configuration file where most things are done and
+use-package calls can be made.")
 
 (defvar ng-package-lock-file "~/.emacs.d/.ng-package-lock.el"
   "The generated file where package load-paths are cached to be
@@ -96,7 +96,7 @@ up future inits."
 ;; Don't save selected packages to custom file. A selected package in
 ;; this config is one that has been pulled in by a use-package.
 ;; Everything else is one-off experimentation that can be cleaned up
-;; by package-autoremove. We save package-selected-packages to to the
+;; by package-autoremove. We save package-selected-packages to the
 ;; lock file instead of the custom file.
 (with-eval-after-load 'package
   (defun package--save-selected-packages (&optional VALUE)))
