@@ -113,6 +113,10 @@ if have npm; then
   export PATH=$HOME/.npm/g/bin:$PATH
 fi
 
+# add dotnet global tools to path
+if have dotnet; then
+    export PATH=$HOME/.dotnet/tools:$PATH
+fi
 
 # aliases
 alias -- -='cd -'
