@@ -1,3 +1,4 @@
+
 # do nothing if not running interactively
 [ -z "$PS1" ] && return
 
@@ -73,22 +74,20 @@ export PATH=$PATH:$HOME/.dot/git
 # editor
 if have emacs; then
     if [ "$DISPLAY" != "" ]; then
-      export EDITOR='emacsclient.sh'
-      alias emacs='emacsclient.sh -n'
+      export EDITOR='emacsclient.sh -c'
+      alias emacsclient='emacsclient.sh'
+      alias e='emacsclient -n'
     else
       export EDITOR=emacs
+      alias e=emacs
     fi
-    alias e=emacs
 elif have code-insiders; then
     export EDITOR='code-insiders -w'
-    alias emacs=code-insiders
-    alias e=emacs
+    alias e=code-insiders
 elif have code; then
     export EDITOR='code -w'
-    alias emacs=code
-    alias e=emacs
+    alias e=code
 else
-    alias emacs=vi
     alias e=vi
 fi
 
@@ -100,7 +99,7 @@ fi
 if have code; then
     alias n=code
 else
-    alias n=emacs
+    alias n=e
 fi
 
 alias notepad=n
@@ -141,7 +140,7 @@ alias tracert=traceroute
 alias copy=cp
 alias move=mv
 alias del=rm
-alias ms='e --eval "(progn (magit-status) (raise-frame))"'
+alias ms='emacsclient -n --eval "(progn (magit-status) (raise-frame))"'
 
 # WSL interop
 if have cmd.exe; then
@@ -191,6 +190,7 @@ if ! have start; then
         alias start=open
     fi
 fi
+
 
 # Start with BSD-safe LS_OPTIONS.
 # We'll augment them if we find GNU coreutils below.

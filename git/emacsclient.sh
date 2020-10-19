@@ -41,7 +41,7 @@ if ! ping; then
     [ $? -eq 0 ] || exit $?
 
     # wait for emacs server to respond
-    echo -n "Waiting for Emacs server to start..."
+    echo -n "Waiting for Emacs server to start.."
     while true; do
         if ping; then
             break
