@@ -27,9 +27,7 @@
 (setq package-archives
       '(("melpa-stable" . "https://stable.melpa.org/packages/")
         ("gnu"          . "https://elpa.gnu.org/packages/")
-        ;;below is currently unused, disable to speed things up
-        ;;("melpa"      . "https://melpa.org/packages/")
-        )
+        ("melpa"        . "https://melpa.org/packages/"))
       package-archive-priorities
       '(("melpa-stable" . 10)
         ("gnu"          . 5)
