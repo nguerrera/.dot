@@ -8,7 +8,7 @@ fileArg=false
 for arg; do
     case $arg in
         -c|--create-frame)
-            createFrame=1
+            createFrame=true
             ;;
         -*)
             ;;
