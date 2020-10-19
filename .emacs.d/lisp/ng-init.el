@@ -50,8 +50,7 @@
  scroll-step                      1
  scroll-preserve-screen-position  1
  hscroll-margin                   0
- hscroll-step                     1
- )
+ hscroll-step                     1)
 
 ;; use ls-lisp everywhere to portably group directories first and get
 ;; away from "ls does not support --dired" warnings
@@ -108,39 +107,33 @@
 ;; Key bindings
 
 ;; http://www.emacswiki.org/CuaMode
-(cua-mode 1)
-(setq cua-auto-tabify-rectangles nil)
-(setq cua-keep-region-after-copy t)
+(progn
+  (setq cua-auto-tabify-rectangles nil)
+  (setq cua-keep-region-after-copy t)
+  (cua-mode 1))
 
 (bind-keys
- ("C-k"         . ng-C-k)
- ("C-w"         . ng-C-w)
- ("C-a"         . ng-home)
- ("M-m"         . ng-home)
- ("<home>"      . ng-home)
- ("C-e"         . ng-end)
- ("<end>"       . ng-end)
- ("C-c C-c"     . ng-done)
- ("C-x C-k"     . ng-kill-other-buffer-and-window)
- ("C-x k"       . ng-kill-this-buffer-and-window)
- ("<M-S-up>"    . ng-rectangle-mark-up)
- ("<M-S-down>"  . ng-rectangle-mark-down)
- ("<M-S-left>"  . ng-rectangle-mark-left)
- ("<M-S-right>" . ng-rectangle-mark-right)
- ("M-n"         . cua-scroll-up)
- ("M-p"         . cua-scroll-down)
- ("C-m"         . newline-and-indent)
- ("C-x C-b"     . ibuffer)
- ("<C-tab>"     . next-buffer)
- ("<C-S-tab>"   . previous-buffer)
- ("C-;"         . comment-line)
- ("C-x SPC"     . cua-rectangle-mark-mode)
- )
-
-;; remove minor mode conflicts with C-c C-c
-(progn
-  (add-hook 'bat-mode-hook (lambda () (unbind-key "C-c C-c" bat-mode-map)))
-  (add-hook 'conf-mode-hook (lambda () (unbind-key "C-c C-c" conf-mode-map))))
+ ("C-k"            . ng-C-k)
+ ("C-w"            . ng-C-w)
+ ("C-a"            . ng-home)
+ ("M-m"            . ng-home)
+ ("<home>"         . ng-home)
+ ("C-e"            . ng-end)
+ ("<end>"          . ng-end)
+ ("C-c c"          . ng-done)
+ ("C-c k"          . ng-kill-other-buffer-and-window)
+ ("C-x k"          . ng-kill-this-buffer-and-window)
+ ("<M-S-up>"       . ng-rectangle-mark-up)
+ ("<M-S-down>"     . ng-rectangle-mark-down)
+ ("<M-S-left>"     . ng-rectangle-mark-left)
+ ("<M-S-right>"    . ng-rectangle-mark-right)
+ ("C-m"            . newline-and-indent)
+ ("C-x C-b"        . ibuffer)
+ ("<C-tab>"        . next-buffer)
+ ("<C-S-tab>"      . previous-buffer)
+ ("<C-iso-leftab>" . previous-buffer)
+ ("C-;"            . comment-line)
+ ("C-x SPC"        . cua-rectangle-mark-mode))
 
 ;; disable archaic "secondary selection" on alt clicks, which we'll
 ;; replace with modern multiple cursor/rectangle functionality
@@ -206,9 +199,8 @@
 ;; http://emacswiki.org/InteractivelyDoThings
 (use-package ido
   :defer 2
-  :init
-  (setq ido-enable-flex-matching t)
   :config
+  (setq ido-enable-flex-matching t)
   (ido-mode 1)
   (ido-everywhere 1))
 
@@ -221,15 +213,14 @@
 ;; https://github.com/lewang/flx
 (use-package flx-ido
   :after ido
-  :init
-  (setq ido-use-faces nil)
   :config
+  (setq ido-use-faces nil)
   (flx-ido-mode 1))
 
 ;; https://github.com/larkery/ido-grid-mode.el
 (use-package ido-grid-mode
   :after ido
-  :init
+  :config
   (setq
    ido-grid-mode-max-columns  1
    ido-grid-mode-max-rows     8
@@ -238,18 +229,20 @@
    ido-grid-mode-scroll-up    #'ido-grid-mode-previous-row
    ido-grid-mode-scroll-wrap  nil
    ido-grid-mode-order        nil)
-  :config
   (ido-grid-mode 1))
 
 ;; https://github.com/bbatsov/projectile
 (use-package projectile
   :diminish
-  :bind
-  ("C-," . projectile-find-file)
   :bind-keymap
-  ("C-c p" . projectile-command-map)
+  ("C-," . projectile-command-map)
   :config
   (projectile-mode 1))
+
+(use-package which-key
+  :defer 3
+  :config
+  (which-key-mode 1))
 
 ;; https://magit.vc/
 (use-package magit
@@ -257,15 +250,17 @@
   ("/COMMIT_EDITMSG\\'"  . git-commit-mode)
   ("/git-rebase-todo\\'" . git-rebase-mode)
   :bind
-  ("C-x g" . magit-status)
-  :init
+  ("C-c m" . magit-status)
+  :config
   (setq
    ;; open magit status in same window
-   magit-display-buffer-function 'magit-display-buffer-fullframe-status-v1
+   magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1
    ;; don't open ediff control in new frame
-   ediff-window-setup-function 'ediff-setup-windows-plain
+   ediff-window-setup-function #'ediff-setup-windows-plain
    ;; use side-by-side ediff by default
-   ediff-split-window-function 'split-window-horizontally))
+   ediff-split-window-function #'split-window-horizontally)
+  ;; disable default global bindings
+  (global-magit-file-mode -1))
 
 (use-package multiple-cursors
   :commands
@@ -280,13 +275,14 @@
   
 (use-package ace-jump-mode
   :bind
-  ("C-j" . ace-jump-mode))
+  ("C-c j" . ace-jump-mode))
 
 (use-package smex
-  :init
-  (setq smex-save-file "~/.emacs.d/.smex-items")
   :bind
-  ("M-x" . smex))
+  ("M-x" . smex)
+  :config
+  (setq smex-save-file "~/.emacs.d/.smex-items"))
+
 
 (use-package csharp-mode
   :mode "\\.cs\\'")
@@ -300,7 +296,7 @@
      (c-set-offset 'case-label '+)
      (setq c-basic-offset 4))))
 
-;; Perl 
+;; Perl
 ;; http://www.emacswiki.org/emacs/CPerlMode
 (progn
   (defalias 'perl-mode 'cperl-mode)

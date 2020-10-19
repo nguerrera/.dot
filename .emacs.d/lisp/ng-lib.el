@@ -95,11 +95,15 @@ following line. Adds symmetry to the mnemonic C-k=kill:C-y==yank."
         (delete-window new-window)))))
 
 (defun ng-done ()
-  "Save the current buffer, kill it, and delete its window."
+  "Save the current buffer, kill it, and delete its
+window. Notify client that we're done."
   (interactive)
   (save-buffer)
-  (if server-buffer-clients
-      (server-done)
-    (ng-kill-this-buffer-and-window)))
+  (cond ((and (boundp 'with-editor-mode) with-editor-mode)
+         (with-editor-finish nil))
+        (server-buffer-clients
+          (server-done))
+        (t
+         (ng-kill-this-buffer-and-window))))
 
 (provide 'ng-lib)
