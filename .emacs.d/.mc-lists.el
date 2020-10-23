@@ -11,4 +11,5 @@
 
 (setq mc/cmds-to-run-once
       '(
+        ng-add-cursor-on-click
         ))
