@@ -111,7 +111,6 @@
 (progn
   (setq cua-auto-tabify-rectangles nil)
   (setq cua-keep-region-after-copy t)
-  (setq cua-rectangle-mark-key (kbd "C-x SPC"))
   (cua-mode 1))
 
 (bind-keys
@@ -144,6 +143,35 @@
  "M-<mouse-1>"
  "M-<mouse-2>"
  "M-<mouse-3>")
+
+(use-package rect
+  :ensure nil ; built-in
+  :demand
+  :init
+  ;; unbind cua-mode version of rectangle selection
+  (define-key cua-global-keymap cua-rectangle-mark-key nil)
+  ;; but advise cua to stop standard rectangle-mark-mode-on-cancel
+  (advice-add 'cua-cancel
+              :before
+              (lambda () (rectangle-mark-mode -1)))
+  :bind
+  ;; make it possible to type over rectangles with multiple cursors
+  (:map rectangle-mark-mode-map
+        ("<remap> <self-insert-command>" . ng-rectangle-self-insert)))
+
+(use-package multiple-cursors
+  :commands
+  mc/edit-lines
+  mc/add-cursor-on-click
+  :bind
+  ("M-<mouse-1>" . ng-add-cursor-on-click)
+  (:map mc/keymap
+        ("<remap> <keyboard-quit>" . mc/keyboard-quit)))
+
+(use-package expand-region
+  :bind
+  ("<C-S-right>" . er/expand-region)
+  ("<C-S-left>"  . er/contract-region))
 
 (use-package move-text
   :bind
@@ -390,20 +418,6 @@
    ediff-split-window-function #'split-window-horizontally)
   ;; disable default global bindings
   (global-magit-file-mode -1))
-
-(use-package multiple-cursors
-  :commands
-  mc/edit-lines
-  mc/add-cursor-on-click
-  :bind
-  ("M-<mouse-1>" . ng-add-cursor-on-click)
-  (:map mc/keymap
-        ("<remap> <keyboard-quit>" . mc/keyboard-quit)))
-
-(use-package expand-region
-  :bind
-  ("<C-S-right>" . er/expand-region)
-  ("<C-S-left>"  . er/contract-region))
 
 (use-package ace-jump-mode
   :bind
