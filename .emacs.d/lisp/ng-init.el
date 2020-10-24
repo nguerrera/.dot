@@ -113,6 +113,16 @@
   (setq cua-keep-region-after-copy t)
   (cua-mode 1))
 
+;; Get color emoji rendering mostly working. Requires Emacs 27 and
+;; appropriate font, still doesn't support ZWJ sequences AFAICT.
+(if (>= emacs-major-version 27)
+    (let ((font (cond ((member "Noto Color Emoji" (font-family-list))
+                       "Noto Color Emoji")
+                      ((member "Apple Color Emoji" (font-family-list))
+                       "Apple Color Emoji"))))
+      (if font (set-fontset-font
+                "fontset-default" 'unicode font nil 'prepend))))
+
 (bind-keys
  ("C-k"             . ng-C-k)
  ("C-w"             . ng-C-w)
