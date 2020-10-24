@@ -250,14 +250,14 @@
     (ng-insert-mode 1))
 
   (defun ng-exit-insert-mode ()
-    (ng-insert-mode 1))
+    (ng-insert-mode -1))
 
   (defun ng-enter-normal-mode ()
     (setq ng-enable-multiple-cursor-keys nil)
     (ng-normal-mode 1))
 
   (defun ng-exit-normal-mode  ()
-    (ng-normal-mode 1))
+    (ng-normal-mode -1))
 
   (defun ng-evil-replace-all ()
     (interactive)
