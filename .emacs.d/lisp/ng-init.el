@@ -160,6 +160,7 @@
         ("<remap> <self-insert-command>" . ng-rectangle-self-insert)))
 
 (use-package multiple-cursors
+  :pin melpa
   :commands
   mc/edit-lines
   mc/add-cursor-on-click
