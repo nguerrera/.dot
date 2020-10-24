@@ -62,7 +62,10 @@ package directories to load-path."
   (load ng-package-lock-file)
   ;; :pin triggers slow package initialization. We only need :pin when
   ;; we're not using the lock file and are actually hitting the network.
-  (advice-add 'use-package-handler/:pin :around (lambda (&rest r))))
+  (advice-add
+   'use-package-handler/:pin :around
+   (lambda (orig name keyword archive-name rest state)
+     (use-package-process-keywords name rest state))))
 
 (defun ng-package-lock-file-up-to-date-p ()
   "Determine if lock file is up to date with configuration"
