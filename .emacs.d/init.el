@@ -26,6 +26,14 @@
 ;;   Startup time logging lifted and GC prevention borrowed from
 ;;   there.
 
+;; Mimic Emacs 27+ initialization order by loading early-init.el
+;; straight away on older versions. This file disables package
+;; initialization on startup and removes scroll bar, menu bar, and
+;; tool bar. The former has to be done there on Emacs 27+, and the
+;; latter is much faster when done there on Emacs 27+.
+(if (< emacs-major-version 27)
+    (load "~/.emacs.d/early-init.el"))
+
 (defvar ng-early-init-file "~/.emacs.d/lisp/ng-early-init.el"
   "The configuration file where package-archives are set and any
 other configuration that would like to happen early before we
@@ -106,10 +114,6 @@ up future inits."
 
 ;; Keep generated config in its own file (loaded at the end of this file)
 (setq custom-file "~/.emacs.d/custom.el")
-
-;; Don't initialize packages at startup, see the pains we go through
-;; below to avoid this slow step.
-(setq package-enable-at-startup nil)
 
 ;; Log startup time
 ;; Use a hook so the message doesn't get clobbered by other messages.

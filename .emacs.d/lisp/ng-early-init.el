@@ -41,13 +41,6 @@
 ;; Also do UI changes early so that there isn't a jarring change from
 ;; the default UI to the customized one during load.
 
-;; hide menu bar, tool bar, scroll bar
-(progn
-  (menu-bar-mode -1)
-  (when window-system
-    (tool-bar-mode -1)
-    (scroll-bar-mode -1)))
-
 ;; theme: patched atom one dark
 (load-theme 'ng-atom-one-dark t)
 
@@ -55,11 +48,11 @@
 (when window-system
   (defun ng-try-set-font (font)
   "If the given font is found, sets it as the font for the
-current frame and all future frames."
+initial frame and all future frames."
     (if (find-font (font-spec :name font))
         (progn
           (add-to-list 'default-frame-alist `(font . ,font))
-          (set-frame-font font)
+          (add-to-list 'initial-frame-alist `(font . ,font))
           t)
       nil))
   (or
