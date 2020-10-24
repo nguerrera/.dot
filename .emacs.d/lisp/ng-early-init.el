@@ -17,8 +17,7 @@
    delete-old-versions            t
    kept-new-versions              5
    kept-old-versions              0
-   version-control                t
-   ))
+   version-control                t))
 
 ;; but lockfiles are terrible and can't be moved, so disable them
 (setq create-lockfiles nil)
