@@ -61,7 +61,10 @@ reused when the config files have not changed.")
 (defun ng-load-package-lock-file ()
   "Restore package-alist and load-path from lock file and adds
 package directories to load-path."
-  (load ng-package-lock-file))
+  (load ng-package-lock-file)
+  ;; :pin triggers slow package initialization. We only need :pin when
+  ;; we're not using the lock file and are actually hitting the network.
+  (advice-add 'use-package-handler/:pin :around (lambda (&rest r))))
 
 (defun ng-package-lock-file-up-to-date-p ()
   "Determine if lock file is up to date with configuration"
@@ -98,8 +101,7 @@ up future inits."
 ;; Everything else is one-off experimentation that can be cleaned up
 ;; by package-autoremove. We save package-selected-packages to the
 ;; lock file instead of the custom file.
-(with-eval-after-load 'package
-  (defun package--save-selected-packages (&optional VALUE)))
+(advice-add 'package--save-selected-packages :around (lambda (&rest r)))
 
 ;; Keep generated config in its own file (loaded at the end of this file)
 (setq custom-file "~/.emacs.d/custom.el")
