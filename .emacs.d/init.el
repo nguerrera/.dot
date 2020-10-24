@@ -23,10 +23,8 @@
 ;;
 ;; *  https://blog.d46.us/advanced-emacs-startup
 ;;
-;;   Startup time logging lifted from there. I played with GC settings
-;;   and they weren't material so I left it alone. I also removed the
-;;   GC count logging as it just led to playing golf with the count
-;;   without a perceptible speedup.
+;;   Startup time logging lifted and GC prevention borrowed from
+;;   there.
 
 (defvar ng-early-init-file "~/.emacs.d/lisp/ng-early-init.el"
   "The configuration file where package-archives are set and any
@@ -119,9 +117,10 @@ up future inits."
     "Startup Time: %.2f seconds"
     (float-time (time-subtract after-init-time before-init-time)))))
 
-;; Do the init dance
-(load ng-early-init-file)
-(ng-package-initialize) 
-(load ng-init-file)
-(ng-package-save)
-(load custom-file)
+;; Do the init dance (with a 10 MB GC threshold)
+(let ((gc-cons-threshold (* 10 1000 1000)))
+  (load ng-early-init-file)
+  (ng-package-initialize)
+  (load ng-init-file)
+  (ng-package-save)
+  (load custom-file))
