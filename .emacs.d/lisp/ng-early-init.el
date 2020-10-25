@@ -44,19 +44,27 @@
 ;; theme: patched atom one dark
 (load-theme 'ng-atom-one-dark t)
 
-;; set font
-(when window-system
-  (defun ng-try-set-font (font)
+(defun ng-try-set-font (font)
   "If the given font is found, sets it as the font for the
 initial frame and all future frames."
-    (if (find-font (font-spec :name font))
-        (progn
-          (add-to-list 'default-frame-alist `(font . ,font))
-          (add-to-list 'initial-frame-alist `(font . ,font))
-          t)
-      nil))
+  (when (find-font (font-spec :name font))
+    (add-to-list 'default-frame-alist `(font . ,font))
+    (add-to-list 'initial-frame-alist `(font . ,font))
+    t))
+
+(defun ng-try-set-fallback-font (font)
+  "If the given font is found, use it as a fallback. Used for
+emoji fonts."
+  (when (find-font (font-spec :name font))
+    (set-fontset-font "fontset-default" 'unicode font nil 'prepend)
+    t))
+
+(when window-system
   (or
    (ng-try-set-font "Cascadia Mono-12")
    (ng-try-set-font "Consolas-12")
    (ng-try-set-font "Noto Mono-12")
-   (ng-try-set-font "DejaVu Sans Mono-12")))
+   (ng-try-set-font "DejaVu Sans Mono-12"))
+  (or
+   (ng-try-set-fallback-font "Noto Color Emoji")
+   (ng-try-set-fallback-font "Apple Color Emoji")))
