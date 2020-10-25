@@ -3,6 +3,8 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        comment-dwim
+        comment-line
         ng-C-k
         ng-C-w
         ng-end
