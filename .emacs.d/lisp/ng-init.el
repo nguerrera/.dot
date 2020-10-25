@@ -290,6 +290,7 @@
         ("<delete>" . nil))
 
   (:map evil-normal-state-map
+        ("U"        . undo-tree-redo)
         ("<escape>" . nil)
         ("C-g"      . nil)
         ("C-n"      . nil)
