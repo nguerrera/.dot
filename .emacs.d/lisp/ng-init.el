@@ -133,7 +133,8 @@
  ("<C-iso-lefttab>" . previous-buffer)
  ("C-;"             . comment-line)
  ("<escape>"        . keyboard-quit)
- ("C-M-g"           . keyboard-escape-quit))
+ ("C-M-g"           . keyboard-escape-quit)
+ ("<mouse-3>"       . menu-bar-open))
 
 (ng-unbind-keys
  ;; disable archaic "secondary selection" on alt clicks, which we'll
