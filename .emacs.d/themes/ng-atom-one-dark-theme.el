@@ -58,8 +58,7 @@
     (brightmagenta "#da9dec")
     (brightred     "#e0606b")
     (brightwhite   "#dcdfe4")
-    (brightyellow  "#f3daab")
-    (darkblack     "#21252b")))
+    (brightyellow  "#f3daab")))
 
 ;; Adjust colors based on available colors. If we have 256 or fewer in 2020+,
 ;; we're in a terminal where hopefully we've got a matching theme set up so
@@ -87,8 +86,7 @@
                 (brightblue    "brightblue")
                 (brightmagenta "brightmagenta")
                 (brightcyan    "brightcyan")
-                (brightwhite   "brightwhite")
-                (darkblack     "black")))
+                (brightwhite   "brightwhite")))
              ((>= color-count 16)
               `( ,@basic-colors
                  (white         "lightgray")
@@ -99,8 +97,7 @@
                  (brightblue    "lightblue")
                  (brightmagenta "lightmagenta")
                  (brightcyan    "lighttcyan")
-                 (brightwhite   "white")
-                 (darkblack     "black")))
+                 (brightwhite   "white")))
              (t
               `( ,@basic-colors
                  (white         "white")
@@ -154,10 +151,10 @@
   `(cua-rectangle ((t (:foreground ,black :background ,white))))
 
   ;; mode-line
-  `(mode-line ((t (:background ,darkblack :foreground ,white :box (:color ,darkblack :line-width 1)))))
+  `(mode-line ((t (:background ,white :foreground ,black))))
   `(mode-line-buffer-id ((t (:weight bold))))
   `(mode-line-emphasis ((t (:weight bold))))
-  `(mode-line-inactive ((t (:background ,black :foreground ,white :box (:color ,black :line-width 1)))))
+  `(mode-line-inactive ((t (:background ,black :foreground ,white))))
 
   ;; custom
   `(custom-state ((t (:foreground ,green))))
@@ -220,11 +217,11 @@
   `(magit-bisect-good ((t (:foreground ,green))))
   `(magit-bisect-skip ((t (:foreground ,brightyellow))))
   `(magit-bisect-bad ((t (:foreground ,red))))
-  `(magit-blame-heading ((t (:background ,darkblack :foreground ,brightblack))))
-  `(magit-blame-hash ((t (:background ,darkblack :foreground ,magenta))))
-  `(magit-blame-name ((t (:background ,darkblack :foreground ,yellow))))
-  `(magit-blame-date ((t (:background ,darkblack :foreground ,brightblack))))
-  `(magit-blame-summary ((t (:background ,darkblack :foreground ,brightblack))))
+  `(magit-blame-heading ((t (:background ,black :foreground ,brightblack))))
+  `(magit-blame-hash ((t (:background ,black :foreground ,magenta))))
+  `(magit-blame-name ((t (:background ,black :foreground ,yellow))))
+  `(magit-blame-date ((t (:background ,black :foreground ,brightblack))))
+  `(magit-blame-summary ((t (:background ,black :foreground ,brightblack))))
   `(magit-dimmed ((t (:foreground ,brightblack))))
   `(magit-hash ((t (:foreground ,magenta))))
   `(magit-tag  ((t (:foreground ,brightyellow :weight bold))))

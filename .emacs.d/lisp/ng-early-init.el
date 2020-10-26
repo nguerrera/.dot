@@ -44,6 +44,10 @@
 ;; theme: patched atom one dark
 (load-theme 'ng-atom-one-dark t)
 
+;; make the mode-line consistent on terminal and GUI
+(setq mode-line-front-space '(" "))
+(setq mode-line-end-spaces '(:eval "-%-"))
+
 (defun ng-try-set-font (font)
   "If the given font is found, sets it as the font for the
 initial frame and all future frames."

@@ -9,6 +9,10 @@
 ;; follow symlinks to source-controlled locations without prompting
 (setq vc-follow-symlinks t)
 
+;; remove sometimes incorrect version control info from mode-line
+(setq-default mode-line-format
+              (delete '(vc-mode vc-mode) mode-line-format))
+
 ;; never use tabs to indent
 (setq-default indent-tabs-mode nil)
 
@@ -233,7 +237,17 @@
    evil-emacs-state-cursor 'bar
    evil-normal-state-cursor 'hbar
    evil-visual-state-cursor 'hbar
-   evil-emacs-state-tag ""
+   evil-echo-state nil
+   evil-emacs-state-tag    "-"
+   evil-insert-state-tag   "I"
+   evil-normal-state-tag   "N"
+   evil-operator-state-tag "O"
+   evil-motion-state-tag   "M"
+   evil-visual-line-tag    "L"
+   evil-visual-char-tag    "V"
+   evil-visual-block-tag   "B"
+   evil-mode-line-format nil
+   mode-line-front-space '(" " (:eval evil-mode-line-tag))
    evil-motion-state-modes '()
    evil-insert-state-modes '()
    evil-normal-state-modes '(prog-mode text-mode)
