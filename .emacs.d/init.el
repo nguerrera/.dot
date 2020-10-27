@@ -43,7 +43,7 @@ potentially hit the network.")
   "The configuration file where most things are done and
 use-package calls can be made.")
 
-(defvar ng-package-lock-file "~/.emacs.d/.ng-package-lock.el"
+(defvar ng-package-lock-file "~/.emacs.d/elpa/ng-package-lock.el"
   "The generated file where package load-paths are cached to be
 reused when the config files have not changed.")
 
