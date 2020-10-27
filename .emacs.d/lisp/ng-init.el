@@ -369,41 +369,6 @@
   (setq goto-address-url-face '((:underline t)))
   (setq goto-address-url-mouse-face '((:underline t :weight bold))))
 
-;; http://emacswiki.org/InteractivelyDoThings
-(use-package ido
-  :defer 2
-  :config
-  (setq ido-enable-flex-matching t)
-  (ido-mode 1)
-  (ido-everywhere 1))
-
-;; https://github.com/DarwinAwardWinner/ido-completing-read-plus
-(use-package ido-completing-read+
-  :after ido
-  :config
-  (ido-ubiquitous-mode 1))
-
-;; https://github.com/lewang/flx
-(use-package flx-ido
-  :after ido
-  :config
-  (setq ido-use-faces nil)
-  (flx-ido-mode 1))
-
-;; https://github.com/larkery/ido-grid-mode.el
-(use-package ido-grid-mode
-  :after ido
-  :config
-  (setq
-   ido-grid-mode-max-columns  1
-   ido-grid-mode-max-rows     8
-   ido-grid-mode-min-rows     8
-   ido-grid-mode-scroll-down  #'ido-grid-mode-next-row
-   ido-grid-mode-scroll-up    #'ido-grid-mode-previous-row
-   ido-grid-mode-scroll-wrap  nil
-   ido-grid-mode-order        nil)
-  (ido-grid-mode 1))
-
 ;; https://github.com/bbatsov/projectile
 (use-package projectile
   :diminish
@@ -425,7 +390,7 @@
   ("/git-rebase-todo\\'" . git-rebase-mode)
   :bind
   ("C-c m" . magit-status)
-  :config
+  :init
   (setq
    ;; open magit status in same window
    magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1
@@ -433,18 +398,68 @@
    ediff-window-setup-function #'ediff-setup-windows-plain
    ;; use side-by-side ediff by default
    ediff-split-window-function #'split-window-horizontally)
+  :config
   ;; disable default global bindings
   (global-magit-file-mode -1))
 
-(use-package ace-jump-mode
+(use-package avy
+  :init
+  (setq avy-keys (number-sequence ?a ?z))
   :bind
-  ("C-c j" . ace-jump-mode))
+  ("C-c j" . avy-goto-word-1)
+  ("M-g g" . avy-goto-line))
 
-(use-package smex
+(use-package ivy
+  :diminish
+  :init
+  (setq
+   ivy-initial-inputs-alist nil
+   ivy-re-builders-alist    '((t . ivy--regex-fuzzy))
+   ivy-extra-directories    nil
+   ivy-count-format "")
+
+  (defun ng-ivy-C-d ()
+    "Before end-of-line delete-char, otherwise ivy-done."
+    (interactive)
+    (if (eolp)
+        (ivy-done)
+      (command-execute 'delete-char)))
+
   :bind
-  ("M-x" . smex)
+  ("<remap> <switch-to-buffer>" . ivy-switch-buffer)
+  ("<remap> <switch-to-buffer-other-window>" . switch-to-buffer-other-window)
+  (:map ivy-minibuffer-map
+        ("RET"        . ivy-alt-done)
+        ("<C-return>" . ivy-alt-done)
+        ("C-d"        . ng-ivy-C-d)
+        ("C-j"        . ivy-next-line)
+        ("C-k"        . ivy-previous-line))
+
   :config
-  (setq smex-save-file "~/.emacs.d/.smex-items"))
+  (ivy-mode 1))
+
+(use-package flx :defer)
+(use-package amx :defer)
+
+(use-package counsel
+  :diminish
+  :defer 2
+  :bind
+  ;; common bindings here in case pressed before deferral timer
+  ("<remap> <execute-extended-command>" . counsel-M-x)
+  ("<remap> <find-file>"                . counsel-find-file)
+  ;; custom bindings not mapped by counsel-mode
+  ("<remap> <dired>"                    . counsel-dired)
+  :config
+  (require 'flx)
+  (require 'amx)
+  (counsel-mode 1)
+  ;; counsel-mode pushes more initial ^ defaults, so reset it
+  (setq ivy-initial-inputs-alist nil))
+
+(use-package swiper
+  :bind
+  ("C-c s" . swiper))
 
 (use-package csharp-mode
   :mode "\\.cs\\'")
