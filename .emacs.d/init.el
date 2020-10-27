@@ -67,13 +67,15 @@ reused when the config files have not changed.")
 (defun ng-load-package-lock-file ()
   "Restore package-alist and load-path from lock file and adds
 package directories to load-path."
-  (load ng-package-lock-file)
-  ;; :pin triggers slow package initialization. We only need :pin when
-  ;; we're not using the lock file and are actually hitting the network.
-  (advice-add
-   'use-package-handler/:pin :around
-   (lambda (orig name keyword archive-name rest state)
-     (use-package-process-keywords name rest state))))
+  (setq use-package-always-ensure nil)
+  (advice-add 'use-package-handler/:pin :around 'ng-disable-pin-advice)
+  (load ng-package-lock-file))
+
+(defun ng-disable-pin-advice (orig name keyword archive-name rest state)
+  "Advice around use-package-handler/:pin to prevent slow package
+initialization when loading from lock file. Lock file is bound to
+specific versions so :pin logic is not needed."
+  (use-package-process-keywords name rest state))
 
 (defun ng-package-lock-file-up-to-date-p ()
   "Determine if lock file is up to date with configuration"
@@ -86,14 +88,13 @@ package directories to load-path."
 using package.el if it's not."
   (if (ng-package-lock-file-up-to-date-p)
       (ng-load-package-lock-file)
-    (progn
-      (delete-file ng-package-lock-file)
-      (setq use-package-always-ensure t)
-      (require 'package)
-      (package-initialize)
-      (unless (package-installed-p 'use-package)
-        (package-refresh-contents)
-        (package-install 'use-package)))))
+    (delete-file ng-package-lock-file)
+    (setq use-package-always-ensure t)
+    (require 'package)
+    (package-initialize)
+    (unless (package-installed-p 'use-package)
+      (package-refresh-contents)
+      (package-install 'use-package))))
 
 (defun ng-package-save ()
   "If this init did a full restore, save the lock file to speed
@@ -131,3 +132,9 @@ up future inits."
   (load ng-init-file)
   (ng-package-save)
   (load custom-file))
+
+;; now that we're done, reset things so that new packages can be added
+;; to config file and changes can be tested with C-x C-e as they would
+;; run on restart where lock file would be out of date.
+(setq use-package-always-ensure t)
+(advice-remove 'use-package-handler/:pin 'ng-disable-pin-advice)
