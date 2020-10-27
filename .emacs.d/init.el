@@ -125,15 +125,19 @@ up future inits."
     "Startup Time: %.2f seconds"
     (float-time (time-subtract after-init-time before-init-time)))))
 
-;; Do the init dance (with a 10 MB GC threshold)
-(let ((gc-cons-threshold (* 10 1000 1000)))
+;; Do the init dance.
+;;
+;; Temporarily use a 10 MB GC threshold and disable special file name
+;; handling to speed things up.
+(let ((gc-cons-threshold (* 10 1000 1000))
+      (file-name-handler-alist nil))
   (load ng-early-init-file)
   (ng-package-initialize)
   (load ng-init-file)
   (ng-package-save)
   (load custom-file))
 
-;; now that we're done, reset things so that new packages can be added
+;; Now that we're done, reset things so that new packages can be added
 ;; to config file and changes can be tested with C-x C-e as they would
 ;; run on restart where lock file would be out of date.
 (setq use-package-always-ensure t)
