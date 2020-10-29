@@ -54,6 +54,11 @@ initial frame and all future frames."
   (when (find-font (font-spec :name font))
     (add-to-list 'default-frame-alist `(font . ,font))
     (add-to-list 'initial-frame-alist `(font . ,font))
+    ;; for some reason this is slow on Linux, but on on Windows
+    ;; it isn't and it prevents a jarring font change from being
+    ;; seen on startup.
+    (when (eq window-system 'w32)
+      (set-frame-font font))
     t))
 
 (defun ng-try-set-fallback-font (font)
