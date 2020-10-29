@@ -22,6 +22,9 @@
 ;; triple productivity
 (defalias 'yes-or-no-p 'y-or-n-p)
 
+;; prefer UTF-8
+(prefer-coding-system 'utf-8)
+
 ;; don't beep
 (setq
  visible-bell t
