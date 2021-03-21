@@ -32,7 +32,7 @@
   ],
   "profiles": {
     "defaults": {
-      "fontFace": "Cascadia Mono PL",
+      "fontFace": "Cascadia Mono",
       "fontSize": 12,
       "colorScheme": "Custom"
     },
