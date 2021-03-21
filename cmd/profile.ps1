@@ -108,13 +108,14 @@ Set-PSReadLineKeyHandler -Key Enter -BriefDescription 'ExpandMacrosAndAcceptLine
 # Set the prompt, avoid flickering and sluggishness of posh-git default
 #  - Don't use git status (branch info is enough)
 #  - Return a single string, don't make independent calls to Write-Host
+$GitPromptSettings.EnableFileStatus = $false
 function prompt {
     $cyan="`e[36m"
     $yellow="`e[33m"
     $plain="`e[0m"
 
     $prompt = "`n${cyan}$(Get-Location)"
-    $branch = Get-GitBranch
+    $branch = (Get-GitStatus).Branch
     if ($branch) {
         $prompt += " ${yellow}(${branch})"
     }
