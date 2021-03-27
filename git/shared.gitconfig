@@ -17,7 +17,3 @@
 	config-wsl = !git config --file ~/.dot/git/wsl.gitconfig
 [hub]
 	protocol = https
-[url "__DO_NOT_PUSH__/"]
-	pushinsteadof = https://github.com/
-[url "https://github.com/nguerrera/"]
-	pushinsteadof = https://github.com/nguerrera/
