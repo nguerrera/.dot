@@ -1,13 +1,5 @@
 [include]
 	path = shared.gitconfig
-[diff]
-	tool = bc
-[difftool "bc"]
-	path = C:/Program Files/Beyond Compare 4/BComp.exe
-[merge]
-	tool = bc
-[mergetool "bc"]
-	path = C:/Program Files/Beyond Compare 4/BComp.exe
 [core]
 	editor = C:/Users/nicholg/.dot/cmd/emacsclient.cmd -c
 	longpaths = true

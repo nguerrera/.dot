@@ -17,3 +17,7 @@
 	config-wsl = !git config --file ~/.dot/git/wsl.gitconfig
 [hub]
 	protocol = https
+[diff]
+	tool = bc
+[merge]
+	tool = bc
