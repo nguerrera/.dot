@@ -335,7 +335,7 @@ function .. { Set-Location .. }
 function du { du.exe -h @args }
 function df { df.exe -h @args }
 function emacs { emacsclient.cmd -n @args }
-function gls { ls.exe --color -h -F --ignore="ntuser.*" --ignore="NTUSER.*" --ignore="*fil*.sys" @args }
+function gls { ls.exe --group-directories-first --color -h -F --ignore="ntuser.*" --ignore="NTUSER.*" --ignore="*fil*.sys" @args }
 function ll { gls -l @args }
 function ms { emacsclient.cmd `-e '"(progn (magit-status) (raise-frame))"' }
 function ver { cmd /c ver }
