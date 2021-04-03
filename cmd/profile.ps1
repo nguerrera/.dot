@@ -281,8 +281,9 @@ function sudo {
 
 # List all powershell commands when which or where is called interactively.
 # Morally equivalent to Windows where.exe, or bash type -a
-Set-Macro where 'gcm -all'
-Set-Macro which 'gcm -all'
+Set-Macro where pswhere
+Set-Macro which pswhere
+function pswhere { Get-Command -All @args | Format-Table -AutoSize -Wrap }
 
 # Use cmd dir/rd/del when given cmd-like arguments interactively, otherwise use
 # Keeps muscle memory intact and makes and also provides terse access to faster
