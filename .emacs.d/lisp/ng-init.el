@@ -256,6 +256,8 @@
   ("/git-rebase-todo\\'" . git-rebase-mode)
   :bind
   ("C-c m" . magit-status)
+  :hook
+  (git-commit-mode . markdown-mode)
   :init
   (setq
    ;; open magit status in same window
@@ -267,6 +269,8 @@
   :config
   ;; disable default global bindings
   (global-magit-file-mode -1))
+
+
 
 (use-package avy
   :init
