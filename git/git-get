@@ -6,7 +6,8 @@ git-get - fast-forward upstream -> origin -> local
 
 Usage: git get [<branch>]
 
-If no <branch> is specified. The default is 'master'.
+If no <branch> is specified, the default is 'master' or 'main' depending
+on what the remotes have.
 
 Works by convention when origin remote is a github fork of upstream
 remote. After successful 'git get' both the fork and the local version
@@ -82,7 +83,9 @@ while true; do
     esac
 done
 
-branch=${1-master}
+
+branch=${1}
+
 
 debug_log() {
     [ ! "$debug" ] || echo $1
@@ -183,6 +186,16 @@ git_try fetch --prune origin
 if has_remote upstream; then
     git_try fetch --prune upstream
 fi
+
+branch=$1
+if [ ! "$branch" ]; then
+    if has_remote_branch origin master || has_remote_branch upstream master; then
+        branch=master
+    else
+        branch=main
+    fi
+fi
+
 
 if ! has_remote_branch origin "$branch" && ! has_remote_branch upstream "$branch"; then
     error "neither origin nor upstream remote has a '$branch' branch."
