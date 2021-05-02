@@ -59,6 +59,9 @@
  hscroll-margin                   0
  hscroll-step                     1)
 
+;; fill to 76 cloumns by default
+(setq-default fill-column 76)
+
 ;; use ls-lisp everywhere to portably group directories first and get
 ;; away from "ls does not support --dired" warnings
 (progn
