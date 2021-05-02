@@ -332,6 +332,9 @@ Set-Macro set {
     }
 }
 
+# Use UNIX diff when diff is called interactively
+Set-Macro diff diff.exe
+
 function .. { Set-Location .. }
 function du { du.exe -h @args }
 function df { df.exe -h @args }
