@@ -23,3 +23,5 @@
 	tool = bc
 [push]
 	default = nothing
+[init]
+	defaultBranch = main
