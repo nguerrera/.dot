@@ -108,14 +108,15 @@ fi
 
 alias notepad=n
 
-# install global npm packages to user dir so I can `npm install -g` without sudo
-# mirrors default behavior on Windows
+# install global npm packages to user dir so I can `npm install -g` without
+# sudo, mirrors default behavior on Windows
 if have npm; then
     # don't change anything if git bash or wsl are using the win32 npm
     if [[ "$(type -f -p npm)" != *"Program Files"* ]]; then
         if [ ! -d $HOME/.npm/g ]; then
             mkdir -p $HOME/.npm/g && npm config set prefix $HOME/.npm/g
         fi
+        export PATH=$HOME/.npm/g/bin:$PATH
     fi
 fi
 
