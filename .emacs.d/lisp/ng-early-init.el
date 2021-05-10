@@ -73,7 +73,8 @@ emoji fonts."
    (ng-try-set-font "Cascadia Mono-12")
    (ng-try-set-font "Noto Mono-12")
    (ng-try-set-font "DejaVu Sans Mono-12")
-   (ng-try-set-font "Consolas-12"))
+   (ng-try-set-font "Consolas-12")
+   (ng-try-set-font "SF Mono-14"))
   (or
    (ng-try-set-fallback-font "Noto Color Emoji")
    (ng-try-set-fallback-font "Apple Color Emoji")

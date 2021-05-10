@@ -5,6 +5,14 @@ declare -a clientArgs
 createFrame=false
 fileArg=false
 
+emacs=emacs
+emacsclient=emacsclient
+
+if [ -d /Applications/Emacs.app ]; then
+  emacs=/Applications/Emacs.app/Contents/MacOS/Emacs
+  emacsclient=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
+fi
+
 for arg; do
     case $arg in
         -c|--create-frame)
@@ -32,12 +40,12 @@ fi
 
 # check if emacs server is up
 ping() {
-  emacsclient --eval nil > /dev/null 2>&1
+  $emacsclient --eval nil > /dev/null 2>&1
 }
 
 if ! ping; then
     # start a new emacs
-    emacs "${startArgs[@]}" &
+    $emacs "${startArgs[@]}" &
     [ $? -eq 0 ] || exit $?
 
     # wait for emacs server to respond
@@ -52,4 +60,4 @@ if ! ping; then
     echo
 fi
 
-exec emacsclient "${clientArgs[@]}"
+exec $emacsclient "${clientArgs[@]}"

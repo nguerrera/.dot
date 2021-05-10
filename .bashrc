@@ -71,7 +71,12 @@ shopt -s nocaseglob 2> /dev/null
 export PATH=$PATH:$HOME/.dot/git
 
 # editor
-if have emacs; then
+if [ -d /Applications/Emacs.app ]; then
+   export EDITOR='emacsclient.sh -c'
+   alias emacsclient='emacsclient.sh -c'
+   alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
+   alias e='emacsclient -n'
+elif have emacs; then
     if [ "$DISPLAY" != "" ]; then
       export EDITOR='emacsclient.sh -c'
       alias emacsclient='emacsclient.sh'
@@ -258,6 +263,11 @@ __use-gnu-coreutils() {
                     alias $cmd=g$cmd
                 fi
             done
+
+            # gnu-tar is a separate package and not handled by above
+            if have gtar; then
+              alias tar=gtar
+            fi
             
             eval "alias man='MANPATH=$coreutils/gnuman:$MANPATH man'"
             return 0
