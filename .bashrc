@@ -73,8 +73,8 @@ export PATH=$PATH:$HOME/.dot/git
 # editor
 if [ -d /Applications/Emacs.app ]; then
    export EDITOR='emacsclient.sh -c'
-   alias emacsclient='emacsclient.sh -c'
-   alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
+   alias emacsclient='emacsclient.sh'
+   alias emacs='/Applications/Emacs.app/Contents/MacOS/emacs'
    alias e='emacsclient -n'
 elif have emacs; then
     if [ "$DISPLAY" != "" ]; then
