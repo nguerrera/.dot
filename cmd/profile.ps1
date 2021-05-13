@@ -350,12 +350,11 @@ Set-Alias n notepad
 Set-Alias traceroute tracert
 Set-Alias vi vim
 
-# Prefer VS Code Insiders
-if (Test-Command code-insiders) {
-    Set-Alias code code-insiders
-}
-
 if (Test-Command code) {
     Set-Alias n code
     Set-Alias notepad code
+} elseif (Test-Command code-insiders) {
+    Set-Alias code code-insiders
+    Set-Alias n code-insiders
+    Set-Alias notepad code-insiders
 }
