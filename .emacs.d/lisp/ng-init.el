@@ -110,6 +110,11 @@
   ;; the default windows behavior of not checking.
   (setq package-check-signature nil))
 
+;; Make sure emacs gets focus when a frame is raised or created on Mac
+(when (eq window-system 'ns)
+  (advice-add 'raise-frame :after 'ng-mac-activate)
+  (add-hook 'after-make-frame-functions 'ng-mac-activate))
+
 (require 'use-package)
 (require 'ng-lib)
 

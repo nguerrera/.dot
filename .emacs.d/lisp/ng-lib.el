@@ -128,4 +128,9 @@ done if applicable."
      ,@(mapcar (lambda (k) `(unbind-key ,k))
                keys)))
 
+(defun ng-mac-activate (&rest r)
+  "Bring Emacs into focus"
+  (ns-do-applescript
+   "tell application \"Emacs\" to activate"))
+
 (provide 'ng-lib)
