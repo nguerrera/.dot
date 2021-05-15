@@ -33,7 +33,19 @@ __set-prompt () {
         local plain='\e[0m'
     fi
 
-    local ps1_dir='\n\u@\h:\w'
+    local windowsQualifier=
+    if have cmd.exe; then
+        case $(uname) in
+            MINGW*|MSYS*)
+                windowsQualifier='[MSYS]'
+                ;;
+            Linux)
+                windowsQualifier='[WSL]'
+                ;;
+        esac
+    fi
+
+    local ps1_dir="\n\u@\h${windowsQualifier}:\w"
 
     if [ "$(type -t __git_ps1)" != "function" ]; then
         if [ -f /usr/share/git/git-prompt.sh ]; then
@@ -146,7 +158,7 @@ alias move=mv
 alias del=rm
 alias ms='emacsclient -n --eval "(progn (magit-status) (raise-frame))"'
 
-# WSL interop
+# WSL / MSYS interop
 if have cmd.exe; then
     tgit() {
         local patharg
@@ -155,28 +167,51 @@ if have cmd.exe; then
         else
            patharg=$2
         fi
-        patharg=$(wslpath -a -w $patharg)
-        "/mnt/c/Program Files/TortoiseGit/bin/TortoiseGitProc.exe" /command:$1 /path:$patharg
-    }
-
-    start() {
-        local arg=$1
-        if [ -e $arg ]; then
-           arg=$(wslpath -a -w $arg)
+        if have wslpath; then
+            patharg=$(wslpath -a -w $patharg)
+            "/mnt/c/Program Files/TortoiseGit/bin/TortoiseGitProc.exe" /command:$1 /path:$patharg
+        else
+            patharg=$(cygpath -a -w $patharg)
+            "/c/Program Files/TortoiseGit/bin/TortoiseGitProc.exe" /command:$1 /path:$patharg
         fi
-        # cmd does not like being run from a network path
-        pushd /mnt/c > /dev/null
-        cmd.exe /c start $arg
-        # annoyingly, above changes terminal title
-        cmd.exe /c title Terminal
-        popd > /dev/null
     }
 
-    alias open=start
+    if have wslpath; then
+        start() {
+            local arg=$1
+            if [ -e $arg ]; then
+                arg=$(wslpath -a -w $arg)
+            fi
+            # cmd does not like being run from a network path
+            pushd /mnt/c > /dev/null
+            cmd.exe /c start $arg
+            # annoyingly, above changes terminal title
+            cmd.exe /c title Terminal
+            popd > /dev/null
+        }
+    fi
+
     alias bcomp=~/.dot/git/bcomp-wsl
 
-    # Make ls gnore paths that cause permission denied in WSL
-    WSL_LS_OPTIONS="--ignore=ntuser.* --ignore=NTUSER.* --ignore=*fil*.sys --ignore=DumpStack.log.tmp --ignore=Config.Msi --ignore=Recovery --ignore=System*Volume*Information'"
+    # Hide well-known windows hidden files
+    WIN_LS_OPTIONS=" \
+        --ignore=*fil*.sys \
+        --ignore=?Recycle.Bin \
+        --ignore=?WinREAgent \
+        --ignore=Application?Data \
+        --ignore=bootmgr \
+        --ignore=BOOTNXT \
+        --ignore=Config.Msi \
+        --ignore=Documents?and?Settings \
+        --ignore=DumpStack.log.tmp \
+        --ignore=Local?Settings \
+        --ignore=My?Documents \
+        --ignore=ntuser.* \
+        --ignore=NTUSER.* \
+        --ignore=OneDriveTemp \
+        --ignore=Recovery \
+        --ignore=System?Volume?Information \
+        "
 
     # Prevent ls from highlighting everything in /mnt/c
     export LS_COLORS=$LS_COLORS:'ow=1;34:'
@@ -193,6 +228,8 @@ if ! have start; then
     elif have open; then
         alias start=open
     fi
+elif ! have open; then
+    alias open=start
 fi
 
 
@@ -201,7 +238,7 @@ fi
 # These LSCOLORS are designed to match the GNU defaults.
 export CLICOLOR=1
 export LSCOLORS=exgxbxdxcxegedabagacad
-LS_OPTIONS="-h -F $WSL_LS_OPTIONS"
+LS_OPTIONS="-h -F $WIN_LS_OPTIONS"
 
 
 # Use GNU coreutils where possible

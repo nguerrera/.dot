@@ -339,10 +339,32 @@ function .. { Set-Location .. }
 function du { du.exe -h @args }
 function df { df.exe -h @args }
 function emacs { emacsclient.cmd -n @args }
-function gls { ls.exe --group-directories-first --color -h -F --ignore="ntuser.*" --ignore="NTUSER.*" --ignore="*fil*.sys" @args }
 function ll { gls -l @args }
 function ms { emacsclient.cmd `-e '"(progn (magit-status) (raise-frame))"' }
 function ver { cmd /c ver }
+
+function gls { 
+    # Hide well-known windows hidden files
+    ls.exe --group-directories-first --color -h -F `
+        --ignore=*fil*.sys `
+        --ignore=?Recycle.Bin `
+        --ignore=?WinREAgent `
+        --ignore=Application?Data `
+        --ignore=bootmgr `
+        --ignore=BOOTNXT `
+        --ignore=Config.Msi `
+        --ignore=Documents?and?Settings `
+        --ignore=DumpStack.log.tmp `
+        --ignore=Local?Settings `
+        --ignore=My?Documents `
+        --ignore=ntuser.* `
+        --ignore=NTUSER.* `
+        --ignore=OneDriveTemp `
+        --ignore=Recovery `
+        --ignore=System?Volume?Information `
+        @args 
+}
+
 
 Set-Alias e emacs
 Set-Alias h history
