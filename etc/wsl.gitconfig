@@ -3,7 +3,7 @@
 [credential]
 	helper = /mnt/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-manager-core.exe
 [difftool "bc"]
-	path = /home/nicholg/.dot/git/bcomp-wsl
+	path = bcomp-wsl
 [alias]
 	dd = difftool --no-symlinks --dir-diff
 	dt = difftool --no-symlinks -y
@@ -11,4 +11,3 @@
 	pushinsteadof = https://github.com/
 [url "https://github.com/nguerrera/"]
 	pushinsteadof = https://github.com/nguerrera/
-

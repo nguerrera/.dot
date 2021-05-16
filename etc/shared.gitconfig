@@ -11,10 +11,10 @@
 	wip = !git add --all && git commit -n -m WIP
 	save = !git add --all && git commit -n -m SAVE && git reset HEAD~1
 	wipe = !git add --all && git commit -n -m WIPE && git reset HEAD~1 --hard
-	config-shared = !git config --file ~/.dot/git/shared.gitconfig
-	config-win = !git config --file ~/.dot/git/win.gitconfig
-	config-unix = !git config --file ~/.dot/git/unix.gitconfig
-	config-wsl = !git config --file ~/.dot/git/wsl.gitconfig
+	config-shared = !git config --file ~/.dot/etc/shared.gitconfig
+	config-win = !git config --file ~/.dot/etc/win.gitconfig
+	config-unix = !git config --file ~/.dot/etc/unix.gitconfig
+	config-wsl = !git config --file ~/.dot/etc/wsl.gitconfig
 [hub]
 	protocol = https
 [diff]

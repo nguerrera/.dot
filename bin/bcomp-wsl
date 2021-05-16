@@ -4,4 +4,4 @@ for arg; do
   array+=($(wslpath -a -w $arg))
 done
 
-"/mnt/c/Program Files/Beyond Compare 4/BComp.exe" --no-symlinks ${array[@]}
+"/mnt/c/Program Files/Beyond Compare 4/BComp.exe" ${array[@]}

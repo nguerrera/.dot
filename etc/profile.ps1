@@ -129,11 +129,8 @@ if (Test-Path "${Env:ProgramW6432}\Beyond Compare 4") {
     $Env:PATH="${Env:PATH};${Env:ProgramW6432}\Beyond Compare 4"
 }
 
-# add this directory to PATH
-$Env:PATH="${Env:USERPROFILE}\.dot\cmd;${Env:PATH}"
-
-# add custom git commands to PATH
-$Env:PATH="${Env:PATH};${Env:USERPROFILE}\.dot\git"
+# add custom bin dir to PATH
+$Env:PATH="${Env:USERPROFILE}\.dot\bin;${Env:PATH}"
 
 # add Git directory to PATH
 if (Test-Path "${Env:ProgramW6432}\Git") {

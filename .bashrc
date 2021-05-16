@@ -79,8 +79,8 @@ shopt -s globstar 2> /dev/null
 # ignore case when globbing
 shopt -s nocaseglob 2> /dev/null
 
-# add custom git commands to path
-export PATH=$PATH:$HOME/.dot/git
+# add custom bin dir to path
+export PATH=$HOME/.dot/bin:$PATH
 
 # editor
 if [ -d /Applications/Emacs.app ]; then
@@ -191,7 +191,7 @@ if have cmd.exe; then
         }
     fi
 
-    alias bcomp=~/.dot/git/bcomp-wsl
+    alias bcomp=bcomp-wsl
 
     # Hide well-known windows hidden files
     WIN_LS_OPTIONS=" \

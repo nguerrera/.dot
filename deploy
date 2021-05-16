@@ -5,15 +5,15 @@
 
 cd $(dirname $0) || exit $?
 if [ -d /mnt/c/windows ]; then
-  git config --global include.path ~/.dot/git/wsl.gitconfig
+  git config --global include.path ~/.dot/etc/wsl.gitconfig
 else
-  git config --global include.path ~/.dot/git/unix.gitconfig
+  git config --global include.path ~/.dot/etc/unix.gitconfig
 fi
 
 for file in .*; do
     case $file in
         .|..|.git*)
-            :    
+            :
             ;;
         *)
             if [ -e ~/$file ]; then

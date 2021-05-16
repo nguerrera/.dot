@@ -1,7 +1,7 @@
 [include]
 	path = shared.gitconfig
 [core]
-	editor = C:/Users/nicholg/.dot/cmd/emacsclient.cmd -c
+	editor = emacsclient.cmd -c
 	longpaths = true
 	preloadindex = true
 	fscache = true
