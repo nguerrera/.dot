@@ -226,16 +226,6 @@
   ;; not really a rainbow, just highlight matched/unmatched differently
   (setq rainbow-delimiters-max-face-count 1))
 
-(use-package smartparens
-  :diminish
-  :hook (prog-mode . smartparens-mode)
-  :config
-  (setq sp-highlight-pair-overlay     nil
-        sp-highlight-wrap-overlay     nil
-        sp-highlight-wrap-tag-overlay nil
-        sp-escape-quotes-after-insert nil)
-  (require 'smartparens-config))
-
 ;; https://www.emacswiki.org/emacs/GotoAddress
 (use-package goto-addr
   :hook ((find-file . goto-address-mode))
