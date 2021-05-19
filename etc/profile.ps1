@@ -108,14 +108,13 @@ Set-PSReadLineKeyHandler -Key Enter -BriefDescription 'ExpandMacrosAndAcceptLine
 # Set the prompt, avoid flickering and sluggishness of posh-git default
 #  - Don't use git status (branch info is enough)
 #  - Return a single string, don't make independent calls to Write-Host
-$GitPromptSettings.EnableFileStatus = $false
 function prompt {
     $cyan="`e[36m"
     $yellow="`e[33m"
     $plain="`e[0m"
 
     $prompt = "`n${cyan}$(Get-Location)"
-    $branch = (Get-GitStatus).Branch
+    $branch = (Get-GitBranch)
     if ($branch) {
         $prompt += " ${yellow}(${branch})"
     }
@@ -300,6 +299,79 @@ Set-Macro ls {
     if (!$arg -or (Test-UnixArg $arg) -or ($arg -eq '-al')) {
         return 'gls'
     }
+}
+
+# Get git branch, ported from posh-git, and changed to avoid slow shelling
+# out to git as much as possible
+function Get-GitBranch($gitDir = $(Get-GitDirectory)) {
+    if (!$gitDir) { return $null }
+    $r = ''; $b = ''; $c = ''
+    $step = ''; $total = ''
+    if (Test-Path $gitDir/rebase-merge) {
+        if (Test-Path $gitDir/rebase-merge/interactive) {
+            $r = '|REBASE-i'
+        }
+        else {
+            $r = '|REBASE-m'
+        }
+        $b = "$(Get-Content $gitDir/rebase-merge/head-name)"
+        $step = "$(Get-Content $gitDir/rebase-merge/msgnum)"
+        $total = "$(Get-Content $gitDir/rebase-merge/end)"
+    }
+    else {
+        if (Test-Path $gitDir/rebase-apply) {
+            $step = "$(Get-Content $gitDir/rebase-apply/next)"
+            $total = "$(Get-Content $gitDir/rebase-apply/last)"
+
+            if (Test-Path $gitDir/rebase-apply/rebasing) {
+                $r = '|REBASE'
+            }
+            elseif (Test-Path $gitDir/rebase-apply/applying) {
+                $r = '|AM'
+            }
+            else {
+                $r = '|AM/REBASE'
+            }
+        }
+        elseif (Test-Path $gitDir/MERGE_HEAD) {
+            $r = '|MERGING'
+        }
+        elseif (Test-Path $gitDir/CHERRY_PICK_HEAD) {
+            $r = '|CHERRY-PICKING'
+        }
+        elseif (Test-Path $gitDir/REVERT_HEAD) {
+            $r = '|REVERTING'
+        }
+        elseif (Test-Path $gitDir/BISECT_LOG) {
+            $r = '|BISECTING'
+        }
+
+        $b = & {
+            $ref = $null
+            if (Test-Path $gitDir/HEAD) {
+                $ref = Get-Content $gitDir/HEAD 2>$null
+            }
+            else {
+                $ref = git --no-optional-locks rev-parse HEAD 2>$null
+            }
+
+            if ($ref -match 'ref: (?<ref>.+)') {
+                return $Matches['ref']
+            }
+            elseif ($ref -and $ref.Length -ge 7) {
+                return $ref.Substring(0,7)+'...'
+            }
+            else {
+                return 'unknown'
+            }
+        }
+    }
+
+    if ($step -and $total) {
+        $r += " $step/$total"
+    }
+
+    return "$c$($b -replace 'refs/heads/','')$r"
 }
 
 # Mimic cmd set
