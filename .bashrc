@@ -84,14 +84,14 @@ export PATH=$HOME/.dot/bin:$PATH
 
 # editor
 if [ -d /Applications/Emacs.app ]; then
-   export EDITOR='emacsclient.sh -c'
-   alias emacsclient='emacsclient.sh'
+   export EDITOR="$HOME/.dot/bin/emacsclient.sh -c"
+   alias emacsclient="$HOME/.dot/bin/emacsclient.sh"
    alias emacs='/Applications/Emacs.app/Contents/MacOS/emacs'
    alias e='emacsclient -n'
 elif have emacs; then
     if [ "$DISPLAY" != "" ]; then
-      export EDITOR='emacsclient.sh -c'
-      alias emacsclient='emacsclient.sh'
+      export EDITOR="$HOME/.dot/bin/emacsclient.sh -c"
+      alias emacsclient="$HOME/.dot/bin/emacsclient.sh"
       alias e='emacsclient -n'
     else
       export EDITOR=emacs
@@ -114,6 +114,8 @@ else
     alias n=e
 fi
 
+export SUDO_EDITOR=$EDITOR
+alias se=sudoedit
 alias notepad=n
 
 # install global npm packages to user dir so I can `npm install -g` without
