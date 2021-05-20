@@ -29,23 +29,24 @@ __set-prompt () {
     local colors=$(tput colors 2> /dev/null)
     if [ ${colors} -ge 8 ] 2> /dev/null || [ "$TERM" == "cygwin" ]; then
         local cyan='\e[36m'
+        local green='\e[32m'
         local yellow='\e[33m'
         local plain='\e[0m'
     fi
 
-    local windowsQualifier=
+    local ps1_dir=
     if have cmd.exe; then
         case $(uname) in
             MINGW*|MSYS*)
-                windowsQualifier='[MSYS]'
+                ps1_dir="${cyan}[MSYS] \w"
                 ;;
             Linux)
-                windowsQualifier='[WSL]'
+                ps1_dir="${cyan}[WSL] \w"
                 ;;
         esac
+    else
+        ps1_dir="\n\u@\h:\w"
     fi
-
-    local ps1_dir="\n\u@\h${windowsQualifier}:\w"
 
     if [ "$(type -t __git_ps1)" != "function" ]; then
         if [ -f /usr/share/git/git-prompt.sh ]; then
