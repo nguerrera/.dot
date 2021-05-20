@@ -34,18 +34,17 @@ __set-prompt () {
         local plain='\e[0m'
     fi
 
-    local ps1_dir=
     if have cmd.exe; then
         case $(uname) in
             MINGW*|MSYS*)
-                ps1_dir="${cyan}[MSYS] \w"
+                local ps1_dir="\n${cyan}MSYS:\w"
                 ;;
             Linux)
-                ps1_dir="${cyan}[WSL] \w"
+                local ps1_dir="\n${cyan}WSL:\w"
                 ;;
         esac
     else
-        ps1_dir="\n\u@\h:\w"
+        local ps1_dir="\n\u@\h:\w"
     fi
 
     if [ "$(type -t __git_ps1)" != "function" ]; then
