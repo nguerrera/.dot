@@ -198,6 +198,7 @@ if have cmd.exe; then
     WIN_LS_OPTIONS=" \
         --ignore=*fil*.sys \
         --ignore=?Recycle.Bin \
+        --ignore=?SysReset \
         --ignore=?WinREAgent \
         --ignore=Application?Data \
         --ignore=bootmgr \
@@ -211,6 +212,7 @@ if have cmd.exe; then
         --ignore=NTUSER.* \
         --ignore=OneDriveTemp \
         --ignore=Recovery \
+        --ignore=system.sav \
         --ignore=System?Volume?Information \
         "
 

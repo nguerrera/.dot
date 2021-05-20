@@ -419,6 +419,7 @@ function gls {
         --ignore=*fil*.sys `
         --ignore=?Recycle.Bin `
         --ignore=?WinREAgent `
+        --ignore=?SysReset `
         --ignore=Application?Data `
         --ignore=bootmgr `
         --ignore=BOOTNXT `
@@ -431,6 +432,7 @@ function gls {
         --ignore=NTUSER.* `
         --ignore=OneDriveTemp `
         --ignore=Recovery `
+        --ignore=system.sav `
         --ignore=System?Volume?Information `
         @args 
 }
