@@ -119,7 +119,8 @@ function prompt {
         $prompt += " ${yellow}(${branch})"
     }
 
-    $prompt += "${plain}`n> "
+    $symbol = if (Test-Admin) { "#" } else { "$" }
+    $prompt += "${plain}`n${symbol} "
     return $prompt
 }
 
