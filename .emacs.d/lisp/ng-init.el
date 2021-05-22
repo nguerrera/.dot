@@ -268,8 +268,6 @@
   ;; disable default global bindings
   (global-magit-file-mode -1))
 
-
-
 (use-package avy
   :init
   (setq avy-keys (number-sequence ?a ?z))

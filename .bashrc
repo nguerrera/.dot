@@ -88,14 +88,17 @@ if [ -d /Applications/Emacs.app ]; then
    alias emacsclient="$HOME/.dot/bin/emacsclient.sh"
    alias emacs='/Applications/Emacs.app/Contents/MacOS/emacs'
    alias e='emacsclient -n'
+   alias ms='emacsclient -c --eval "(magit-status)"'
 elif have emacs; then
     if [ "$DISPLAY" != "" ]; then
       export EDITOR="$HOME/.dot/bin/emacsclient.sh -c"
       alias emacsclient="$HOME/.dot/bin/emacsclient.sh"
       alias e='emacsclient -n'
+      alias ms='emacsclient -c --eval "(magit-status)"'
     else
       export EDITOR=emacs
       alias e=emacs
+      alias ms='emacs --eval "(magit-status)"'
     fi
 elif have code; then
     export EDITOR='code -w'
@@ -158,7 +161,6 @@ alias tracert=traceroute
 alias copy=cp
 alias move=mv
 alias del=rm
-alias ms='emacsclient -n --eval "(progn (magit-status) (raise-frame))"'
 
 # WSL / MSYS interop
 if have cmd.exe; then
