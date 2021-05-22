@@ -330,6 +330,9 @@
 (use-package csharp-mode
   :mode "\\.cs\\'")
 
+(use-package conf-mode
+  :mode "\\.gitconfig\\'")
+
 ;; C/C++/C#/Java and other c-mode based language
 (progn
   (add-hook
