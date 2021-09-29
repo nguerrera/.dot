@@ -100,15 +100,19 @@ elif have emacs; then
       alias e=emacs
       alias ms='emacs --eval "(magit-status)"'
     fi
+elif have code-insiders; then
+    export EDITOR='code-insiders -w'
+    alias e=code-insiders
 elif have code; then
     export EDITOR='code -w'
     alias e=code
-elif have code-insiders; then
-    export EDITOR='code-insiders -w'
-    alias code=code-insiders
-    alias e=code-insiders
 else
     alias e=vi
+fi
+
+# prefer vs code insiders
+if have code-insiders; then
+    alias code=code-insiders
 fi
 
 if have code; then
