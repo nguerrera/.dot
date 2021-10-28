@@ -1,71 +1,115 @@
 {
-  "$schema": "https://aka.ms/terminal-profiles-schema",
-  "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
-  "alwaysShowTabs": false,
-  "showTabsInTitlebar": false,
-  "disabledProfileSources": [
-    "Windows.Terminal.Azure",
-    "Windows.Terminal.Wsl"
-  ],
-  "schemes": [
+    "$help": "https://aka.ms/terminal-documentation",
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "actions": 
+    [
+        {
+            "command": 
+            {
+                "action": "copy"
+            },
+            "keys": "ctrl+c"
+        },
+        {
+            "command": 
+            {
+                "action": "copy"
+            },
+            "keys": "enter"
+        },
+        {
+            "command": "paste",
+            "keys": "ctrl+v"
+        }
+    ],
+    "alwaysShowTabs": false,
+    "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+    "disabledProfileSources": 
+    [
+        "Windows.Terminal.Azure",
+        "Windows.Terminal.Wsl"
+    ],
+    "profiles": 
     {
-      "name": "Custom",
-      "background": "#282c34",
-      "foreground": "#abb2bf",
-      "black": "#282c34",
-      "blue": "#61afef",
-      "cyan": "#56b6c2",
-      "green": "#98c379",
-      "purple": "#c678dd",
-      "red": "#e06c75",
-      "white": "#abb2bf",
-      "yellow": "#e5c07b",
-      "brightBlack": "#8d8d8d",
-      "brightBlue": "#8ac1ee",
-      "brightCyan": "#8eb7bd",
-      "brightGreen": "#a9ce8f",
-      "brightPurple": "#da9dec",
-      "brightRed": "#e0606b",
-      "brightWhite": "#dcdfe4",
-      "brightYellow": "#f3daab"
-    }
-  ],
-  "profiles": {
-    "defaults": {
-      "fontFace": "Cascadia Mono",
-      "fontSize": 12,
-      "colorScheme": "Custom"
+        "defaults": 
+        {
+            "colorScheme": "Custom",
+            "font": 
+            {
+                "face": "Cascadia Mono",
+                "size": 12
+            }
+        },
+        "list": 
+        [
+            {
+                "commandline": "pwsh.exe -NoLogo",
+                "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+                "hidden": false,
+                "name": "Terminal",
+                "source": "Windows.Terminal.PowershellCore"
+            },
+            {
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "hidden": true,
+                "name": "Windows PowerShell"
+            },
+            {
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "hidden": true,
+                "name": "Command Prompt"
+            },
+            {
+                "guid": "{d188c10f-b889-5c48-871f-2b5431fd0ec6}",
+                "hidden": true,
+                "name": "Developer Command Prompt for VS 2022 [IntPreview]",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{5e7b6e06-f9a7-595f-8219-fa6799ca7144}",
+                "hidden": true,
+                "name": "Developer PowerShell for VS 2022 [IntPreview]",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{64d1dd91-4e8e-5c9a-a66e-3230ea441bc0}",
+                "hidden": true,
+                "name": "Developer Command Prompt for VS 2019 [IntPreview]",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{fbc19527-e723-5a4d-9ec1-f6cb445288c7}",
+                "hidden": true,
+                "name": "Developer PowerShell for VS 2019 [IntPreview]",
+                "source": "Windows.Terminal.VisualStudio"
+            }
+        ]
     },
-    "list": [
-      {
-        "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
-        "name": "Terminal",
-        "commandline": "pwsh.exe -NoLogo"
-      },
-      {
-        "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-        "name": "Windows PowerShell",
-        "hidden": true
-      },
-      {
-        "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-        "name": "Command Prompt",
-        "hidden": true
-      }
-    ]
-  },
-  "keybindings": [
-    {
-      "command": "copy",
-      "keys": "ctrl+c"
-    },
-    {
-      "command": "paste",
-      "keys": "ctrl+v"
-    },
-    {
-      "command": "copy",
-      "keys": "enter"
-    }
-  ]
+    "schemes": 
+    [
+        {
+            "background": "#282C34",
+            "black": "#282C34",
+            "blue": "#61AFEF",
+            "brightBlack": "#8D8D8D",
+            "brightBlue": "#8AC1EE",
+            "brightCyan": "#8EB7BD",
+            "brightGreen": "#A9CE8F",
+            "brightPurple": "#DA9DEC",
+            "brightRed": "#E0606B",
+            "brightWhite": "#DCDFE4",
+            "brightYellow": "#F3DAAB",
+            "cursorColor": "#FFFFFF",
+            "cyan": "#56B6C2",
+            "foreground": "#ABB2BF",
+            "green": "#98C379",
+            "name": "Custom",
+            "purple": "#C678DD",
+            "red": "#E06C75",
+            "selectionBackground": "#FFFFFF",
+            "white": "#ABB2BF",
+            "yellow": "#E5C07B"
+        },
+    ],
+    "showTabsInTitlebar": false
 }
