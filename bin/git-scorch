@@ -11,6 +11,7 @@ repo_root=$(git rev-parse --show-toplevel)
 [ $? -eq 0 ] || exit $?
 
 run cd $repo_root
+run git submodule foreach git scorch
 run git add --all
 run git commit -n --allow-empty -m SCORCH
 run git reset HEAD~1 --hard
