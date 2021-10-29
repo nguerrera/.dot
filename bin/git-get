@@ -181,11 +181,7 @@ if ! has_remote origin; then
     error "there is no origin remote."
 fi
 
-git_try fetch --prune origin
-
-if has_remote upstream; then
-    git_try fetch --prune upstream
-fi
+git_try fetch --all --prune
 
 branch=$1
 if [ ! "$branch" ]; then
