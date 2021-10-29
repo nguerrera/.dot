@@ -32,11 +32,11 @@ upstream changes with ease.
 
 * Merge what others have done...
     > git get
-    > git merge master
+    > git merge main
 
 * ...or rebase your changes on top.
     > git get
-    > git rebase master
+    > git rebase main
     
 NOTE:
   - This is not a built-in git command.
