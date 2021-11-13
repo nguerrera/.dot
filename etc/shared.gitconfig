@@ -25,3 +25,5 @@
 	default = nothing
 [init]
 	defaultBranch = main
+[submodule]
+	recurse = true
