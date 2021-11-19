@@ -251,6 +251,7 @@ elif is_ancestor "$branch" "$origin/$branch"; then
         echo
     else
         git_try merge --ff-only "$origin/$branch"
+        git_try submodule update --init
     fi
 
 else
