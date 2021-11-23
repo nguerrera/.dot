@@ -7,7 +7,8 @@
 	bash = !bash
 	dd = difftool --dir-diff
 	dt = difftool -y
-	ff = merge --ff-only
+	ff = "!f() { git merge --ff-only $* && git su; }; f"
+	su = submodule update --init
 	wip = !git add --all && git commit -n -m WIP
 	save = !git add --all && git commit -n -m SAVE && git reset HEAD~1
 	wipe = !git add --all && git commit -n -m WIPE && git reset HEAD~1 --hard
