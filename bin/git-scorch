@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# git-schorch - git clean -fdx with backup in reflog and rush shenanigans
+# git-scorch - git reset --hard && git clean -fdx with backup in reflog and rush shenanigans
 
 run() {
   echo
