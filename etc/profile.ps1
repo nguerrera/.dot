@@ -258,7 +258,7 @@ function tgit {
 # Process one line at a time, allowing spaces, and don't munge backslashes
 function xargs {
     param($command)
-    process { & $command @args $_ }
+    process { & $command @args $_.Trim() }
 }
 
 # Mimic unix sudo
