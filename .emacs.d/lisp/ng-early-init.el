@@ -11,13 +11,14 @@
   (defvar ng-auto-save-dir  "~/.emacs.d/saves/")
   (make-directory ng-auto-save-dir t)
   (setq
-   auto-save-file-name-transforms `((".*" ,ng-auto-save-dir t))
-   backup-directory-alist         `(("." .  ,ng-auto-save-dir))
-   backup-by-copying              t
-   delete-old-versions            t
-   kept-new-versions              5
-   kept-old-versions              0
-   version-control                t))
+   auto-save-file-name-transforms      `((".*"    ,ng-auto-save-dir t))
+   backup-directory-alist              `((".*" .  ,ng-auto-save-dir))
+   undo-tree-history-directory-alist   `((".*" .  ,ng-auto-save-dir))
+   backup-by-copying                   t
+   delete-old-versions                 t
+   kept-new-versions                   5
+   kept-old-versions                   0
+   version-control                     t))
 
 ;; but lockfiles are terrible and can't be moved, so disable them
 (setq create-lockfiles nil)
