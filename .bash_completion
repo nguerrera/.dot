@@ -15,6 +15,7 @@ complete -o bashdefault -d pushd
 # the bashdefault fallback.
 type -t compopt > /dev/null || return
 for cmd in $(complete | egrep -v '(-d -G)' | awk '{print $(NF)}' | egrep -v '(_minimal)'); do
+    if [ "$cmd" = "" -o "$cmd" = "''" ]; then continue; fi;
     compopt -o bashdefault $cmd
 done
 
