@@ -90,7 +90,7 @@ if [ -d /Applications/Emacs.app ]; then
    alias e='emacsclient -n'
    alias ms='emacsclient -c --eval "(magit-status)"'
 elif have emacs; then
-    if [ "$DISPLAY" != "" ]; then
+    if [ "$DISPLAY" != "" ] && (! have wslpath); then
       export EDITOR="$HOME/.dot/bin/emacsclient.sh -c"
       alias emacsclient="$HOME/.dot/bin/emacsclient.sh"
       alias e='emacsclient -n'
