@@ -5,7 +5,8 @@ using namespace Microsoft.PowerShell
 Import-Module posh-git
 Set-PSReadLineOption -EditMode Emacs -BellStyle Visual
 Set-PSReadlineKeyHandler -Key Tab -Function TabCompleteNext
-Set-PSReadlineKeyHandler -Key Shift+Tab -Function TabCompletePrevious
+Set-PSReadlineKeyHandler -Key Shift+Tab -Function TabCompletePrevious 
+Set-PSReadLineOption -PredictionSource None
 
 # Clean up after prior invocations
 if (!$Env:PathBeforeProfile) {
