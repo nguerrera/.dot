@@ -12,7 +12,15 @@ git config --global include.path %~dp0etc\win.gitconfig
 
 call :make_links
 call :make_links /d /j
-call :make_link %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState\settings.json %~dp0etc\settings.json
+
+if exist %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState (
+  call :make_link %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json %~dp0etc\settings.json
+)
+
+if exist %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState (
+  call :make_link %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState\settings.json %~dp0etc\settings.json
+)
+
 mkdir %USERPROFILE%\Documents\PowerShell\
 call :make_link %USERPROFILE%\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 %~dp0etc\profile.ps1
 goto :eof
