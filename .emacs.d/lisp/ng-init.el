@@ -263,10 +263,9 @@
    ;; don't open ediff control in new frame
    ediff-window-setup-function #'ediff-setup-windows-plain
    ;; use side-by-side ediff by default
-   ediff-split-window-function #'split-window-horizontally)
-  :config
+   ediff-split-window-function #'split-window-horizontally
   ;; disable default global bindings
-  (global-magit-file-mode -1))
+  global-magit-file-mode nil))
 
 (use-package avy
   :init
