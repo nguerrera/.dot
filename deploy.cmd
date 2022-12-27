@@ -10,6 +10,12 @@ setlocal enabledelayedexpansion
 
 git config --global include.path %~dp0etc\win.gitconfig
 
+:: Disable safe directories so Windows git can operate on WSL mounts. For
+:: some reason, this has to be in the top-level config file. And it also
+:: does not support wildcard other than single '*' to match absolutely
+:: everything. :(
+git config --global safe.directory *
+
 call :make_links
 call :make_links /d /j
 
