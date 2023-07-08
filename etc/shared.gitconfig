@@ -1,9 +1,7 @@
 [user]
 	name = Nick Guerrera
-	useconfigonly = true
+	email = nick@technogenic.net
 [alias]
-	for-fun = config user.email "nick@technogenic.net"
-	for-work = config user.email "nicholg@microsoft.com"
 	bash = !bash
 	dd = difftool --dir-diff
 	dt = difftool -y
