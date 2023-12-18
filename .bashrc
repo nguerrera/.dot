@@ -82,6 +82,11 @@ shopt -s nocaseglob 2> /dev/null
 # add custom bin dir to path
 export PATH=$HOME/.dot/bin:$PATH
 
+# add homebrew env
+if [ -x /opt/homebrew/bin/brew ]; then
+    eval $(/opt/homebrew/bin/brew shellenv)
+fi
+
 # editor
 if [ -d /Applications/Emacs.app ]; then
    export EDITOR="$HOME/.dot/bin/emacsclient.sh -c"
@@ -242,10 +247,6 @@ elif ! have open; then
     alias open=start
 fi
 
-# Set up homebrew env
-if [ -x /opt/homebrew/bin/brew ]; then
-    eval $(/opt/homebrew/bin/brew shellenv)
-fi
 
 # Start with BSD-safe LS_OPTIONS.
 # We'll augment them if we find GNU coreutils below.
