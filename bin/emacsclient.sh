@@ -18,7 +18,7 @@ emacsclient=emacsclient
 
 if [ -d /Applications/Emacs.app ]; then
   emacs=/Applications/Emacs.app/Contents/MacOS/Emacs
-  emacsclient=/Applications/Emacs.app/Contents/MacOS/bin/emacsclient
+  emacsclient=/Applications/Emacs.app/Contents/MacOS/bin-arm64-11/emacsclient
 
   # Mac OS has a weird behavior where it restores another minimized frame
   # when closing the client frame instead of closing it and returning focus.

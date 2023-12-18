@@ -2,7 +2,7 @@
 [ -z "$PS1" ] && return
 
 # source global /etc/bashrc and /etc/bash_completion if available
-for etc in /etc /usr/local/etc; do
+for etc in /etc /usr/local/etc /opt/homebrew/etc; do
     for config in bashrc bash_completion; do
         if [ -f $etc/$config ]; then
            source $etc/$config
@@ -242,6 +242,10 @@ elif ! have open; then
     alias open=start
 fi
 
+# Set up homebrew env
+if [ -x /opt/homebrew/bin/brew ]; then
+    eval $(/opt/homebrew/bin/brew shellenv)
+fi
 
 # Start with BSD-safe LS_OPTIONS.
 # We'll augment them if we find GNU coreutils below.
@@ -284,7 +288,7 @@ __use-gnu-coreutils() {
             ;;
         
         Darwin)
-            local coreutils=/usr/local/opt/coreutils/libexec
+            local coreutils=/opt/homebrew/opt/coreutils/libexec
             if [ ! -d $coreutils ]; then
                 # coreutils have not been installed
                 return 1
