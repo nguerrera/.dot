@@ -334,10 +334,7 @@ __use-gnu-coreutils() {
 }
 
 if __use-gnu-coreutils; then
-    LS_OPTIONS="$LS_OPTIONS --color=auto"
-    if ls ~/ --group-directories-first > /dev/null 2>&1; then
-        LS_OPTIONS="$LS_OPTIONS --group-directories-first"
-    fi
+    LS_OPTIONS="$LS_OPTIONS --color=auto --group-directories-first"
 fi
 
 unset -f __use-gnu-coreutils
