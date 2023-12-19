@@ -35,7 +35,7 @@ for arg; do
             createFrame=true
             clientArgs+=("$arg")
             ;;
-        -n|--no-wait)
+        -n|--no-wait|-e|--eval)
             takeBackFocus=false
             clientArgs+=("$arg")
             clientArgsNoFrame+=("$arg")
