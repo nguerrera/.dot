@@ -55,7 +55,8 @@ done
 
 # if not given a file and not told to create a frame, bring emacs into focus
 if ((! $fileArg) && (! $createFrame)); then
-    clientArgs=(--eval "(raise-frame)")
+    clientArgs+=(--eval "(raise-frame)")
+    clientArgsNoFrame+=(--eval "(raise-frame)")
 fi
 
 # if we're creating a frame, then start the initial instance minimized
