@@ -126,6 +126,10 @@ else
     alias n=e
 fi
 
+if ! have python && have python3; then
+    alias python=python3
+fi
+
 export SUDO_EDITOR=$EDITOR
 alias se=sudoedit
 alias notepad=n
