@@ -71,7 +71,7 @@ emoji fonts."
 
 (when window-system
   (or
-   (ng-try-set-font "Menlo-14")
+   (ng-try-set-font "Menlo-15")
    (ng-try-set-font "Cascadia Mono-12")
    (ng-try-set-font "Noto Mono-12")
    (ng-try-set-font "DejaVu Sans Mono-12")
