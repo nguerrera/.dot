@@ -93,13 +93,13 @@ if [ -d /Applications/Emacs.app ]; then
    alias emacsclient="$HOME/.dot/bin/emacsclient.sh"
    alias emacs='/Applications/Emacs.app/Contents/MacOS/emacs'
    alias e='emacsclient -n'
-   alias ms='emacsclient -c --eval "(progn (magit-status) (raise-frame))"'
+   alias ms='emacsclient --eval "(progn (magit-status) (raise-frame))"'
 elif have emacs; then
     if [ "$DISPLAY" != "" ] && (! have wslpath); then
       export EDITOR="$HOME/.dot/bin/emacsclient.sh -c"
       alias emacsclient="$HOME/.dot/bin/emacsclient.sh"
       alias e='emacsclient -n'
-      alias ms='emacsclient -c --eval "(magit-status)"'
+      alias ms='emacsclient --eval "(progn (magit-status) (raise-frame))"'
     else
       export EDITOR=emacs
       alias e=emacs
