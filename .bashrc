@@ -236,10 +236,6 @@ if have cmd.exe; then
     export LS_COLORS=$LS_COLORS:'ow=1;34:'
 fi
 
-if have hub; then
-    alias git=hub
-fi
-
 if ! have start; then
     if have xdg-open; then
         alias start=xdg-open

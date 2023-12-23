@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+arg=$1
+if [[ $arg == "" ]]; then
+  arg=$(git rev-parse --abbrev-ref HEAD)
+  [[ $? -eq 0 ]] || exit 1
+fi
+
+gh extension install kyanny/gh-browse-compare
+exec gh browse-compare $arg
