@@ -87,7 +87,7 @@
             "selectionBackground": "#FFFFFF",
             "white": "#ABB2BF",
             "yellow": "#E5C07B"
-        },
+        }
     ],
     "showTabsInTitlebar": false
 }
