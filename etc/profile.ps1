@@ -144,11 +144,6 @@ if (Test-Path "${Env:ProgramW6432}\Git") {
     Set-Macro find gfind
 }
 
-# use hub as alias for git if available
-if (Test-Path "${Env:UserProfile}\OneDrive\Tools\Hub\bin") {
-    Set-Alias git "${Env:UserProfile}\OneDrive\Tools\Hub\bin\hub.exe"
-}
-
 # use ripgrep if available
 if (Test-Path "${Env:UserProfile}\OneDrive\Tools\RipGrep") {
     Set-Alias rg "${Env:UserProfile}\OneDrive\Tools\RipGrep\rg.exe"
