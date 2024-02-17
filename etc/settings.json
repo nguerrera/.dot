@@ -35,6 +35,7 @@
     {
         "defaults": 
         {
+            "bellStyle": "none",
             "colorScheme": "Custom",
             "font": 
             {
