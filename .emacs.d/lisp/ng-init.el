@@ -161,20 +161,14 @@
  "M-<mouse-2>"
  "M-<mouse-3>")
 
-(use-package rect
-  :ensure nil ; built-in
-  :demand
-  :init
+(progn
+  (require 'rect)
   ;; unbind cua-mode version of rectangle selection
   (define-key cua-global-keymap cua-rectangle-mark-key nil)
-  ;; but advise cua to stop standard rectangle-mark-mode-on-cancel
-  (advice-add 'cua-cancel
-              :before
-              (lambda () (rectangle-mark-mode -1)))
-  :bind
+  ;; but advise cua to stop standard rectangle-mark-mode on cancel
+  (advice-add 'cua-cancel :before (lambda () (rectangle-mark-mode -1)))
   ;; make it possible to type over rectangles with multiple cursors
-  (:map rectangle-mark-mode-map
-        ("<remap> <self-insert-command>" . ng-rectangle-self-insert)))
+  (define-key rectangle-mark-mode-map (kbd "<remap> <self-insert-command>") 'ng-rectangle-self-insert))
 
 (use-package multiple-cursors
   :pin melpa
