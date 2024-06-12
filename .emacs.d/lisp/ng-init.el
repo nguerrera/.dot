@@ -62,6 +62,11 @@
 ;; fill to 76 cloumns by default
 (setq-default fill-column 76)
 
+;; use visual line mode with left fringe indicator in text modes
+(progn
+  (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+  (setq visual-line-fringe-indicators '(nil right-curly-arrow)))
+
 ;; use ls-lisp everywhere to portably group directories first and get
 ;; away from "ls does not support --dired" warnings
 (progn
