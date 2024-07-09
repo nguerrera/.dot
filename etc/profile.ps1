@@ -126,8 +126,8 @@ function prompt {
 }
 
 # add beyond compare to the path
-if (Test-Path "${Env:ProgramW6432}\Beyond Compare 4") {
-    $Env:PATH="${Env:PATH};${Env:ProgramW6432}\Beyond Compare 4"
+if (Test-Path "${Env:ProgramW6432}\Beyond Compare 5") {
+    $Env:PATH="${Env:PATH};${Env:ProgramW6432}\Beyond Compare 5"
 }
 
 # add custom bin dir to PATH
