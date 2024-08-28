@@ -3,6 +3,9 @@
 *#
 .#*
 
+# ignore Mac .DS_Store
+.DS_Store
+
 # ignore byte-compiled elisp
 *.elc
 
