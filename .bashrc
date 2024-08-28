@@ -134,6 +134,11 @@ export SUDO_EDITOR=$EDITOR
 alias se=sudoedit
 alias notepad=n
 
+# Use node@20 on homebrew if we don't have node on path, but we have that
+if ! have node && [ -d /opt/homebrew/opt/node@20 ]; then
+    export PATH=/opt/homebrew/opt/node@20/bin:$PATH
+fi
+
 # install global npm packages to user dir so I can `npm install -g` without
 # sudo, mirrors default behavior on Windows
 if have npm; then
