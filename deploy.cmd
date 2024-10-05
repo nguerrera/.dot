@@ -27,8 +27,18 @@ if exist %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\
   call :make_link %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState\settings.json %~dp0etc\settings.json
 )
 
-mkdir %USERPROFILE%\Documents\PowerShell\
-call :make_link %USERPROFILE%\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 %~dp0etc\profile.ps1
+:: Can't use symlink in Documents folder because OneDrive backup breaks
+:: Emit a one line powershell profile that imports profile.ps1 from here instead
+for /f "usebackq tokens=*" %%a in (`powershell -command "[Environment]::GetFolderPath('Personal')"`) do (set DOCS=%%a)
+mkdir "%DOCS%\PowerShell"
+set PS_PROFILE=%DOCS%\PowerShell\Microsoft.PowerShell_profile.ps1
+if exist "%PS_PROFILE%" (
+  echo warning: '%PS_PROFILE%' already exists, not overwriting
+) else (
+  echo y
+  echo Creating %PS_PROFILE%
+  echo . %~dp0etc\profile.ps1 > "%PS_PROFILE%"
+)
 goto :eof
 
 :make_links
