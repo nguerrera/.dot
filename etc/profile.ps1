@@ -257,8 +257,8 @@ function xargs {
     process { & $command @args $_.Trim() }
 }
 
-# Mimic unix sudo
-function sudo {
+# sudo for versions of Windows without sudo.exe
+function _sudo {
     param ($command)
     if (Test-Admin) {
         & $command @args
@@ -270,6 +270,9 @@ function sudo {
         }
         Start-Process -Verb RunAs -FilePath $command -ArgumentList $argumentList -WorkingDirectory (Get-Location)
     }
+}
+if (!(Test-Command sudo.exe)) {
+    Set-Alias sudo _sudo
 }
 
 # List all powershell commands when which or where is called interactively.
