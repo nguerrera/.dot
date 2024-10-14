@@ -108,12 +108,7 @@
 
   ;; with this in place, we can use projectile's fast "alien" indexing
   ;; on windows, which is the default on other OSes
-  (setq projectile-indexing-method 'alien)
-
-  ;; with this in place, emacs finds Windows gpg.exe and tries to use it
-  ;; to validate package signatures, but it does not work so revert to
-  ;; the default windows behavior of not checking.
-  (setq package-check-signature nil))
+  (setq projectile-indexing-method 'alien))
 
 ;; Make sure emacs gets focus when a frame is raised or created on Mac
 (when (eq window-system 'ns)
