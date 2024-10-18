@@ -1,10 +1,19 @@
 #!/usr/bin/env bash
-
-arg=$1
-if [[ $arg == "" ]]; then
-  arg=$(git rev-parse --abbrev-ref HEAD)
+branch=$1
+if [[ $branch == "" ]]; then
+  branch=$(git rev-parse --abbrev-ref HEAD)
   [[ $? -eq 0 ]] || exit 1
 fi
 
-gh extension install kyanny/gh-browse-compare
-exec gh browse-compare $arg
+origin=$(git config --get remote.origin.url)
+if [[ $? -ne 0 ]]; then
+   echo "error: This is not a git repo or there is no origin remote."
+   exit 1
+fi
+
+if [[ "$origin" == *"dev.azure.com"*  ]]; then
+  start $origin/pullrequestcreate?sourceRef=$branch
+else
+  gh extension install kyanny/gh-browse-compare
+  exec gh browse-compare $branch
+fi
