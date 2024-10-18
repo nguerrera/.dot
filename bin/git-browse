@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+origin=$(git config --get remote.origin.url)
+
+if [[ $? -ne 0 ]]; then
+   echo "error: This is not a git repo or there is no origin remote"
+   exit 1
+fi
+
+if [[ "$origin" == *"github.com"*  ]]; then
+  gh browse $*
+else
+  start $origin
+fi
+

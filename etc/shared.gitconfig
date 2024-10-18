@@ -9,7 +9,6 @@
 	dt = difftool -y
 	ff = "!f() { git merge --ff-only $* && git su; }; f"
 	su = submodule update --init
-	browse = !gh browse
 	wip = !git add --all && git commit -n -m WIP
 	save = !git add --all && git commit -n -m SAVE && git reset HEAD~1
 	wipe = !git add --all && git commit -n -m WIPE && git reset HEAD~1 --hard
