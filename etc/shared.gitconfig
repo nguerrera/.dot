@@ -17,8 +17,6 @@
 	config-win = !git config --file ~/.dot/etc/win.gitconfig
 	config-unix = !git config --file ~/.dot/etc/unix.gitconfig
 	config-wsl = !git config --file ~/.dot/etc/wsl.gitconfig
-[hub]
-	protocol = https
 [diff]
 	tool = bc
 [merge]
