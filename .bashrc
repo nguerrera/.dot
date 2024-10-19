@@ -219,6 +219,7 @@ if have cmd.exe; then
     WIN_LS_OPTIONS=" \
         --ignore=*fil*.sys \
         --ignore=?Recycle.Bin \
+        --ignore=?RECYCLE.BIN \
         --ignore=?SysReset \
         --ignore=?WinREAgent \
         --ignore=Application?Data \

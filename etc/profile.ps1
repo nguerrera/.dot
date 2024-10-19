@@ -417,6 +417,7 @@ function gls {
     ls.exe --group-directories-first --color -h -F `
         --ignore=*fil*.sys `
         --ignore=?Recycle.Bin `
+        --ignore=?RECYCLE.BIN `
         --ignore=?WinREAgent `
         --ignore=?SysReset `
         --ignore=Application?Data `
