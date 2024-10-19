@@ -22,6 +22,11 @@ have() {
     type -t $1 > /dev/null 2>&1
 }
 
+# Set the title for a terminal window
+title() {
+  echo -ne "\033]0;$1\007"
+}
+
 # Set up the prompt with some defense against dumb terminals
 # that don't understand the color escape sequences (e.g. M-x
 # shell on the old version of emacs that ships with Mac OS X.)
@@ -198,18 +203,13 @@ if have cmd.exe; then
         fi
     }
 
-    if have wslpath; then
+    if have wslview; then
         start() {
-            local arg=$1
-            if [ -e $arg ]; then
-                arg=$(wslpath -a -w $arg)
-            fi
-            # cmd does not like being run from a network path
-            pushd /mnt/c > /dev/null
-            cmd.exe /c start $arg
-            # annoyingly, above changes terminal title
-            cmd.exe /c title Terminal
-            popd > /dev/null
+           wslview $*
+           local error_code=$?
+           # Annoyingly wslview -> powershell changes the terminal title, so change it back
+           title Terminal
+           return $error_code
         }
     fi
 
