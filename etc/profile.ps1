@@ -6,7 +6,7 @@ Import-Module posh-git
 Set-PSReadLineOption -EditMode Emacs -BellStyle Visual
 Set-PSReadlineKeyHandler -Key Tab -Function TabCompleteNext
 Set-PSReadlineKeyHandler -Key Shift+Tab -Function TabCompletePrevious 
-Set-PSReadLineOption -PredictionSource None
+Set-PSReadLineOption -PredictionViewStyle ListView
 
 # Clean up after prior invocations
 if (!$Env:PathBeforeProfile) {
