@@ -1,3 +1,5 @@
+# -*- mode: shell-script -*-
+
 set completion-ignore-case on
 set prefer-visible-bell on
 set skip-completed-text on
@@ -23,4 +25,3 @@ C-SPACE: possible-completions
 # command start
 "\e[19~": history-search-backward
 
-# -*- mode: shell -*-
