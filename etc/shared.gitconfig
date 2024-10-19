@@ -22,7 +22,8 @@
 [merge]
 	tool = bc
 [push]
-	default = nothing
+	default = simple
+	autoSetupRemote = true
 [pull]
 	ff = only
 [init]
