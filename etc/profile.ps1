@@ -433,6 +433,8 @@ function gls {
         --ignore=Recovery `
         --ignore=system.sav `
         --ignore=System?Volume?Information `
+        --ignore=?WINRE_BACKUP_PARTITION.MARKER `
+        --ignore=desktop.ini `
         @args 
 }
 

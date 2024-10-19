@@ -235,6 +235,8 @@ if have cmd.exe; then
         --ignore=Recovery \
         --ignore=system.sav \
         --ignore=System?Volume?Information \
+        --ignore=?WINRE_BACKUP_PARTITION.MARKER \
+        --ignore=desktop.ini \
         "
 
     # Prevent ls from highlighting everything in /mnt/c
