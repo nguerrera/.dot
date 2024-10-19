@@ -25,6 +25,8 @@
 	tool = bc
 [push]
 	default = nothing
+[pull]
+	ff = only
 [init]
 	defaultBranch = main
 [submodule]
