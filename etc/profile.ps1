@@ -180,9 +180,11 @@ function Clear-VSEnv {
     }
 
     $Env:Path = $Env:PathBeforeVSEnv
+
     $Env:CommandPromptType = ''
     $Env:DevEnvDir = ''
     $Env:ExtensionSdkDir = ''
+    $Env:EXTERNAL_INCLUDE = ''
     $Env:Framework40Version = ''
     $Env:FrameworkDir = ''
     $Env:FrameworkDir32 = ''
@@ -197,11 +199,13 @@ function Clear-VSEnv {
     $Env:UniversalCRTSdkDir = ''
     $Env:VCIDEInstallDir = ''
     $Env:VCINSTALLDIR = ''
+    $Env:VCPKG_ROOT = ''
     $Env:VCToolsInstallDir = ''
     $Env:VCToolsRedistDir = ''
     $Env:VCToolsVersion = ''
     $Env:VisualStudioVersion = ''
     $Env:VS160COMNTOOLS = ''
+    $Env:VS170COMNTOOLS = ''
     $Env:VSCMD_ARG_app_plat = ''
     $Env:VSCMD_ARG_HOST_ARCH = ''
     $Env:VSCMD_ARG_TGT_ARCH = ''
