@@ -26,7 +26,7 @@
         "Windows.Terminal.VisualStudio",
         "Git"
     ],
-    "newTabMenu":
+    "newTabMenu": 
     [
         {
             "type": "remainingProfiles"
