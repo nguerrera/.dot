@@ -6,7 +6,11 @@ Import-Module posh-git
 Set-PSReadLineOption -EditMode Emacs -BellStyle Visual
 Set-PSReadlineKeyHandler -Key Tab -Function TabCompleteNext
 Set-PSReadlineKeyHandler -Key Shift+Tab -Function TabCompletePrevious 
+
+# I find always-on prediction distracting so I bind F7/F8 like classic cmd.exe to use it on-demand
 Set-PSReadLineOption -PredictionSource None
+Set-PSReadLineKeyHandler -Key F7 -ScriptBlock { Show-Predictions }
+Set-PSReadLineKeyHandler -Key F8 -ScriptBlock { Use-FirstPrediction }
 
 # Clean up after prior invocations
 if (!$Env:PathBeforeProfile) {
@@ -110,6 +114,9 @@ Set-PSReadLineKeyHandler -Key Enter -BriefDescription 'ExpandMacrosAndAcceptLine
 #  - Don't use git status (branch info is enough)
 #  - Return a single string, don't make independent calls to Write-Host
 function prompt {
+    # Undo previous one-time use of prediction
+    Hide-Predictions
+   
     $cyan="`e[36m"
     $yellow="`e[33m"
     $plain="`e[0m"
@@ -123,6 +130,24 @@ function prompt {
     $symbol = if (Test-Admin) { "#" } else { "$" }
     $prompt += "${plain}`n${symbol} "
     return $prompt
+}
+
+function Use-FirstPrediction {
+    Set-PSReadLineOption -PredictionSource History
+    Set-PSReadLineOption -PredictionViewStyle InlineView
+    [PSConsoleReadLine]::Insert('')
+    [PSConsoleReadLine]::AcceptSuggestion()
+}
+
+function Show-Predictions {
+    Set-PSReadLineOption -PredictionSource History
+    Set-PSReadLineOption -PredictionViewStyle ListView
+    [PSConsoleReadLine]::Insert('')
+}
+
+function Hide-Predictions {
+    Set-PSReadLineOption -PredictionSource None
+    Set-PSReadLineOption -PredictionViewStyle InlineView
 }
 
 # add beyond compare to the path
