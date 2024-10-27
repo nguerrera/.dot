@@ -4,8 +4,8 @@ using namespace Microsoft.PowerShell
 
 Import-Module posh-git
 Set-PSReadLineOption -EditMode Emacs -BellStyle Visual
-Set-PSReadlineKeyHandler -Key Tab -Function TabCompleteNext
-Set-PSReadlineKeyHandler -Key Shift+Tab -Function TabCompletePrevious 
+Set-PSReadLineKeyHandler -Key Tab -Function TabCompleteNext
+Set-PSReadLineKeyHandler -Key Shift+Tab -Function TabCompletePrevious
 
 # I find always-on prediction distracting so I bind F7/F8 like classic cmd.exe to use it on-demand
 Set-PSReadLineOption -PredictionSource None
@@ -113,7 +113,7 @@ Set-PSReadLineKeyHandler -Key Enter -BriefDescription 'ExpandMacrosAndAcceptLine
 # Set the prompt, avoid flickering and sluggishness of posh-git default
 #  - Don't use git status (branch info is enough)
 #  - Return a single string, don't make independent calls to Write-Host
-function prompt {
+function Prompt {
     # Undo previous one-time use of prediction
     Hide-Predictions
    
