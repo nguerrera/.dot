@@ -1,8 +1,10 @@
 using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
+using namespace System.Security.Principal
 using namespace Microsoft.PowerShell
 
 Import-Module posh-git
+
 Set-PSReadLineOption -EditMode Emacs -BellStyle Visual
 Set-PSReadLineKeyHandler -Key Tab -Function TabCompleteNext
 Set-PSReadLineKeyHandler -Key Shift+Tab -Function TabCompletePrevious
@@ -19,54 +21,48 @@ if (!$Env:PathBeforeProfile) {
 $Env:PATH = $Env:PathBeforeProfile
 
 # Check if a given command is available
-function Test-Command {
-    param($command)
+function Test-Command([string] $command) {
     Get-Command -ErrorAction SilentlyContinue $Command | Out-Null
     return $?
 }
 
 # Check if we're running as admin
 function Test-Admin {
-    $principal = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
-    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')
+    $principal = [WindowsPrincipal][WindowsIdentity]::GetCurrent()
+    return $principal.IsInRole([WindowsBuiltInRole]'Administrator')
 }
 
 # Check if given string looks like a unix arg (--something or -x)
-function Test-UnixArg {
-    param([string]$arg)
+function Test-UnixArg([string] $arg) {
     return $arg -and ($arg.StartsWith('--') -or (($arg.Length -eq 2) -and $arg[0] -eq '-'))
 }
 
 # Check if the given string looks like a cmd arg (/x)
-function Test-CmdArg {
-    param([string]$arg)
+function Test-CmdArg([string] $arg) {
     return ($arg -and $arg.Length -eq 2 -and $arg[0] -eq '/')
 }
 
 # Register a macro to replace the given command when it appears as the first
 # token of command line is $command, replace it with $replacement.
 #
-# $replacement can be a string or a scriptblock taking three args: command being
-# replaced, first argument to command, and total number of arguments that
-# returns replacement dynamically, or opts out of replacing by returning $null.
+# $replacement can be a string or a scriptblock taking the command line
+# split into tokens that returns the replacement for the or opts out of
+# replacing by returning $null.
 #
-# TODO: It would be more elegant if the replacment block took an array of args
-#       instead of first arg and arg count.
-#
-# These macros are invisible to scripts or in position beyond the start of the
-# command line. This allows us to customize built-in commands without breaking
-# anything.
-#
+# These macros are invisible to scripts or in any position beyond the start
+# of the command line. This allows us to customize built-in commands without
+# breaking anything.
 $Macros = @{}
-function Set-Macro {
-    param ([string]$command, $replacement)
+function Set-Macro([string] $command, $replacement) {
     $Macros[$command] = $replacement
 }
 
 # Replace command line according to registered macro
 function Expand-Macros {
     $tokens = Get-PSReadLineTokens
-    if ($tokens.Count -eq 0) {
+
+    # first token is command, last token is EOF
+    if ($tokens.Count -lt 2) {
         return
     }
 
@@ -77,15 +73,9 @@ function Expand-Macros {
         return
     }
 
-    # argument count minus command itself and end token
-    $count = $tokens.Length - 2
-    $arg = $null
-    if ($count -gt 0) {
-        $arg = $tokens[1].Extent.Text
-    }
-
+    $arguments = [string[]]($tokens[1 .. ($tokens.Length - 2)] | ForEach-Object { $_.Extent.Text })
     if ($replacement -is [scriptblock]) {
-        $replacement = & $replacement $command $arg $count
+        $replacement = & $replacement $command @arguments
     }
 
     if ($replacement) {
@@ -276,14 +266,12 @@ function tgit {
 
 # Mimic unix xargs in a way that works better on Windows and PowerShell
 # Process one line at a time, allowing spaces, and don't munge backslashes
-function xargs {
-    param($command)
+function xargs($command) {
     process { & $command @args $_.Trim() }
 }
 
 # sudo for versions of Windows without sudo.exe
-function _sudo {
-    param ($command)
+function _sudo($command) {
     if (Test-Admin) {
         & $command @args
     } else {
@@ -400,11 +388,12 @@ function Get-GitBranch($gitDir = $(Get-GitDirectory)) {
 
 # Mimic cmd set
 Set-Macro set {
-    param ($command, $arg, $count)
+    param ($command)
 
-    # If we have one argument with and equal sign, set environment variable
-    # NOTE: This can't be done by shelling to cmd as it will get its own process
-    if ($count -eq 1) {
+    # If we have one argument with an equal sign, set environment variable
+    # NOTE: This can't be done by shelling out to cmd as it will get its own process
+    if ($args.Length -eq 1) {
+        $arg = $args[0]
         $equalIndex = $arg.IndexOf('=')
         if ($equalIndex -cge 0) {
             $variable = $arg.Substring(0, $equalIndex)
@@ -420,7 +409,7 @@ Set-Macro set {
     # Otherwise, if we have one or no arguments, use cmd set
     # No arguments will list all environment variables
     # One arugment will list all environment variables with the given prefix
-    if ($count -lt 2) {
+    if ($args.Length -lt 2) {
         return 'cmd /c set'
     }
 }
