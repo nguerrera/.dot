@@ -6,13 +6,19 @@ using namespace Microsoft.PowerShell
 Import-Module posh-git
 
 Set-PSReadLineOption -EditMode Emacs -BellStyle Visual
+Set-PSReadLineOption -PredictionSource None
+
 Set-PSReadLineKeyHandler -Key Tab -Function TabCompleteNext
 Set-PSReadLineKeyHandler -Key Shift+Tab -Function TabCompletePrevious
+Set-PSReadLineKeyHandler -Key F6 -BriefDescription ExpandMacros { Expand-Macros }
+Set-PSReadLineKeyHandler -Key F7 -BriefDescription SwitchHistoryList -ScriptBlock { Switch-HistoryList }
+Set-PSReadLineKeyHandler -Key F8 -BriefDescription UseHistorySuggestion -ScriptBlock { Use-HistorySuggestion }
 
-# I find always-on prediction distracting so I bind F7/F8 like classic cmd.exe to use it on-demand
-Set-PSReadLineOption -PredictionSource None
-Set-PSReadLineKeyHandler -Key F7 -ScriptBlock { Show-Predictions }
-Set-PSReadLineKeyHandler -Key F8 -ScriptBlock { Use-FirstPrediction }
+Set-PSReadLineKeyHandler -Key Enter -BriefDescription 'ExpandMacrosAndAcceptLine' -ScriptBlock {
+    param($key, $arg)
+    Expand-Macros
+    [PSConsoleReadLine]::AcceptLine($key, $arg)
+}
 
 # Clean up after prior invocations
 if (!$Env:PathBeforeProfile) {
@@ -83,7 +89,7 @@ function Expand-Macros {
     }
 }
 
-# Helper to get just the tokens from PSReadLine buffer state
+
 function Get-PSReadLineTokens {
     $ast = $null
     $tokens = $null
@@ -93,20 +99,76 @@ function Get-PSReadLineTokens {
     return $tokens
 }
 
-# On enter key press, expand macros and accept line
-Set-PSReadLineKeyHandler -Key Enter -BriefDescription 'ExpandMacrosAndAcceptLine' -ScriptBlock {
-    param($key, $arg)
+function Get-PSReadLineBuffer {
+    $buffer = $null;
+    $cursor = $null;
+    [PSConsoleReadLine]::GetBufferState([ref]$buffer, [ref]$cursor);
+    return $buffer;
+}
+
+$HistoryState = @{ 
+    CmdBefore = ""; 
+    CmdAfter = ""; 
+}
+
+# Make Clear-History actually clear everything
+function Clear-History {
+    [PSConsoleReadLine]::ClearHistory()
+    Remove-Item (Get-PSReadLineOption).HistorySavePath
+    & (Get-Command -CommandType Cmdlet Clear-History)
+}
+
+# Bound to F8: Temporarily enables prediction and accepts the first suggestion
+function Use-HistorySuggestion {
+    $cmd = Get-PSReadLineBuffer
+    if ($cmd -eq $HistoryState.CmdAfter) {
+        return
+    }
+
+    $HistoryState.CmdBefore = Get-PSReadLineBuffer;
+    Set-PSReadLineOption -PredictionSource History
+    Set-PSReadLineOption -PredictionViewStyle InlineView
     Expand-Macros
-    [PSConsoleReadLine]::AcceptLine($key, $arg)
+    [PSConsoleReadLine]::Insert('')
+    [PSConsoleReadLine]::AcceptSuggestion()
+    Set-PSReadLineOption -PredictionSource None
+    $HistoryState.CmdAfter = Get-PSReadLineBuffer; 
+}
+
+# Bound to F7: Toggle prediction with list view on or off
+function Switch-HistoryList {
+    if ((Get-PSReadLineOption).PredictionViewStyle -eq 'ListView') {
+        Reset-HistorySuggestion
+        [PSConsoleReadLine]::Insert('')
+        return
+    }
+
+    # If suggestion was used before list, revert suggestion
+    $cmd = Get-PSReadLineBuffer
+    if ($cmd -eq $HistoryState.CmdAfter -and $HistoryState.CmdBefore -ne $HistoryState.CmdAfter) {
+        [PSConsoleReadLine]::RevertLine()
+        [PSConsoleReadLine]::Insert($HistoryState.CmdBefore);
+    }
+
+    Set-PSReadLineOption -PredictionSource History
+    Set-PSReadLineOption -PredictionViewStyle ListView
+    Expand-Macros
+    [PSConsoleReadLine]::Insert('')
+}
+
+function Reset-HistorySuggestion {
+    $HistoryState.CmdBefore = "";
+    $HistoryState.CmdAfter = "";
+    Set-PSReadLineOption -PredictionViewStyle InlineView
+    Set-PSReadLineOption -PredictionSource None
 }
 
 # Set the prompt, avoid flickering and sluggishness of posh-git default
 #  - Don't use git status (branch info is enough)
 #  - Return a single string, don't make independent calls to Write-Host
 function Prompt {
-    # Undo previous one-time use of prediction
-    Hide-Predictions
-   
+    Reset-HistorySuggestion
+
     $cyan="`e[36m"
     $yellow="`e[33m"
     $plain="`e[0m"
@@ -120,24 +182,6 @@ function Prompt {
     $symbol = if (Test-Admin) { "#" } else { "$" }
     $prompt += "${plain}`n${symbol} "
     return $prompt
-}
-
-function Use-FirstPrediction {
-    Set-PSReadLineOption -PredictionSource History
-    Set-PSReadLineOption -PredictionViewStyle InlineView
-    [PSConsoleReadLine]::Insert('')
-    [PSConsoleReadLine]::AcceptSuggestion()
-}
-
-function Show-Predictions {
-    Set-PSReadLineOption -PredictionSource History
-    Set-PSReadLineOption -PredictionViewStyle ListView
-    [PSConsoleReadLine]::Insert('')
-}
-
-function Hide-Predictions {
-    Set-PSReadLineOption -PredictionSource None
-    Set-PSReadLineOption -PredictionViewStyle InlineView
 }
 
 # add beyond compare to the path
