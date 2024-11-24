@@ -188,9 +188,14 @@ function Prompt {
     return $prompt
 }
 
-# add beyond compare to the path
-if (Test-Path "${Env:ProgramW6432}\Beyond Compare 5") {
-    $Env:PATH="${Env:PATH};${Env:ProgramW6432}\Beyond Compare 5"
+# add things to path if available
+foreach ($each in (
+    "${Env:ProgramW6432}\Beyond Compare 5",
+    "$Env:LOCALAPPDATA\Programs\ILSpy"
+    )) {
+    if (Test-Path $each) {
+        $Env:PATH = "${Env:PATH};$each";
+    }
 }
 
 # add custom bin dir to PATH
