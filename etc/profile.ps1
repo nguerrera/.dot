@@ -79,7 +79,11 @@ function Expand-Macros {
         return
     }
 
-    $arguments = [string[]]($tokens[1 .. ($tokens.Length - 2)] | ForEach-Object { $_.Extent.Text })
+    if ($tokens.Length -eq 2) {
+        $arguments = @();
+    } else {
+        $arguments = [string[]]($tokens[1 .. ($tokens.Length - 2)] | ForEach-Object { $_.Extent.Text })
+    }
     if ($replacement -is [scriptblock]) {
         $replacement = & $replacement $command @arguments
     }
