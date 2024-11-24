@@ -210,9 +210,6 @@ $Env:NO_UPDATE_NOTIFIER='true'
 # Load VS developer environment
 #
 # Accepts vswhere args to pick which VS to use, defaults to -latest -prerelease
-#
-# NOTE: This is slow and I don't need it so much these days, so tuck it behind a
-# helper function that can be invoked when needed.
 function VSEnv {
     Clear-VSEnv
 
@@ -229,6 +226,17 @@ function VSEnv {
             Enter-VsDevShell -VsInstallPath $installPath -SkipAutomaticLocation
         }
     }
+}
+
+# Since loading VS Environment is slow and not always needed these days, do it
+# lazily when one of these commands is first attempted.
+foreach ($each in ('csi', 'cl', 'csc', 'dumpbin', 'ildasm', 'link', 'msbuild')) {
+    New-Item -Path "function:$each" -Value {
+        if (!(Test-Path Env:VSCMD_VER)) {
+            VSEnv
+        }
+        & "$each.exe" @args
+    }.GetNewClosure() | Out-Null
 }
 
 # Clear previous invocation of VSEnv
