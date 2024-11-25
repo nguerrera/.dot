@@ -239,12 +239,13 @@ function VSEnv {
 
 # Since loading VS Environment is slow and not always needed these days, do it
 # lazily when one of these commands is first attempted.
-foreach ($each in ('csi', 'cl', 'csc', 'dumpbin', 'ildasm', 'link', 'msbuild')) {
+foreach ($each in ('csi', 'cl', 'csc', 'dumpbin', 'ildasm', 'link', 'msbuild', 'devenv')) {
     New-Item -Path "function:$each" -Value {
         if (!(Test-Path Env:VSCMD_VER)) {
             VSEnv
         }
-        & "$each.exe" @args
+        $cmd = if ($each -eq 'devenv') { "$each.com" } else { "$each.exe" }
+        & $cmd @args
     }.GetNewClosure() | Out-Null
 }
 
