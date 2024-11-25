@@ -17,6 +17,7 @@
 	config-win = !git config --file ~/.dot/etc/win.gitconfig
 	config-unix = !git config --file ~/.dot/etc/unix.gitconfig
 	config-wsl = !git config --file ~/.dot/etc/wsl.gitconfig
+	logl = log --pretty=\"format:%C(yellow)%h%C(cyan)%>(12)%ad %C(green)%<(7)%aN%C(red)%d %Creset%s\" --date=short --no-merges
 [diff]
 	tool = bc
 [merge]
