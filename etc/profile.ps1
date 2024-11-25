@@ -43,9 +43,28 @@ function Test-UnixArg([string] $arg) {
     return $arg -and ($arg.StartsWith('--') -or (($arg.Length -eq 2) -and $arg[0] -eq '-'))
 }
 
-# Check if the given string looks like a cmd arg (/x)
+# Check if the given string looks like a cmd arg
 function Test-CmdArg([string] $arg) {
-    return ($arg -and $arg.Length -eq 2 -and $arg[0] -eq '/')
+    if (!$arg || $arg.Length -lt 2 || $arg[0] -ne '/') {
+        return $false;
+    }
+
+    # special case for dir /s/b without space between switches
+    if ($arg -eq "/s/b") {
+        return $true;
+    }
+
+    # /x
+    if ($arg.Length -eq 2) {
+        return $true;
+    }
+
+    # /x:y
+    if ($arg.Length -eq 4) {
+        return $arg[2] -eq ':'
+    }
+
+    return $false;
 }
 
 # Register a macro to replace the given command when it appears as the first
