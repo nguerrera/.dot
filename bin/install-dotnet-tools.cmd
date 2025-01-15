@@ -19,3 +19,6 @@ dotnet tool update -g ultra
 
 :: https://github.com/VerifyTests/Verify.Terminal
 dotnet tool update -g verify.tool
+
+:: https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-trace
+dotnet tool update -g dotnet-trace
