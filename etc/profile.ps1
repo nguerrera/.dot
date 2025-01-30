@@ -5,21 +5,6 @@ using namespace Microsoft.PowerShell
 
 Import-Module posh-git
 
-Set-PSReadLineOption -EditMode Emacs -BellStyle Visual
-Set-PSReadLineOption -PredictionSource None
-
-Set-PSReadLineKeyHandler -Key Tab -Function TabCompleteNext
-Set-PSReadLineKeyHandler -Key Shift+Tab -Function TabCompletePrevious
-Set-PSReadLineKeyHandler -Key F6 -BriefDescription ExpandMacros { Expand-Macros }
-Set-PSReadLineKeyHandler -Key F7 -BriefDescription SwitchHistoryList -ScriptBlock { Switch-HistoryList }
-Set-PSReadLineKeyHandler -Key F8 -BriefDescription UseHistorySuggestion -ScriptBlock { Use-HistorySuggestion }
-
-Set-PSReadLineKeyHandler -Key Enter -BriefDescription 'ExpandMacrosAndAcceptLine' -ScriptBlock {
-    param($key, $arg)
-    Expand-Macros
-    [PSConsoleReadLine]::AcceptLine($key, $arg)
-}
-
 # Clean up after prior invocations
 if (!$Env:_NG_PATH_BEFORE_PROFILE) {
     $Env:_NG_PATH_BEFORE_PROFILE = $Env:PATH
@@ -128,6 +113,7 @@ function Get-PSReadLineBuffer {
     return $buffer;
 }
 
+# Record command line before and after history search
 $HistoryState = @{ 
     CmdBefore = ""; 
     CmdAfter = ""; 
@@ -140,32 +126,28 @@ function Clear-History {
     & (Get-Command -CommandType Cmdlet Clear-History)
 }
 
-# Bound to F8: Temporarily enables prediction and accepts the first suggestion
-function Use-HistorySuggestion {
-    $cmd = Get-PSReadLineBuffer
-    if ($cmd -eq $HistoryState.CmdAfter) {
-        return
-    }
 
-    $HistoryState.CmdBefore = Get-PSReadLineBuffer;
-    Set-PSReadLineOption -PredictionSource History
-    Set-PSReadLineOption -PredictionViewStyle InlineView
-    Expand-Macros
-    [PSConsoleReadLine]::Insert('')
-    [PSConsoleReadLine]::AcceptSuggestion()
-    Set-PSReadLineOption -PredictionSource None
-    $HistoryState.CmdAfter = Get-PSReadLineBuffer; 
+# Wrapper around Set-PSReadLineKeyHandler to add macro expansion hook
+function Set-PSReadLineKeyHandlerWithMacroExpansion($key, $func) {
+    $description = if ($func -ne '') { "ExpandMacrosAnd${func}" } else { "ExpandMacros" }
+    Set-PSReadLineKeyHandler -Key $key -BriefDescription $description -ScriptBlock {
+        param($key, $arg)
+        Expand-Macros
+        if ($func -ne '') {
+            [PSConsoleReadLine]::$func($key, $arg)
+        }
+    }.GetNewClosure() | Out-Null
 }
 
-# Bound to F7: Toggle prediction with list view on or off
-function Switch-HistoryList {
+# Toggle history prediction with list view on or off
+function ToggleHistoryListView {
     if ((Get-PSReadLineOption).PredictionViewStyle -eq 'ListView') {
-        Reset-HistorySuggestion
+        Reset-HistorySearch
         [PSConsoleReadLine]::Insert('')
         return
     }
 
-    # If suggestion was used before list, revert suggestion
+    # If search was used before list, revert suggestion
     $cmd = Get-PSReadLineBuffer
     if ($cmd -eq $HistoryState.CmdAfter -and $HistoryState.CmdBefore -ne $HistoryState.CmdAfter) {
         [PSConsoleReadLine]::RevertLine()
@@ -178,7 +160,28 @@ function Switch-HistoryList {
     [PSConsoleReadLine]::Insert('')
 }
 
-function Reset-HistorySuggestion {
+# Search history backwards, but loop if we get to the beginning of history
+function HistorySearchBacwkwardLoop {
+    $cmdBefore = Get-PSReadLineBuffer
+    if ((Get-PSReadLineOption).PredictionViewStyle -eq 'ListView') {
+        ToggleHistoryListView
+    }
+    if ($HistoryState.CmdBefore -eq '') {
+        $HistoryState.CmdBefore = $cmdBefore
+    }
+    Expand-Macros
+    [PSConsoleReadLine]::HistorySearchBackward()
+    $cmd = Get-PSReadLineBuffer
+    if ($cmd -eq $cmdBefore) {
+        [PSConsoleReadLine]::EndOfHistory()
+        [PSConsoleReadLine]::HistorySearchBackward()
+        $cmd = Get-PSReadLineBuffer
+    }
+    $HistoryState.CmdAfter = $cmd
+}
+
+# Reset history search state to defaults
+function Reset-HistorySearch {
     $HistoryState.CmdBefore = "";
     $HistoryState.CmdAfter = "";
     Set-PSReadLineOption -PredictionViewStyle InlineView
@@ -189,7 +192,7 @@ function Reset-HistorySuggestion {
 #  - Don't use git status (branch info is enough)
 #  - Return a single string, don't make independent calls to Write-Host
 function Prompt {
-    Reset-HistorySuggestion
+    Reset-HistorySearch
 
     $cyan="`e[36m"
     $yellow="`e[33m"
@@ -600,3 +603,16 @@ if (Test-Command code) {
     Set-Alias n code
     Set-Alias notepad code
 }
+
+Set-PSReadLineOption -EditMode Emacs -BellStyle Visual
+Set-PSReadLineOption -PredictionSource None
+Set-PSReadLineOption -HistorySearchCursorMovesToEnd
+
+Set-PSReadLineKeyHandlerWithMacroExpansion Enter AcceptLine
+Set-PSReadLineKeyHandlerWithMacroExpansion Tab  TabCompleteNext
+Set-PSReadLineKeyHandlerWithMacroExpansion Shift+Tab TabCompletePrevious
+Set-PSReadLineKeyHandlerWithMacroExpansion F6 ''
+Set-PSReadLineKeyHandler -Key F7 -BriefDescription ToggleHistoryListView -ScriptBlock { ToggleHistoryListView }
+Set-PSReadLineKeyHandler -Key Ctrl+r -BriefDescription ToggleHistoryListView -ScriptBlock { ToggleHistoryListView }
+Set-PSReadLineKeyHandler -Key F8 -BriefDescription HistorySearchBackwardsLoop -ScriptBlock { HistorySearchBacwkwardLoop }
+
