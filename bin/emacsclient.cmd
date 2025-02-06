@@ -1,7 +1,22 @@
 @if not defined _echo echo off
 setlocal
 
-set emacsDir=C:\Program Files\Emacs\bin
+if exist "%ProgramW6432%\Emacs\bin\runemacs.exe" (
+  set emacsDir="%ProgramW6432%\Emacs\bin"
+  goto :Start
+)
+
+for /d %%d in ("%ProgramW6432%\Emacs\*") do (
+  if exist "%%d\bin\runemacs.exe" (
+    set emacsDir=%%d\bin
+    goto :Start
+  )
+)
+
+echo error: Emacs not found.
+exit /b 1
+
+:Start
 set startArgs=
 set clientArgs=%*
 set createFrame=0

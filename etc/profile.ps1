@@ -210,7 +210,8 @@ function Prompt {
 # add things to path if available
 foreach ($each in (
     "${Env:ProgramW6432}\Beyond Compare 5",
-    "$Env:LOCALAPPDATA\Programs\ILSpy"
+    "${Env:LOCALAPPDATA}\Programs\Beyond Compare 5",
+    "${Env:LOCALAPPDATA}\Programs\ILSpy"
     )) {
     if (Test-Path $each) {
         $Env:PATH = "${Env:PATH};$each";

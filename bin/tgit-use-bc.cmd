@@ -3,8 +3,10 @@
 setlocal
 
 set BCDir=%ProgramW6432%\Beyond Compare 5
+if not exist "%BCDir%" set BCDir=%LOCALAPPDATA%\Programs\Beyond Compare 5
+
 if not exist "%BCDir%" (
-  echo Beyond Compare not found.
+  echo error: Beyond Compare not found.
   exit /b 1
 )
 
