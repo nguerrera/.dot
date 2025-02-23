@@ -2,7 +2,7 @@
 setlocal
 
 if exist "%ProgramW6432%\Emacs\bin\runemacs.exe" (
-  set emacsDir="%ProgramW6432%\Emacs\bin"
+  set emacsDir=%ProgramW6432%\Emacs\bin
   goto :Start
 )
 
