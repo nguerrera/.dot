@@ -12,7 +12,7 @@ if [[ $? -ne 0 ]]; then
    exit 1
 fi
 
-if [[ "$origin" == *"dev.azure.com"* ]]; then
+if [[ "$origin" == *"dev.azure.com"* || "$origin" == *"visualstudio.com"* ]]; then
   exec start $origin/pullrequestcreate?sourceRef=$arg
 fi
 
