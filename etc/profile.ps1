@@ -112,7 +112,6 @@ function Expand-Macros {
     }
 }
 
-
 function Get-PSReadLineTokens {
     $ast = $null
     $tokens = $null
