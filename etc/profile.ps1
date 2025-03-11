@@ -45,7 +45,7 @@ function Test-UnixArg([string] $arg) {
 
 # Check if the given string looks like a cmd arg
 function Test-CmdArg([string] $arg) {
-    if (!$arg || $arg.Length -lt 2 || $arg[0] -ne '/') {
+    if (!$arg -or $arg.Length -lt 2 -or $arg[0] -ne '/') {
         return $false;
     }
 
