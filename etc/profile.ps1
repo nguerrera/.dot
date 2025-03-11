@@ -281,7 +281,7 @@ function vswhere {
 # lazily when one of these commands is first attempted.
 foreach ($each in ('csi', 'cl', 'csc', 'dumpbin', 'ildasm', 'link', 'msbuild', 'devenv')) {
     New-Item -Path "function:$each" -Value {
-        if (!(Test-Path Env:VSCMD_VER)) {
+        if (!$Env:VSCMD_VER) {
             VSEnv
         }
         $cmd = if ($each -eq 'devenv') { "$each.com" } else { "$each.exe" }
