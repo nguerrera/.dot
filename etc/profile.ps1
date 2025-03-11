@@ -21,10 +21,10 @@ Set-PSReadLineKeyHandler -Key Enter -BriefDescription 'ExpandMacrosAndAcceptLine
 }
 
 # Clean up after prior invocations
-if (!$Env:PathBeforeProfile) {
-    $Env:PathBeforeProfile = $Env:PATH
+if (!$Env:_NG_PATH_BEFORE_PROFILE) {
+    $Env:_NG_PATH_BEFORE_PROFILE = $Env:PATH
 }
-$Env:PATH = $Env:PathBeforeProfile
+$Env:PATH = $Env:_NG_PATH_BEFORE_PROFILE
 
 # Check if a given command is available
 function Test-Command([string] $command) {
@@ -233,27 +233,48 @@ if (Test-Path "${Env:ProgramW6432}\Git") {
 
 # Disable npm update check on Windows. It constantly errors out for me even
 # though I keep it up to date.
-$Env:NO_UPDATE_NOTIFIER='true'
+$Env:NO_UPDATE_NOTIFIER = 'true'
+
+# Disable message about using preview versions of .NET SDK
+$Env:SuppressNETCoreSdkPreviewMessage = 'true'
 
 # Load VS developer environment
-#
-# Accepts vswhere args to pick which VS to use, defaults to -latest -prerelease
+# Accepts vswhere args to pick which VS to use.
+# Uses latest preview by default, latest RTM if Use-RTM was invoked.
 function VSEnv {
     Clear-VSEnv
 
-    $vswhere = 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe'
     $vswhereArgs = $args
     if ($args.Length -eq 0) {
-        $vswhereArgs = @('-latest', '-prerelease')
+        $vswhereArgs = $Env:_NG_VSENV_VSWHERE_ARGS.Split(' ', [StringSplitOptions]::RemoveEmptyEntries)
     }
 
-    if (Test-Path $vswhere) {
-        $installPath = & $vswhere @vswhereArgs -property installationPath
-        if ($installPath) {
-            Import-Module (Join-Path $installPath 'Common7\Tools\Microsoft.VisualStudio.DevShell.dll')
-            Enter-VsDevShell -VsInstallPath $installPath -SkipAutomaticLocation
-        }
+    $installPath = & vswhere @vswhereArgs -property installationPath
+    if (!$installPath) {
+        return # No matching VS
     }
+
+    # Locate Microsoft.VisualStudio.DevShell.dll module. We can only load one
+    # version per process, so always use the absolute latest including previews
+    # and hope that it is backwards compatible enough.
+    if (!$Env:_NG_VSDEVSHELL_MODULE) {
+        $latest = & vswhere -latest -prerelease -property installationPath
+        if (!$latest) {
+            return # No VS at all
+        }
+        $module = Join-Path $latest 'Common7\Tools\Microsoft.VisualStudio.DevShell.dll'
+        $Env:_NG_VSDEVSHELL_MODULE=$module
+    }
+
+    Import-Module $Env:_NG_VSDEVSHELL_MODULE
+    Enter-VsDevShell -VsInstallPath $installPath -SkipAutomaticLocation
+}
+
+function vswhere {
+     $vswhere = 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe'
+     if (Test-Path $vswhere) {
+        & $vswhere @args
+     }
 }
 
 # Since loading VS Environment is slow and not always needed these days, do it
@@ -270,12 +291,11 @@ foreach ($each in ('csi', 'cl', 'csc', 'dumpbin', 'ildasm', 'link', 'msbuild', '
 
 # Clear previous invocation of VSEnv
 function Clear-VSEnv {
-    if (!$Env:PathBeforeVSEnv) {
-        $Env:PathBeforeVSEnv = $Env:PATH
+    if (!$Env:_NG_PATH_BEFORE_VSENV) {
+        $Env:_NG_PATH_BEFORE_VSENV = $Env:PATH
         return
     }
-
-    $Env:Path = $Env:PathBeforeVSEnv
+    $Env:Path = $Env:_NG_PATH_BEFORE_VSENV
 
     $Env:CommandPromptType = ''
     $Env:DevEnvDir = ''
@@ -320,6 +340,42 @@ function Clear-VSEnv {
     $Env:__VSCMD_PREINIT_PATH = ''
     $Env:__VSCMD_script_err_count = ''
 }
+
+function Use-Previews {
+    Use-VS-Preview
+    Use-Code-Insiders
+}
+
+function Use-RTM {
+    Use-VS-RTM
+    Use-Code-RTM
+}
+
+function Use-VS-Preview {
+    Clear-VSEnv
+    $Env:_NG_VSENV_VSWHERE_ARGS="-latest -prerelease"
+
+}
+function Use-VS-RTM {
+    Clear-VSEnv
+    $Env:_NG_VSENV_VSWHERE_ARGS="-latest"
+}
+
+function Use-Code-Insiders {
+    if (Test-Command code-insiders) {
+        Set-Alias -Scope Global code code-insiders
+    }
+}
+
+function Use-Code-RTM {
+    if (Test-Path Alias:\code) {
+        Remove-Alias -Force code
+    }
+}
+
+# Use VS and VS Code previews by default
+# Commands above can be used to switch
+Use-Previews
 
 # NOTE: This intentionally overrides the tgit from posh-git, which
 # doesn't do /path for you and doesn't default to repo root.
@@ -539,11 +595,6 @@ Set-Alias h history
 Set-Alias n notepad
 Set-Alias traceroute tracert
 Set-Alias vi vim
-
-# Prefer VS Code Insiders
-if (Test-Command code-insiders) {
-    Set-Alias code code-insiders
-}
 
 if (Test-Command code) {
     Set-Alias n code
