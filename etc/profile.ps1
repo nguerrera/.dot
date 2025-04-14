@@ -409,6 +409,19 @@ Set-Macro where pswhere
 Set-Macro which pswhere
 function pswhere { Get-Command -All @args | Format-Table -AutoSize -Wrap }
 
+# Mimic unix time command. Measure a command without capturing its output.
+function time {
+    param(
+        [Parameter(Mandatory=$true, Position=0)]
+        $command,
+        [Parameter(ValueFromRemainingArguments=$true)]
+        $args
+   )
+   $outerArgs = $args
+   $measured = (Measure-Command { & $command @outerArgs | Out-Default }).TotalMilliseconds
+   [PSCustomObject]@{Time = "$measured ms"}
+}
+
 # Use cmd dir/rd/del when given cmd-like arguments interactively, otherwise use
 # Keeps muscle memory intact and makes and also provides terse access to faster
 # /s recursion than PowerShell equivalent.
