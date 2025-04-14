@@ -8,13 +8,11 @@
             {
                 "action": "copy"
             },
-            "id": "User.copy",
-            "keys": "ctrl+c"
+            "id": "User.copy"
         },
         {
             "command": "paste",
-            "id": "User.paste",
-            "keys": "ctrl+v"
+            "id": "User.paste"
         }
     ],
     "alwaysShowTabs": false,
@@ -25,6 +23,17 @@
         "Windows.Terminal.Wsl",
         "Windows.Terminal.VisualStudio",
         "Git"
+    ],
+    "keybindings": 
+    [
+        {
+            "id": "User.copy",
+            "keys": "ctrl+c"
+        },
+        {
+            "id": "User.paste",
+            "keys": "ctrl+v"
+        }
     ],
     "newTabMenu": 
     [
