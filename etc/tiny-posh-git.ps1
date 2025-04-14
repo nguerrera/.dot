@@ -57,7 +57,7 @@ function Get-GitDirectory {
 
             # Handle the worktree case where .git is a file
             if (Test-Path -LiteralPath $gitDirPath -PathType Leaf) {
-                $gitDirPath = Invoke-Utf8ConsoleCommand { git rev-parse --git-dir 2>$null }
+                $gitDirPath = git rev-parse --git-dir 2>$null
                 if ($gitDirPath) {
                     return $gitDirPath
                 }
@@ -70,7 +70,7 @@ function Get-GitDirectory {
                 if ((Test-Path -LiteralPath $refsPath -PathType Container) -and
                     (Test-Path -LiteralPath $objsPath -PathType Container)) {
 
-                    $bareDir = Invoke-Utf8ConsoleCommand { git rev-parse --git-dir 2>$null }
+                    $bareDir = git rev-parse --git-dir 2>$null
                     if ($bareDir -and (Test-Path -LiteralPath $bareDir -PathType Container)) {
                         $resolvedBareDir = (Resolve-Path $bareDir).Path
                         return $resolvedBareDir
@@ -83,122 +83,76 @@ function Get-GitDirectory {
     }
 }
 
-function Get-GitBranch($branch = $null, $gitDir = $(Get-GitDirectory), [switch]$isDotGitOrBare, [Diagnostics.Stopwatch]$sw) {
+# NG: Modified to avoid slow shelling out to git as much as possible
+function Get-GitBranch($gitDir = $(Get-GitDirectory)) {
     if (!$gitDir) { return }
-
-    Invoke-Utf8ConsoleCommand {
-        dbg 'Finding branch' $sw
-        $r = ''; $b = ''; $c = ''
-        $step = ''; $total = ''
-        if (Test-Path $gitDir/rebase-merge) {
-            dbg 'Found rebase-merge' $sw
-            if (Test-Path $gitDir/rebase-merge/interactive) {
-                dbg 'Found rebase-merge/interactive' $sw
-                $r = '|REBASE-i'
-            }
-            else {
-                $r = '|REBASE-m'
-            }
-            $b = "$(Get-Content $gitDir/rebase-merge/head-name)"
-            $step = "$(Get-Content $gitDir/rebase-merge/msgnum)"
-            $total = "$(Get-Content $gitDir/rebase-merge/end)"
+    $r = ''; $b = ''; $c = ''
+    $step = ''; $total = ''
+    if (Test-Path $gitDir/rebase-merge) {
+        if (Test-Path $gitDir/rebase-merge/interactive) {
+            $r = '|REBASE-i'
         }
         else {
-            if (Test-Path $gitDir/rebase-apply) {
-                dbg 'Found rebase-apply' $sw
-                $step = "$(Get-Content $gitDir/rebase-apply/next)"
-                $total = "$(Get-Content $gitDir/rebase-apply/last)"
-
-                if (Test-Path $gitDir/rebase-apply/rebasing) {
-                    dbg 'Found rebase-apply/rebasing' $sw
-                    $r = '|REBASE'
-                }
-                elseif (Test-Path $gitDir/rebase-apply/applying) {
-                    dbg 'Found rebase-apply/applying' $sw
-                    $r = '|AM'
-                }
-                else {
-                    $r = '|AM/REBASE'
-                }
-            }
-            elseif (Test-Path $gitDir/MERGE_HEAD) {
-                dbg 'Found MERGE_HEAD' $sw
-                $r = '|MERGING'
-            }
-            elseif (Test-Path $gitDir/CHERRY_PICK_HEAD) {
-                dbg 'Found CHERRY_PICK_HEAD' $sw
-                $r = '|CHERRY-PICKING'
-            }
-            elseif (Test-Path $gitDir/REVERT_HEAD) {
-                dbg 'Found REVERT_HEAD' $sw
-                $r = '|REVERTING'
-            }
-            elseif (Test-Path $gitDir/BISECT_LOG) {
-                dbg 'Found BISECT_LOG' $sw
-                $r = '|BISECTING'
-            }
-
-            if ($step -and $total) {
-                $r += " $step/$total"
-            }
-
-            $b = Invoke-NullCoalescing `
-                $b `
-                $branch `
-                { dbg 'Trying symbolic-ref' $sw; git --no-optional-locks symbolic-ref HEAD -q 2>$null } `
-                { '({0})' -f (Invoke-NullCoalescing `
-                    {
-                        dbg 'Trying describe' $sw
-                        switch ($Global:GitPromptSettings.DescribeStyle) {
-                            'contains' { git --no-optional-locks describe --contains HEAD 2>$null }
-                            'branch' { git --no-optional-locks describe --contains --all HEAD 2>$null }
-                            'describe' { git --no-optional-locks describe HEAD 2>$null }
-                            default { git --no-optional-locks tag --points-at HEAD 2>$null }
-                        }
-                    } `
-                    {
-                        dbg 'Falling back on parsing HEAD' $sw
-                        $ref = $null
-
-                        if (Test-Path $gitDir/HEAD) {
-                            dbg 'Reading from .git/HEAD' $sw
-                            $ref = Get-Content $gitDir/HEAD 2>$null
-                        }
-                        else {
-                            dbg 'Trying rev-parse' $sw
-                            $ref = git --no-optional-locks rev-parse HEAD 2>$null
-                        }
-
-                        if ($ref -match 'ref: (?<ref>.+)') {
-                            return $Matches['ref']
-                        }
-                        elseif ($ref -and $ref.Length -ge 7) {
-                            return $ref.Substring(0, 7) + '...'
-                        }
-                        else {
-                            return 'unknown'
-                        }
-                    }
-                ) }
+            $r = '|REBASE-m'
         }
-
-        if ($isDotGitOrBare -or !$b) {
-            dbg 'Inside git directory?' $sw
-            $revParseOut = git --no-optional-locks rev-parse --is-inside-git-dir 2>$null
-            if ('true' -eq $revParseOut) {
-                dbg 'Inside git directory' $sw
-                $revParseOut = git --no-optional-locks rev-parse --is-bare-repository 2>$null
-                if ('true' -eq $revParseOut) {
-                    $c = 'BARE:'
-                }
-                else {
-                    $b = 'GIT_DIR!'
-                }
-            }
-        }
-
-        "$c$($b -replace 'refs/heads/','')$r"
+        $b = "$(Get-Content $gitDir/rebase-merge/head-name)"
+        $step = "$(Get-Content $gitDir/rebase-merge/msgnum)"
+        $total = "$(Get-Content $gitDir/rebase-merge/end)"
     }
+    else {
+        if (Test-Path $gitDir/rebase-apply) {
+            $step = "$(Get-Content $gitDir/rebase-apply/next)"
+            $total = "$(Get-Content $gitDir/rebase-apply/last)"
+
+            if (Test-Path $gitDir/rebase-apply/rebasing) {
+                $r = '|REBASE'
+            }
+            elseif (Test-Path $gitDir/rebase-apply/applying) {
+                $r = '|AM'
+            }
+            else {
+                $r = '|AM/REBASE'
+            }
+        }
+        elseif (Test-Path $gitDir/MERGE_HEAD) {
+            $r = '|MERGING'
+        }
+        elseif (Test-Path $gitDir/CHERRY_PICK_HEAD) {
+            $r = '|CHERRY-PICKING'
+        }
+        elseif (Test-Path $gitDir/REVERT_HEAD) {
+            $r = '|REVERTING'
+        }
+        elseif (Test-Path $gitDir/BISECT_LOG) {
+            $r = '|BISECTING'
+        }
+
+        if ($step -and $total) {
+            $r += " $step/$total"
+        }
+
+        $b = & {
+            $ref = $null
+            if (Test-Path $gitDir/HEAD) {
+                $ref = Get-Content $gitDir/HEAD 2>$null
+            }
+            else {
+                $ref = git --no-optional-locks rev-parse HEAD 2>$null
+            }
+
+            if ($ref -match 'ref: (?<ref>.+)') {
+                return $Matches['ref']
+            }
+            elseif ($ref -and $ref.Length -ge 7) {
+                return $ref.Substring(0,7)+'...'
+            }
+            else {
+                return 'unknown'
+            }
+        }
+    }
+
+    "$c$($b -replace 'refs/heads/','')$r"
 }
 
 function Get-AliasPattern($cmd) {
@@ -208,13 +162,9 @@ function Get-AliasPattern($cmd) {
 
 ### TortoiseGit.ps1
 
+# NG: Modified to not support old versions of tgit
 function private:Get-TortoiseGitPath {
-    if ((Test-Path "C:\Program Files\TortoiseGit\bin\TortoiseGitProc.exe") -eq $true) {
-        # TortoiseGit 1.8.0 renamed TortoiseProc to TortoiseGitProc.
-        return "C:\Program Files\TortoiseGit\bin\TortoiseGitProc.exe"
-    }
-
-    return "C:\Program Files\TortoiseGit\bin\TortoiseProc.exe"
+    return "C:\Program Files\TortoiseGit\bin\TortoiseGitProc.exe"
 }
 
 $Global:TortoiseGitSettings = new-object PSObject -Property @{
@@ -266,30 +216,38 @@ $Global:TortoiseGitSettings = new-object PSObject -Property @{
     }
 }
 
+# NG: Modified to take path argument and default it to current git repo
 function tgit {
-    if ($args) {
-        # Replace any aliases with actual TortoiseGit commands
-        if ($Global:TortoiseGitSettings.TortoiseGitCommands.ContainsKey($args[0])) {
-            $args[0] = $Global:TortoiseGitSettings.TortoiseGitCommands.Get_Item($args[0])
-        }
+    param (
+        [Parameter(Mandatory=$true, Position=0)]
+        $command,
 
-        if ($args[0] -eq "help") {
-            # Replace the built-in help behaviour with just a list of commands
-            $Global:TortoiseGitSettings.TortoiseGitCommands.Values.GetEnumerator() | Sort-Object | Get-Unique
+        [Parameter(Position=1)]
+        $path,
+
+        [Parameter(ValueFromRemainingArguments=$true)]
+        $args
+    )
+
+    # Replace any aliases with actual TortoiseGit commands
+    if ($Global:TortoiseGitSettings.TortoiseGitCommands.ContainsKey($command)) {
+        $command = $Global:TortoiseGitSettings.TortoiseGitCommands.Get_Item($command)
+    }
+
+    if ($command -eq "help") {
+        # Replace the built-in help behaviour with just a list of commands
+        $Global:TortoiseGitSettings.TortoiseGitCommands.Values.GetEnumerator() | Sort-Object | Get-Unique
+        return
+    }
+
+    if (!$path) {
+        $path = git rev-parse --show-toplevel
+        if ($LASTEXITCODE -ne 0) {
             return
         }
-
-        $newArgs = @()
-        $newArgs += "/command:" + $args[0]
-
-        $cmd = $args[0]
-
-        if ($args.length -gt 1) {
-            $args[1..$args.length] | ForEach-Object { $newArgs += $_ }
-        }
-
-        & $Global:TortoiseGitSettings.TortoiseGitPath $newArgs
     }
+
+    & $Global:TortoiseGitSettings.TortoiseGitPath /command:$command /path:$path @args
 }
 
 
@@ -818,7 +776,7 @@ function script:expandParamValues($cmd, $param, $filter) {
 
 function Expand-GitCommand($Command) {
     # Parse all Git output as UTF8, including tab completion output - https://github.com/dahlbyk/posh-git/pull/359
-    $res = Invoke-Utf8ConsoleCommand { GitTabExpansionInternal $Command $Global:GitStatus }
+    $res = GitTabExpansionInternal $Command $Global:GitStatus
     $res
 }
 
@@ -1119,11 +1077,4 @@ else {
             "^$(Get-AliasPattern gitk) (.*)" { WriteTabExpLog $msg; Expand-GitCommand $lastBlock }
         }
     }
-}
-
-# Handles Remove-GitBranch -Name parameter auto-completion using the built-in mechanism for cmdlet parameters
-Microsoft.PowerShell.Core\Register-ArgumentCompleter -CommandName Remove-GitBranch -ParameterName Name -ScriptBlock {
-    param($Command, $Parameter, $WordToComplete, $CommandAst, $FakeBoundParams)
-
-    gitBranches $WordToComplete $true
 }

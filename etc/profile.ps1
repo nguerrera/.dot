@@ -3,7 +3,7 @@ using namespace System.Management.Automation.Language
 using namespace System.Security.Principal
 using namespace Microsoft.PowerShell
 
-Import-Module posh-git
+. $PSScriptRoot\tiny-posh-git.ps1
 
 # Clean up after prior invocations
 if (!$Env:_NG_PATH_BEFORE_PROFILE) {
@@ -380,30 +380,6 @@ function Use-Code-RTM {
 # Commands above can be used to switch
 Use-Previews
 
-# NOTE: This intentionally overrides the tgit from posh-git, which
-# doesn't do /path for you and doesn't default to repo root.
-function tgit {
-    param (
-        [Parameter(Mandatory=$true, Position=0)]
-        $command,
-
-        [Parameter(Position=1)]
-        $path,
-
-        [Parameter(ValueFromRemainingArguments=$true)]
-        $args
-        )
-
-    if (!$path) {
-        $path=git rev-parse --show-toplevel
-        if ($LASTEXITCODE -ne 0) {
-            return
-        }
-    }
-
-    & $Global:TortoiseGitSettings.TortoiseGitPath /command:$command /path:$path @args
-}
-
 # Mimic unix xargs in a way that works better on Windows and PowerShell
 # Process one line at a time, allowing spaces, and don't munge backslashes
 function xargs($command) {
@@ -451,79 +427,6 @@ Set-Macro ls {
     if (!$arg -or (Test-UnixArg $arg) -or ($arg -eq '-al')) {
         return 'gls'
     }
-}
-
-# Get git branch, ported from posh-git, and changed to avoid slow shelling
-# out to git as much as possible
-function Get-GitBranch($gitDir = $(Get-GitDirectory)) {
-    if (!$gitDir) { return $null }
-    $r = ''; $b = ''; $c = ''
-    $step = ''; $total = ''
-    if (Test-Path $gitDir/rebase-merge) {
-        if (Test-Path $gitDir/rebase-merge/interactive) {
-            $r = '|REBASE-i'
-        }
-        else {
-            $r = '|REBASE-m'
-        }
-        $b = "$(Get-Content $gitDir/rebase-merge/head-name)"
-        $step = "$(Get-Content $gitDir/rebase-merge/msgnum)"
-        $total = "$(Get-Content $gitDir/rebase-merge/end)"
-    }
-    else {
-        if (Test-Path $gitDir/rebase-apply) {
-            $step = "$(Get-Content $gitDir/rebase-apply/next)"
-            $total = "$(Get-Content $gitDir/rebase-apply/last)"
-
-            if (Test-Path $gitDir/rebase-apply/rebasing) {
-                $r = '|REBASE'
-            }
-            elseif (Test-Path $gitDir/rebase-apply/applying) {
-                $r = '|AM'
-            }
-            else {
-                $r = '|AM/REBASE'
-            }
-        }
-        elseif (Test-Path $gitDir/MERGE_HEAD) {
-            $r = '|MERGING'
-        }
-        elseif (Test-Path $gitDir/CHERRY_PICK_HEAD) {
-            $r = '|CHERRY-PICKING'
-        }
-        elseif (Test-Path $gitDir/REVERT_HEAD) {
-            $r = '|REVERTING'
-        }
-        elseif (Test-Path $gitDir/BISECT_LOG) {
-            $r = '|BISECTING'
-        }
-
-        $b = & {
-            $ref = $null
-            if (Test-Path $gitDir/HEAD) {
-                $ref = Get-Content $gitDir/HEAD 2>$null
-            }
-            else {
-                $ref = git --no-optional-locks rev-parse HEAD 2>$null
-            }
-
-            if ($ref -match 'ref: (?<ref>.+)') {
-                return $Matches['ref']
-            }
-            elseif ($ref -and $ref.Length -ge 7) {
-                return $ref.Substring(0,7)+'...'
-            }
-            else {
-                return 'unknown'
-            }
-        }
-    }
-
-    if ($step -and $total) {
-        $r += " $step/$total"
-    }
-
-    return "$c$($b -replace 'refs/heads/','')$r"
 }
 
 # Mimic cmd set
