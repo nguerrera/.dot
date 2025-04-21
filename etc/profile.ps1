@@ -359,6 +359,7 @@ function Use-VS-Preview {
     $Env:_NG_VSENV_VSWHERE_ARGS="-latest -prerelease"
 
 }
+
 function Use-VS-RTM {
     Clear-VSEnv
     $Env:_NG_VSENV_VSWHERE_ARGS="-latest"
