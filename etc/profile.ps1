@@ -31,17 +31,17 @@ function Test-UnixArg([string] $arg) {
 # Check if the given string looks like a cmd arg
 function Test-CmdArg([string] $arg) {
     if (!$arg -or $arg.Length -lt 2 -or $arg[0] -ne '/') {
-        return $false;
+        return $false
     }
 
     # special case for dir /s/b without space between switches
     if ($arg -eq "/s/b") {
-        return $true;
+        return $true
     }
 
     # /x
     if ($arg.Length -eq 2) {
-        return $true;
+        return $true
     }
 
     # /x:y
@@ -49,7 +49,7 @@ function Test-CmdArg([string] $arg) {
         return $arg[2] -eq ':'
     }
 
-    return $false;
+    return $false
 }
 
 # Register a macro to replace the given command when it appears as the first
@@ -84,7 +84,7 @@ function Expand-Macros {
     }
 
     if ($tokens.Length -eq 2) {
-        $arguments = @();
+        $arguments = @()
     } else {
         $arguments = [string[]]($tokens[1 .. ($tokens.Length - 2)] | ForEach-Object { $_.Extent.Text })
     }
@@ -107,16 +107,16 @@ function Get-PSReadLineTokens {
 }
 
 function Get-PSReadLineBuffer {
-    $buffer = $null;
-    $cursor = $null;
-    [PSConsoleReadLine]::GetBufferState([ref]$buffer, [ref]$cursor);
-    return $buffer;
+    $buffer = $null
+    $cursor = $null
+    [PSConsoleReadLine]::GetBufferState([ref]$buffer, [ref]$cursor)
+    return $buffer
 }
 
 # Record command line before and after history search
 $HistoryState = @{ 
-    CmdBefore = ""; 
-    CmdAfter = ""; 
+    CmdBefore = ""
+    CmdAfter = ""
 }
 
 # Make Clear-History actually clear everything
@@ -151,7 +151,7 @@ function ToggleHistoryListView {
     $cmd = Get-PSReadLineBuffer
     if ($cmd -eq $HistoryState.CmdAfter -and $HistoryState.CmdBefore -ne $HistoryState.CmdAfter) {
         [PSConsoleReadLine]::RevertLine()
-        [PSConsoleReadLine]::Insert($HistoryState.CmdBefore);
+        [PSConsoleReadLine]::Insert($HistoryState.CmdBefore)
     }
 
     Set-PSReadLineOption -PredictionSource History
@@ -182,8 +182,8 @@ function HistorySearchBacwkwardLoop {
 
 # Reset history search state to defaults
 function Reset-HistorySearch {
-    $HistoryState.CmdBefore = "";
-    $HistoryState.CmdAfter = "";
+    $HistoryState.CmdBefore = ""
+    $HistoryState.CmdAfter = ""
     Set-PSReadLineOption -PredictionViewStyle InlineView
     Set-PSReadLineOption -PredictionSource None
 }
@@ -216,7 +216,7 @@ foreach ($each in (
     "${Env:LOCALAPPDATA}\Programs\ILSpy"
     )) {
     if (Test-Path $each) {
-        $Env:PATH = "${Env:PATH};$each";
+        $Env:PATH = "${Env:PATH};$each"
     }
 }
 
