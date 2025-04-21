@@ -520,7 +520,8 @@ if (Test-Command code) {
     Set-Alias notepad code
 }
 
-Set-PSReadLineOption -EditMode Emacs -BellStyle Visual
+Set-PSReadLineOption -EditMode Emacs
+Set-PSReadLineOption -BellStyle Visual
 Set-PSReadLineOption -PredictionSource None
 Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 
