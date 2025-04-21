@@ -532,4 +532,4 @@ Set-PSReadLineKeyHandlerWithMacroExpansion F6 ''
 Set-PSReadLineKeyHandler -Key F7 -BriefDescription ToggleHistoryListView -ScriptBlock { ToggleHistoryListView }
 Set-PSReadLineKeyHandler -Key Ctrl+r -BriefDescription ToggleHistoryListView -ScriptBlock { ToggleHistoryListView }
 Set-PSReadLineKeyHandler -Key F8 -BriefDescription HistorySearchBackwardsLoop -ScriptBlock { HistorySearchBacwkwardLoop }
-
+Remove-PSReadLineKeyHandler -Key Ctrl+s
