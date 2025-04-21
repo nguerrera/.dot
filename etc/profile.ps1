@@ -386,23 +386,6 @@ function xargs($command) {
     process { & $command @args $_.Trim() }
 }
 
-# sudo for versions of Windows without sudo.exe
-function _sudo($command) {
-    if (Test-Admin) {
-        & $command @args
-    } else {
-        $argumentList = $null
-        if ($args) {
-            $quotedArgs = $args | ForEach-Object { if ($_.Contains(' ')) { "`"$_`"" } else { $_ } }
-            $argumentList = [String]::Join(' ', $quotedArgs)
-        }
-        Start-Process -Verb RunAs -FilePath $command -ArgumentList $argumentList -WorkingDirectory (Get-Location)
-    }
-}
-if (!(Test-Command sudo.exe)) {
-    Set-Alias sudo _sudo
-}
-
 # List all powershell commands when which or where is called interactively.
 # Morally equivalent to Windows where.exe, or bash type -a
 Set-Macro where pswhere
