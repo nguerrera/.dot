@@ -5,6 +5,8 @@
 	longpaths = true
 	preloadindex = true
 	fscache = true
+	; work around https://github.com/git-for-windows/git/issues/5517
+	symlinks = false
 [url "__DO_NOT_PUSH__/"]
 	pushinsteadof = https://github.com/
 [url "https://github.com/nguerrera/"]
