@@ -410,7 +410,11 @@ Set-Macro set {
 
             # Do the replacement ourselves as return value doesn't overwrite arg, only command
             [PSConsoleReadLine]::RevertLine()
-            [PSConsoleReadLine]::Insert("`$Env:$variable = '$value'")
+            if ($value -eq '') {
+                [PSConsoleReadLine]::Insert("rm Env:\$variable")
+            } else {
+                [PSConsoleReadLine]::Insert("`$Env:$variable = '$value'")
+            }
             return $null
         }
     }
