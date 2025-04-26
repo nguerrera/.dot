@@ -1,5 +1,6 @@
 using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
+using namespace System.Collections.Generic
 using namespace System.Security.Principal
 using namespace Microsoft.PowerShell
 
@@ -246,6 +247,8 @@ $Env:SuppressNETCoreSdkPreviewMessage = 'true'
 # Uses latest preview by default, latest RTM if Use-RTM was invoked.
 function VSEnv {
     Clear-VSEnv
+    [string[]]$vars = Get-ChildItem Env: | ForEach-Object { $_.Name }
+    $script:_NG_ENV_VARS_BEFORE_VSENV = [HashSet[string]]::new($vars)
 
     $vswhereArgs = $args
     if ($args.Length -eq 0) {
@@ -298,50 +301,16 @@ function Clear-VSEnv {
         $Env:_NG_PATH_BEFORE_VSENV = $Env:PATH
         return
     }
-    $Env:Path = $Env:_NG_PATH_BEFORE_VSENV
+    $Env:PATH = $Env:_NG_PATH_BEFORE_VSENV
 
-    $Env:CommandPromptType = ''
-    $Env:DevEnvDir = ''
-    $Env:ExtensionSdkDir = ''
-    $Env:EXTERNAL_INCLUDE = ''
-    $Env:Framework40Version = ''
-    $Env:FrameworkDir = ''
-    $Env:FrameworkDir32 = ''
-    $Env:FrameworkVersion = ''
-    $Env:FrameworkVersion32 = ''
-    $Env:FSHARPINSTALLDIR = ''
-    $Env:INCLUDE = ''
-    $Env:LIB = ''
-    $Env:LIBPATH = ''
-    $Env:NETFXSDKDir = ''
-    $Env:UCRTVersion = ''
-    $Env:UniversalCRTSdkDir = ''
-    $Env:VCIDEInstallDir = ''
-    $Env:VCINSTALLDIR = ''
-    $Env:VCPKG_ROOT = ''
-    $Env:VCToolsInstallDir = ''
-    $Env:VCToolsRedistDir = ''
-    $Env:VCToolsVersion = ''
-    $Env:VisualStudioVersion = ''
-    $Env:VS160COMNTOOLS = ''
-    $Env:VS170COMNTOOLS = ''
-    $Env:VSCMD_ARG_app_plat = ''
-    $Env:VSCMD_ARG_HOST_ARCH = ''
-    $Env:VSCMD_ARG_TGT_ARCH = ''
-    $Env:VSCMD_VER = ''
-    $Env:VSINSTALLDIR = ''
-    $Env:WindowsLibPath = ''
-    $Env:WindowsSdkBinPath = ''
-    $Env:WindowsSdkDir = ''
-    $Env:WindowsSDKLibVersion = ''
-    $Env:WindowsSdkVerBinPath = ''
-    $Env:WindowsSDKVersion = ''
-    $Env:WindowsSDK_ExecutablePath_x64 = ''
-    $Env:WindowsSDK_ExecutablePath_x86 = ''
-    $Env:__DOTNET_ADD_32BIT = ''
-    $Env:__DOTNET_PREFERRED_BITNESS = ''
-    $Env:__VSCMD_PREINIT_PATH = ''
-    $Env:__VSCMD_script_err_count = ''
+    if ($script:_NG_ENV_VARS_BEFORE_VSENV) {
+        foreach ($var in Get-ChildItem Env: | ForEach-Object { $_.Name }) {
+            if (!$script:_NG_ENV_VARS_BEFORE_VSENV.Contains($var)) {
+                Remove-Item Env:\$var
+            }
+        }
+    }
+    $script:_NG_ENV_VARS_BEFORE_VSENV = $null
 }
 
 function Use-Previews {
