@@ -95,6 +95,7 @@ function Expand-Macros {
 
     if ($replacement) {
         [PSConsoleReadLine]::Replace($extent.StartOffset, $extent.EndOffset - $extent.StartOffset, $replacement)
+        [PSConsoleReadLine]::EndOfLine()
     }
 }
 
@@ -415,6 +416,7 @@ Set-Macro set {
             } else {
                 [PSConsoleReadLine]::Insert("`$Env:$variable = '$value'")
             }
+            [PSConsoleReadLine]::EndOfLine()
             return $null
         }
     }
