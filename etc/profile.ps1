@@ -494,9 +494,9 @@ if (Test-Command code) {
 # Add completion for dotnet
 Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
-        dotnet complete --position $cursorPosition "$commandAst" | ForEach-Object {
-            [CompletionResult]::new($_, $_, 'ParameterValue', $_)
-        }
+    dotnet complete --position $cursorPosition "$commandAst" | ForEach-Object {
+        [CompletionResult]::new($_, $_, 'ParameterValue', $_)
+    }
 }
 
 Set-PSReadLineOption -EditMode Emacs
