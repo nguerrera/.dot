@@ -163,7 +163,7 @@ function ToggleHistoryListView {
 }
 
 # Search history backwards, but loop if we get to the beginning of history
-function HistorySearchBacwkwardLoop {
+function HistorySearchBackwardLoop {
     $cmdBefore = Get-PSReadLineBuffer
     if ((Get-PSReadLineOption).PredictionViewStyle -eq 'ListView') {
         ToggleHistoryListView
@@ -498,5 +498,5 @@ Set-PSReadLineKeyHandlerWithMacroExpansion Shift+Tab TabCompletePrevious
 Set-PSReadLineKeyHandlerWithMacroExpansion F6 ''
 Set-PSReadLineKeyHandler -Key F7 -BriefDescription ToggleHistoryListView -ScriptBlock { ToggleHistoryListView }
 Set-PSReadLineKeyHandler -Key Ctrl+r -BriefDescription ToggleHistoryListView -ScriptBlock { ToggleHistoryListView }
-Set-PSReadLineKeyHandler -Key F8 -BriefDescription HistorySearchBackwardsLoop -ScriptBlock { HistorySearchBacwkwardLoop }
+Set-PSReadLineKeyHandler -Key F8 -BriefDescription HistorySearchBackwardLoop -ScriptBlock { HistorySearchBackwardLoop }
 Remove-PSReadLineKeyHandler -Key Ctrl+s
