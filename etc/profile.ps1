@@ -78,6 +78,16 @@ function Expand-Macros {
     }
 
     $extent = $tokens[0].Extent
+
+    # If the first token is 'time', skip it so that time can time macros
+    if ($extent.Text -eq 'time') {
+        if ($tokens.Count -lt 3) {
+            return
+        }
+        $extent = $tokens[1].Extent
+        $tokens = $tokens[1 .. ($tokens.Length)]
+    }
+
     $command = $extent.Text
     $replacement = $Macros[$command]
     if (!$replacement) {
@@ -365,15 +375,17 @@ function pswhere { Get-Command -All @args | Format-Table -AutoSize -Wrap }
 
 # Mimic unix time command. Measure a command without capturing its output.
 function time {
-    param(
-        [Parameter(Mandatory=$true, Position=0)]
-        $command,
-        [Parameter(ValueFromRemainingArguments=$true)]
-        $args
-   )
-   $outerArgs = $args
-   $measured = (Measure-Command { & $command @outerArgs | Out-Default }).TotalMilliseconds
-   [PSCustomObject]@{Time = "$measured ms"}
+    $cmd = Get-PSReadLineBuffer
+    $cmd = $cmd -replace '^time\s', ''
+
+    if ($cmd -match '^time($|\s)')
+    {
+        Write-Error "cannot time time itself."
+        return
+    }
+
+    $measured = (Measure-Command { Invoke-Expression $cmd | Out-Default }.GetNewClosure()).TotalMilliseconds
+    [PSCustomObject]@{Time = "$measured ms"}
 }
 
 # Use cmd dir/rd/del when given cmd-like arguments interactively, otherwise use
