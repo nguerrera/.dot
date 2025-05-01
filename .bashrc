@@ -256,7 +256,7 @@ elif ! have open; then
     alias open=start
 fi
 
-# Add completion for the dotnet
+# Add completion for dotnet
 case $(uname) in
     MINGW*|MSYS*)
         _NEWLINE=$'\r\n'
@@ -266,10 +266,10 @@ case $(uname) in
         ;;
 esac
 _dotnet_bash_complete() {
-  local cur="${COMP_WORDS[COMP_CWORD]}" IFS=$_NEWLINE
-  local candidates
-  read -d '' -ra candidates < <(dotnet complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)
-  read -d '' -ra COMPREPLY < <(compgen -W "${candidates[*]:-}" -- "$cur")
+    local cur="${COMP_WORDS[COMP_CWORD]}" IFS=$_NEWLINE
+    local candidates
+    read -d '' -ra candidates < <(dotnet complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)
+    read -d '' -ra COMPREPLY < <(compgen -W "${candidates[*]:-}" -- "$cur")
 }
 complete -f -F _dotnet_bash_complete dotnet
 
