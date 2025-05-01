@@ -272,7 +272,6 @@ export CLICOLOR=1
 export LSCOLORS=exgxbxdxcxegedabagacad
 LS_OPTIONS="-h -F $WIN_LS_OPTIONS"
 
-
 # Use GNU coreutils where possible
 #
 # I greatly prefer GNU coreutils over the spartan BSD equivalents.
