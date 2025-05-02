@@ -376,10 +376,14 @@ function pswhere { Get-Command -All @args | Format-Table -AutoSize -Wrap }
 # Mimic unix time command. Measure a command without capturing its output.
 function time {
     $cmd = Get-PSReadLineBuffer
-    $cmd = $cmd -replace '^time\s', ''
+    $cmd = $cmd -replace '^time\s*', ''
 
-    if ($cmd -match '^time($|\s)')
-    {
+    if ($cmd -eq '') {
+        Write-Error "no command given to time."
+        return
+    }
+
+    if ($cmd -match '^time($|\s)'){
         Write-Error "cannot time time itself."
         return
     }
