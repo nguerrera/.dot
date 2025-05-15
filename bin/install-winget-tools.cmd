@@ -15,6 +15,7 @@ winget install -e --id Microsoft.Sysinternals
 winget install -e --id OpenJS.NodeJS.LTS
 winget install -e --id ScooterSoftware.BeyondCompare.5
 winget install -e --id TortoiseGit.TortoiseGit
+winget install -e --id WinDirStat.WinDirStat
 
 winget install -e --name "ILSpy Fresh" --source msstore --accept-package-agreements
 
