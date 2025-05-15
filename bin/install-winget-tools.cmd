@@ -20,7 +20,7 @@ winget install -e --name "ILSpy Fresh" --source msstore --accept-package-agreeme
 
 :: Emacs installer doesn't register itself so running this script twice will
 :: install twice without this check. To upgrade, change the version here.
-@set EMACS_VER=29.4
+@set EMACS_VER=30.1
 @if exist "%ProgramW6432%\Emacs\emacs-%EMACS_VER%" goto :EmacsInstalled
 winget install -e --id GNU.Emacs -v %EMACS_VER%
 :EmacsInstalled
