@@ -509,7 +509,7 @@ Set-PSReadLineOption -PredictionSource None
 Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 
 Set-PSReadLineKeyHandlerWithMacroExpansion Enter AcceptLine
-Set-PSReadLineKeyHandlerWithMacroExpansion Tab  TabCompleteNext
+Set-PSReadLineKeyHandlerWithMacroExpansion Tab TabCompleteNext
 Set-PSReadLineKeyHandlerWithMacroExpansion Shift+Tab TabCompletePrevious
 Set-PSReadLineKeyHandlerWithMacroExpansion F6 ''
 Set-PSReadLineKeyHandler -Key F7 -BriefDescription ToggleHistoryListView -ScriptBlock { ToggleHistoryListView }
