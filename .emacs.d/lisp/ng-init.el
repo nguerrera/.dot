@@ -59,8 +59,8 @@
  hscroll-margin                   0
  hscroll-step                     1)
 
-;; fill to 76 cloumns by default
-(setq-default fill-column 76)
+;; fill to 80 columns by default
+(setq-default fill-column 80)
 
 ;; use visual line mode with left fringe indicator in text modes
 (progn
