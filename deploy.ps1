@@ -7,7 +7,7 @@ Set-ItemProperty -Path "HKCU:\Environment" -Name "HOME" -Value $env:HOME
 
 # Git Config
 $gitConfigPath = "$PSScriptRoot\etc\win.gitconfig"
-Write-Output "Configuring git to include use $gitConfigPath.."
+Write-Output "Configuring git to use $gitConfigPath.."
 git config --global include.path $gitConfigPath
 
 # Disable safe directories so Windows git can operate on WSL mounts. For some
@@ -22,10 +22,10 @@ Get-ChildItem -Path "$PSScriptRoot\.*"  | ForEach-Object {
         $link = Join-Path -Path $env:HOME -ChildPath $_.Name
         $target = $_.FullName
         if (Test-Path $link) {
-           Write-Warning "'$link' already exists, not overwriting."
+           Write-Warning "$link already exists, not overwriting."
         } else {
             $itemType = $_.PSIsContainer ? "Junction" : "SymbolicLink"
-            Write-Output "$_.Name -> $target"
+            Write-Output "$link -> $target"
             New-Item -ItemType $itemType -Path $link -Target $_ | Out-Null
         }
     }
@@ -41,7 +41,7 @@ foreach ($terminalPath in $terminalPaths) {
         continue
     }
     if (Test-Path "$terminalPath\settings.json") {
-        Write-Warning "'$terminalPath\settings.json' already exists, not overwriting."
+        Write-Warning "$terminalPath\settings.json already exists, not overwriting."
     } else {
         Write-Output "$terminalPath\settings.json -> $PSScriptRoot\etc\settings.json"
         New-Item -ItemType SymbolicLink -Path "$terminalPath\settings.json" -Target "$PSScriptRoot\etc\settings.json" | Out-Null
