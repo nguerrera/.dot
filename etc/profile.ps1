@@ -240,10 +240,12 @@ if (Test-Path "${Env:ProgramW6432}\Git") {
     $GIT_DIR="${Env:ProgramW6432}\Git"
     # at the end to avoid conflicts such as find.exe breaking Windows things
     $Env:PATH="${Env:PATH};$GIT_DIR\bin;$GIT_DIR\mingw64\bin;$GIT_DIR\usr\bin"
-    # but make find available as gfind
+    # but make some things availble with `g` prefix
     Set-Alias gfind "$GIT_DIR\usr\bin\find.exe"
-    # and use it interactively as just find
+    Set-Alias gdu "$GIT_DIR\usr\bin\du.exe"
+    # and use them interactively without prefix
     Set-Macro find gfind
+    Set-Macro du gdu
 }
 
 # Disable npm update check on Windows. It constantly errors out for me even
