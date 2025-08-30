@@ -4,6 +4,7 @@
 winget install -e --id BurntSushi.ripgrep.MSVC
 winget install -e --id Git.Git
 winget install -e --id GitHub.cli
+winget install -e --id GNU.Emacs
 winget install -e --id icsharpcode.ILSpy
 winget install -e --id KirillOsenkov.MSBuildStructuredLogViewer
 winget install -e --id Microsoft.AzureCLI
@@ -17,10 +18,3 @@ winget install -e --id OpenJS.NodeJS.LTS
 winget install -e --id ScooterSoftware.BeyondCompare.5
 winget install -e --id TortoiseGit.TortoiseGit
 winget install -e --id WinDirStat.WinDirStat
-
-:: Emacs installer doesn't register itself so running this script twice will
-:: install twice without this check. To upgrade, change the version here.
-@set EMACS_VER=30.1
-@if exist "%ProgramW6432%\Emacs\emacs-%EMACS_VER%" goto :EmacsInstalled
-winget install -e --id GNU.Emacs -v %EMACS_VER%
-:EmacsInstalled
