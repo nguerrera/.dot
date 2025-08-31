@@ -441,7 +441,7 @@ Set-Macro set {
 
     # Otherwise, if we have one or no arguments, use cmd set
     # No arguments will list all environment variables
-    # One arugment will list all environment variables with the given prefix
+    # One argument will list all environment variables with the given prefix
     if ($args.Length -lt 2) {
         return 'cmd /c set'
     }
