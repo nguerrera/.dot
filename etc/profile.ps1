@@ -245,7 +245,7 @@ if (Test-Path "${Env:ProgramW6432}\Git") {
     Set-Alias gdu "$GIT_DIR\usr\bin\du.exe"
     # and use them interactively without prefix
     Set-Macro find gfind
-    Set-Macro du gdu
+    Set-Macro du "gdu -h"
 }
 
 # Disable npm update check on Windows. It constantly errors out for me even
@@ -451,7 +451,6 @@ Set-Macro set {
 Set-Macro diff diff.exe
 
 function .. { Set-Location .. }
-function du { du.exe -h @args }
 function df { df.exe -h @args }
 function emacs { emacsclient.cmd -n @args }
 function ll { gls -l @args }
