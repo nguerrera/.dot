@@ -11,10 +11,12 @@ winget install -e --id Microsoft.AzureCLI
 winget install -e --id Microsoft.DotNet.SDK.8
 winget install -e --id Microsoft.DotNet.SDK.9
 winget install -e --id Microsoft.PowerShell
-winget install -e --id Microsoft.Sysinternals.Suite
 winget install -e --id Microsoft.VisualStudioCode
 winget install -e --id Microsoft.WinDbg
 winget install -e --id OpenJS.NodeJS.LTS
 winget install -e --id ScooterSoftware.BeyondCompare.5
 winget install -e --id TortoiseGit.TortoiseGit
 winget install -e --id WinDirStat.WinDirStat
+
+winget install -e --name "Sysinternals Suite" --source msstore
+winget install -e --name "NuGet Package Explorer" --source msstore
