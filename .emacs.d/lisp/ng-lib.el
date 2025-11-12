@@ -87,7 +87,7 @@ modern editors."
     (rectangle-left-char arg)))
 
 (defun ng-rectangle-mark-right (&optional arg)
-  "Extend rectangle rig. Start rectangle-mark-mode if not already started."
+  "Extend rectangle right. Start rectangle-mark-mode if not already started."
   (interactive "p")
   (when (ng-use-multiple-cursor-keys)
     (unless rectangle-mark-mode (rectangle-mark-mode 1))
