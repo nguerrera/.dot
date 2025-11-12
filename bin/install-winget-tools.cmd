@@ -10,6 +10,7 @@ winget install -e --id KirillOsenkov.MSBuildStructuredLogViewer
 winget install -e --id Microsoft.AzureCLI
 winget install -e --id Microsoft.DotNet.SDK.8
 winget install -e --id Microsoft.DotNet.SDK.9
+winget install -e --id Microsoft.DotNet.SDK.10
 winget install -e --id Microsoft.PowerShell
 winget install -e --id Microsoft.VisualStudioCode
 winget install -e --id Microsoft.WinDbg
