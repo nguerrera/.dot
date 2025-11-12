@@ -22,6 +22,8 @@
         "Windows.Terminal.Azure",
         "Windows.Terminal.Wsl",
         "Windows.Terminal.VisualStudio",
+        "Microsoft.WSL",
+        "VSDebugConsole",
         "Git"
     ],
     "keybindings": 
