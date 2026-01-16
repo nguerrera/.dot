@@ -4,6 +4,7 @@
 winget install -e --id BurntSushi.ripgrep.MSVC
 winget install -e --id Git.Git
 winget install -e --id GitHub.cli
+winget install -e --id GitHub.Copilot
 winget install -e --id GNU.Emacs
 winget install -e --id icsharpcode.ILSpy
 winget install -e --id KirillOsenkov.MSBuildStructuredLogViewer
