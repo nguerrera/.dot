@@ -1,0 +1,108 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+properties:
+  configurationVersion: 0.2.0
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: BurntSushi.ripgrep.MSVC
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: Git.Git
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: GitHub.cli
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: GitHub.Copilot
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: GNU.Emacs
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: icsharpcode.ILSpy
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: KirillOsenkov.MSBuildStructuredLogViewer
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: Microsoft.AzureCLI
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: Microsoft.DotNet.SDK.8
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: Microsoft.DotNet.SDK.9
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: Microsoft.DotNet.SDK.10
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: Microsoft.PowerShell
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: Microsoft.VisualStudioCode
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: Microsoft.WinDbg
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: OpenJS.NodeJS.LTS
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: ScooterSoftware.BeyondCompare.5
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: TortoiseGit.TortoiseGit
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
+        id: WinDirStat.WinDirStat
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Sysinternals Suite
+      settings:
+        id: 9P7KNL5RWT25
+        source: msstore
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: NuGet Package Explorer
+      settings:
+        id: 9WZDNCRDMDM3
+        source: msstore
+        useLatest: true
