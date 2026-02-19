@@ -4,6 +4,11 @@ properties:
   resources:
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       settings:
+        id: astral-sh.uv
+        source: winget
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      settings:
         id: BurntSushi.ripgrep.MSVC
         source: winget
         useLatest: true
@@ -104,5 +109,12 @@ properties:
         description: NuGet Package Explorer
       settings:
         id: 9WZDNCRDMDM3
+        source: msstore
+        useLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Python 3.13
+      settings:
+        id: 9PNRBTZXMB4Z
         source: msstore
         useLatest: true
