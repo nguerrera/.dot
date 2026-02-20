@@ -452,9 +452,10 @@ Set-Macro diff diff.exe
 
 function .. { Set-Location .. }
 function df { df.exe -h @args }
-function emacs { emacsclient.cmd -n @args }
+function emacsclient { git bash ~/.dot/bin/emacsclient.sh @args }
+function emacs { emacsclient `-n @args }
 function ll { gls -l @args }
-function ms { emacsclient.cmd `-e '"(progn (magit-status) (raise-frame))"' }
+function ms { emacsclient `-e '(progn (magit-status) (raise-frame))' }
 function ver { cmd /c ver }
 
 function gls { 

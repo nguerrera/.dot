@@ -93,23 +93,48 @@ if [ -x /opt/homebrew/bin/brew ]; then
 fi
 
 # editor
-if [ -d /Applications/Emacs.app ]; then
-   export EDITOR="$HOME/.dot/bin/emacsclient.sh -c"
-   alias emacsclient="$HOME/.dot/bin/emacsclient.sh"
-   alias emacs='/Applications/Emacs.app/Contents/MacOS/emacs'
-   alias e='emacsclient -n'
-   alias ms='emacsclient --eval "(progn (magit-status) (raise-frame))"'
-elif have emacs; then
-    if [ "$DISPLAY" != "" ] && (! have wslpath); then
-      export EDITOR="$HOME/.dot/bin/emacsclient.sh -c"
-      alias emacsclient="$HOME/.dot/bin/emacsclient.sh"
-      alias e='emacsclient -n'
-      alias ms='emacsclient --eval "(progn (magit-status) (raise-frame))"'
-    else
-      export EDITOR=emacs
-      alias e=emacs
-      alias ms='emacs --eval "(magit-status)"'
+__use-emacsclient() {
+    case "$(uname)" in
+        Darwin)
+            [ -d /Applications/Emacs.app ]
+            return $?
+            ;;
+        MINGW*|MSYS*)
+            [ -d "$(cygpath "$ProgramW6432" 2> /dev/null)/Emacs" ]
+            return $?
+            ;;
+    esac
+
+    if have emacs && [ "$DISPLAY" != "" ] && (! have wslpath); then
+        return 0
     fi
+
+    return 1
+}
+
+__alias-emacs-to-emacsclient() {
+    case "$(uname)" in
+        Darwin|MINGW*|MSYS*)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+if __use-emacsclient; then
+    export EDITOR="$HOME/.dot/bin/emacsclient.sh -c"
+    alias emacsclient="$HOME/.dot/bin/emacsclient.sh"
+    alias e='emacsclient -n'
+    alias ms='emacsclient --eval "(progn (magit-status) (raise-frame))"'
+    if __alias-emacs-to-emacsclient; then
+        alias emacs='emacsclient -n'
+    fi
+elif have emacs; then
+    export EDITOR=emacs
+    alias e=emacs
+    alias ms='emacs --eval "(magit-status)"'
 elif have code-insiders; then
     export EDITOR='code-insiders -w'
     alias e=code-insiders
@@ -119,6 +144,8 @@ elif have code; then
 else
     alias e=vi
 fi
+
+unset -f __use-emacsclient __alias-emacs-to-emacsclient
 
 # prefer vs code insiders
 if have code-insiders; then

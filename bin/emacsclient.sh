@@ -16,18 +16,42 @@ startMinimized=true
 emacs=emacs
 emacsclient=emacsclient
 
-if [ -d /Applications/Emacs.app ]; then
-  emacs=/Applications/Emacs.app/Contents/MacOS/Emacs
-  emacsclient=/Applications/Emacs.app/Contents/MacOS/bin-arm64-11/emacsclient
+case "$(uname -s)" in
+  Darwin)
+    if [ -d /Applications/Emacs.app ]; then
+      emacs=/Applications/Emacs.app/Contents/MacOS/Emacs
+      emacsclient=/Applications/Emacs.app/Contents/MacOS/bin-arm64-11/emacsclient
 
-  # Mac OS has a weird behavior where it restores another minimized frame
-  # when closing the client frame instead of closing it and returning focus.
-  # To deal with this, we reuse the initial frame for first invocation and
-  # use AppleScript to get the focus back.
-  currentApp=`osascript -e "(path to frontmost application) as text"`
-  takeBackFocus=true
-  startMinimized=false
-fi
+      # Mac OS has a weird behavior where it restores another minimized frame
+      # when closing the client frame instead of closing it and returning focus.
+      # To deal with this, we reuse the initial frame for first invocation and
+      # use AppleScript to get the focus back.
+      currentApp=`osascript -e "(path to frontmost application) as text"`
+      takeBackFocus=true
+      startMinimized=false
+    fi
+    ;;
+  MINGW*|MSYS*)
+    progfiles="$(cygpath "$ProgramW6432")"
+    emacsDir=""
+    if [ -f "$progfiles/Emacs/bin/runemacs.exe" ]; then
+      emacsDir="$progfiles/Emacs/bin"
+    else
+      for d in "$progfiles/Emacs"/*/bin; do
+        if [ -f "$d/runemacs.exe" ]; then
+          emacsDir="$d"
+          break
+        fi
+      done
+    fi
+    if [ -z "$emacsDir" ]; then
+      echo "error: Emacs not found." >&2
+      exit 1
+    fi
+    emacs="$emacsDir/runemacs.exe"
+    emacsclient="$emacsDir/emacsclient.exe"
+    ;;
+esac
 
 for arg; do
     case $arg in
@@ -66,12 +90,12 @@ fi
 
 # check if emacs server is up
 ping() {
-    $emacsclient --eval nil > /dev/null 2>&1
+    "$emacsclient" --eval nil > /dev/null 2>&1
 }
 
 if ! ping; then
     # start a new emacs
-    $emacs "${startArgs[@]}" &
+    "$emacs" "${startArgs[@]}" &
 
     # if we're not starting the new instance minimized then don't create
     # another frame for the client
@@ -93,10 +117,10 @@ if ! ping; then
 fi
 
 if $takeBackFocus; then
-    $emacsclient "${clientArgs[@]}"
+    "$emacsclient" "${clientArgs[@]}"
     exitCode=$?
     osascript -e "activate application \"$currentApp\""
     exit $exitCode
 fi
 
-exec $emacsclient "${clientArgs[@]}"
+exec "$emacsclient" "${clientArgs[@]}"
