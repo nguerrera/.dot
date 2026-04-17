@@ -87,6 +87,11 @@ shopt -s nocaseglob 2> /dev/null
 # add custom bin dir to path
 export PATH=$HOME/.dot/bin:$PATH
 
+# add dnvm env
+if [ -f "$HOME/.local/share/dnvm/env" ]; then
+    . "$HOME/.local/share/dnvm/env"
+fi
+
 # add homebrew env
 if [ -x /opt/homebrew/bin/brew ]; then
     eval $(/opt/homebrew/bin/brew shellenv)
