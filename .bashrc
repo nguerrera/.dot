@@ -88,8 +88,10 @@ shopt -s nocaseglob 2> /dev/null
 export PATH=$HOME/.dot/bin:$HOME/.local/bin:$PATH
 
 # add dnvm env
-if [ -f "$HOME/.local/share/dnvm/env" ]; then
-    . "$HOME/.local/share/dnvm/env"
+if ! have dotnet && [ -d "$HOME/.local/share/dnvm" ]; then
+    export PATH="$HOME/.local/share/dnvm:$PATH"
+    export PATH="$HOME/.dotnet/tools:$PATH"
+    export DOTNET_ROOT="$HOME/.local/share/dnvm/dn"
 fi
 
 # add homebrew env
