@@ -84,8 +84,8 @@ shopt -s globstar 2> /dev/null
 # ignore case when globbing
 shopt -s nocaseglob 2> /dev/null
 
-# add custom bin dir to path
-export PATH=$HOME/.dot/bin:$PATH
+# add custom bin dir and local bin to path
+export PATH=$HOME/.dot/bin:$HOME/.local/bin:$PATH
 
 # add dnvm env
 if [ -f "$HOME/.local/share/dnvm/env" ]; then
