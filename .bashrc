@@ -178,9 +178,9 @@ if [ -d /Applications/Beyond\ Compare.app/Contents/MacOS ]; then
    export PATH=$PATH:/Applications/Beyond\ Compare.app/Contents/MacOS
 fi
 
-# Use node@22 on homebrew if we don't have node on PATH, but we have that
-if ! have node && [ -d /opt/homebrew/opt/node@22/bin ]; then
-    export PATH=$PATH:/opt/homebrew/opt/node@22/bin
+# Use node@24 on homebrew if we don't have node on PATH, but we have that
+if ! have node && [ -d /opt/homebrew/opt/node@24/bin ]; then
+    export PATH=$PATH:/opt/homebrew/opt/node@24/bin
 fi
 
 # install global npm packages to user dir so I can `npm install -g` without
