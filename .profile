@@ -3,6 +3,12 @@ have() {
     command -v $1 > /dev/null 2>&1
 }
 
+# clean up after prior invocations
+if [ -z "$_NG_PATH_BEFORE_PROFILE" ]; then
+    export _NG_PATH_BEFORE_PROFILE=$PATH
+fi
+export PATH=$_NG_PATH_BEFORE_PROFILE
+
 # add custom bin dir and local bin to path
 export PATH=$HOME/.dot/bin:$HOME/.local/bin:$PATH
 
