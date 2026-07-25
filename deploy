@@ -21,6 +21,13 @@ else
   git config --global include.path ~/.dot/etc/unix.gitconfig
 fi
 
+# ~/.bash_profile takes priority over ~/.profile for login shells, so a
+# machine-provided skeleton .bash_profile would silently shadow our .profile
+# forever. Back it out of the way even though we don't deploy a replacement.
+if [ -e ~/.bash_profile ] || [ -L ~/.bash_profile ]; then
+    backup ~/.bash_profile
+fi
+
 for file in .*; do
     case $file in
         .|..|.git*)
