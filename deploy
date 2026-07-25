@@ -3,6 +3,17 @@
 # Symbolically link to all of the dot files in this directory from the home
 # directory. Chain in more git configuration layers.
 
+backup() {
+    local link=$1
+    local bak=$link.bak
+    local n=1
+    while [ -e "$bak" ]; do
+        bak=$link.bak.$n
+        n=$((n+1))
+    done
+    mv -v "$link" "$bak" || exit $?
+}
+
 cd $(dirname $0) || exit $?
 if [ -d /mnt/c/windows ]; then
   git config --global include.path ~/.dot/etc/wsl.gitconfig
@@ -16,10 +27,15 @@ for file in .*; do
             :
             ;;
         *)
-            if [ -e ~/$file ]; then
-                echo "warning: ~/$file already exists, not overwriting"
+            target=$(pwd)/$file
+            link=~/$file
+            if [ -L "$link" ] && [ "$(readlink "$link")" = "$target" ]; then
+                : # already linked correctly
+            elif [ -e "$link" ] || [ -L "$link" ]; then
+                backup "$link"
+                ln -s -v "$target" "$link" || exit $?
             else
-                ln -i -s -v $(pwd)/$file ~/$file || exit $?
+                ln -s -v "$target" "$link" || exit $?
             fi
         ;;
     esac
