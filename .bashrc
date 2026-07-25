@@ -70,8 +70,18 @@ __set-prompt () {
 __set-prompt
 unset -f __set-prompt
 
-# don't include repeat commands in history 
+# don't include repeat commands in history
 HISTCONTROL=ignoredups:erasedups
+
+# limit history size to keep perf snappy
+HISTSIZE=500
+HISTFILESIZE=500
+
+# share history immediately between windows: append instead of
+# overwrite, then after each prompt write this session's new lines
+# to the history file and reload the merged file into memory
+shopt -s histappend
+PROMPT_COMMAND="history -a; history -c; history -r${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
 
 # cd to directory when given as bare command
 shopt -s autocd 2> /dev/null
