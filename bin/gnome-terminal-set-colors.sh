@@ -47,7 +47,7 @@ dlist_append() {
 
     local entries="$(
         {
-            "$DCONF" read "$key" | tr -d '[]' | tr , "\n" | fgrep -v "$val"
+            "$DCONF" read "$key" | tr -d '[]' | tr , "\n" | grep -Fv "$val"
             echo "'$val'"
         } | head -c-1 | tr "\n" ,
     )"

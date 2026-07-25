@@ -14,7 +14,7 @@ complete -o bashdefault -d pushd
 # Workaround: loop through every command that has custom completion and add
 # the bashdefault fallback.
 type -t compopt > /dev/null || return
-for cmd in $(complete | egrep -v '(-d -G)' | awk '{print $(NF)}' | egrep -v '(_minimal)'); do
+for cmd in $(complete | grep -Ev '(-d -G)' | awk '{print $(NF)}' | grep -Ev '(_minimal)'); do
     if [ "$cmd" = "" -o "$cmd" = "''" ]; then continue; fi;
     compopt -o bashdefault $cmd
 done
