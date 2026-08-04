@@ -13,11 +13,21 @@ every tracked `.md` file for a line over 80 columns, a non-ASCII character, and
 a relative link that does not resolve. CI runs it on every push and every pull
 request.
 
-- **An agent's branch is `agent/<slug>/<what>`**: two ordinary words naming the
-  work, then what this particular branch is. The slug names the work rather than
-  the session, so it survives a handoff. Run
-  `git ls-remote --heads origin 'agent/<slug>/*'` before first use, which makes
-  it collision-free rather than merely unlikely.
+- **An agent's branch is `agent/<slug>/<what>`. The slug identifies rather than
+  describes**: two arbitrary words, `amber-heron` or `slate-marten`, with what
+  the branch is for going in `<what>`. A slug naming the work defeats its own
+  purpose, because the next agent on that subject coins the same one -- and in a
+  change spanning repositories it produces one branch name in each, which makes
+  `git rev-parse <branch>` ambiguous the moment two clones are in reach.
+- **One slug per agent, a subagent included**, checked with
+  `git ls-remote --heads origin 'agent/<slug>/*'` before first use. Everything
+  one agent creates lives under it: the branch its pull request opens from, a
+  second attempt, a backup taken before a rewrite. That makes an agent's whole
+  output one prefix to list and one prefix to sweep, and it makes whose branch
+  this is a question the name answers.
+- Taking over somebody else's pull request means pushing to their branch, which
+  belongs to the pull request rather than to a session. What a slug governs is
+  what an agent creates.
 - **Open a draft pull request when the work starts**, not when it finishes, and
   push to it freely. The branch is where the journey lives, and none of it
   reaches `main` because the merge squashes.
