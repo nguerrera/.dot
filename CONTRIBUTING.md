@@ -1,9 +1,9 @@
-# CONTRIBUTING.md
+# Contributing
 
 How a change gets made and landed here. It reads the same for a person and an
 agent.
 
-## The Workflow
+## Contributing a change
 
 Work on a branch, open a pull request, let it be reviewed. That is the whole of
 it.
@@ -33,7 +33,7 @@ request.
   cumulative diff cold, and `tools/check` green.** Converting back to draft is
   the right answer to a review that says it is not close.
 
-## The Pull Request Message
+### The pull request message
 
 - **The pull request title and body are the commit message**, because the squash
   is what lands. Write the subject as a plain sentence: a capital letter, no
@@ -49,7 +49,7 @@ request.
   and why, **the thread** is how it got there, and **the branch commits** are
   working notes that reach nothing.
 
-## Review
+### Review
 
 - **Answer review comments by pushing more commits to the same branch**, and by
   replying in the thread. Never a force-push and never a fresh pull request.
@@ -65,7 +65,7 @@ request.
   is not a descendant of, so it will offer the merged work a second time,
   deletions included, while reporting `mergeable_state: clean` throughout.
 
-## Merging And Cleanup
+### Merging and cleanup
 
 The repository owner reviews and merges. `delete_branch_on_merge` is on, so the
 remote branch goes with the merge, and what is left to clean up is local:
@@ -89,7 +89,7 @@ gh pr list --head <branch> --state all --json number,state,mergedAt
 `git branch -vv` shows against a deleted upstream is a hint rather than proof,
 since a remote branch can be deleted without ever having merged.
 
-## Attribution
+### Attribution and provenance
 
 - A commit written with an agent carries a `Co-Authored-By:` trailer naming it,
   on every commit even though the commits are working notes. That trailer is
@@ -119,3 +119,17 @@ since a remote branch can be deleted without ever having merged.
 - Write ASCII: `--` rather than an em dash, `...` rather than an ellipsis, `->`
   rather than an arrow. Output from a tool underneath passes through as it
   comes.
+
+## Agents
+
+An agent works the way this file describes, because the process is the same one
+either way. What it needs beyond that is what a person would not have to be
+told.
+
+[`AGENTS.md`](AGENTS.md) is that: the research discipline, what belongs in a
+comment versus a pull request body, what may leave this machine, and whose
+`sudo` it is. Every rule in it is one any agent can carry out, wherever it is
+running.
+
+[`CLAUDE.md`](CLAUDE.md) imports it and is Claude Code's alone: its own tools
+and syntax.
