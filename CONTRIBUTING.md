@@ -64,11 +64,15 @@ request.
   merges and before anything else: the squash creates a commit the upper layer
   is not a descendant of, so it will offer the merged work a second time,
   deletions included, while reporting `mergeable_state: clean` throughout.
-- **The repository owner reviews and merges.** Afterward `git checkout main`,
-  pull, and delete the branch with `git branch -D`. `-d` refuses, because it
-  tests whether the branch is reachable from `main` and a squash merge lands a
-  commit it never is. That is true of every branch this workflow produces, so
-  the capital is the normal case rather than a hazard being overridden.
+## Merging And Cleanup
+
+The repository owner reviews and merges. Afterward `git checkout main`, pull,
+and delete the branch with `git branch -D`.
+
+`-d` refuses, because it tests whether the branch is reachable from `main` and
+a squash merge lands a commit it never is. That is true of every branch this
+workflow produces, so the capital is the normal case rather than a hazard being
+overridden.
 
 ## Attribution
 
