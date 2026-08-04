@@ -67,13 +67,27 @@ request.
 
 ## Merging And Cleanup
 
-The repository owner reviews and merges. Afterward `git checkout main`, pull,
-and delete the branch with `git branch -D`.
+The repository owner reviews and merges. `delete_branch_on_merge` is on, so the
+remote branch goes with the merge and what is left to clean up is local:
+`git checkout main`, pull, and delete the branch with `git branch -D`.
 
-`-d` refuses, because it tests whether the branch is reachable from `main` and
-a squash merge lands a commit it never is. That is true of every branch this
-workflow produces, so the capital is the normal case rather than a hazard being
-overridden.
+A squash merge lands a commit the branch is not an ancestor of, which breaks
+every reachability test git has at once. `git branch --merged` never lists the
+branch, `git branch -d` refuses it, and `git merge-base --is-ancestor` says no.
+
+That is why the delete takes a capital, on every branch this workflow produces
+rather than on an unusual one where a hazard is being overridden.
+
+It is also why nothing git says settles whether the work landed. The pull
+request's own state does, and it does not rest on ancestry:
+
+```sh
+gh pr list --head <branch> --state all --json number,state,mergedAt
+```
+
+`mergedAt` set is the whole of the check. The `[gone]` marker that
+`git branch -vv` shows against a deleted upstream is a hint rather than proof,
+since a remote branch can be deleted without ever having merged.
 
 ## Attribution
 
