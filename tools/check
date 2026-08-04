@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+# Check the markdown rules CONTRIBUTING.md states: an 80-column wrap done by
+# hand, ASCII only, and relative links that resolve. Needs nothing but git,
+# awk and a shell, so it runs in a fresh clone and in CI with no install step.
+
+set -u
+
+cd "$(dirname "$0")/.." || exit 2
+
+# C collation so awk counts bytes and matches the ASCII range literally.
+export LC_ALL=C
+
+files=$(git ls-files '*.md')
+[ -n "$files" ] || exit 0
+
+width_and_ascii() {
+    awk '
+        # A word longer than the columns left to it can never be wrapped into
+        # them, which is what a bare URL or a deep path usually is.
+        function unwrappable(line,   n, i, word, indent, longest) {
+            match(line, /^[ \t]*/)
+            indent = RLENGTH
+            longest = 0
+            n = split(line, word, /[ \t]+/)
+            for (i = 1; i <= n; i++)
+                if (length(word[i]) > longest)
+                    longest = length(word[i])
+            return indent + longest > 80
+        }
+
+        /^[ \t]*```/ { fence = !fence; next }
+
+        /[^\t -~]/ { print FILENAME ":" FNR ": non-ASCII character" }
+
+        !fence && length($0) > 80 && !unwrappable($0) {
+            print FILENAME ":" FNR ": " length($0) " columns"
+        }
+    ' "$@"
+}
+
+# Emit one "file|line|target" per relative markdown link, dropping the ones
+# that address a server or a heading rather than a file in the repository.
+link_targets() {
+    awk '
+        {
+            rest = $0
+            while (match(rest, /\]\([^)]+\)/)) {
+                target = substr(rest, RSTART + 2, RLENGTH - 3)
+                rest = substr(rest, RSTART + RLENGTH)
+                if (target ~ /^[a-zA-Z][a-zA-Z0-9+.-]*:/) continue
+                if (target ~ /^[#\/]/) continue
+                print FILENAME "|" FNR "|" target
+            }
+        }
+    ' "$@"
+}
+
+broken_links() {
+    link_targets "$@" | while IFS='|' read -r file line target; do
+        path=${target%%#*}
+        [ -n "$path" ] || continue
+        [ -e "$(dirname "$file")/$path" ] ||
+            echo "$file:$line: link does not resolve: $target"
+    done
+}
+
+findings=$( { width_and_ascii $files; broken_links $files; } | sort )
+
+if [ -n "$findings" ]; then
+    printf '%s\n' "$findings"
+    exit 1
+fi

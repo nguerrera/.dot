@@ -8,6 +8,10 @@ agent.
 Work on a branch, open a pull request, let it be reviewed. That is the whole of
 it.
 
+`tools/check` is the thing to run, and it needs nothing installed. It enforces
+the markdown rules below over every tracked `.md` file, and CI runs it on every
+push and every pull request.
+
 - **An agent's branch is `agent/<slug>/<what>`**: two ordinary words naming the
   work, then what this particular branch is. The slug names the work rather than
   the session, so it survives a handoff. Run
@@ -24,9 +28,8 @@ it.
 - Commits inside a branch are working notes. Commit as often as is useful and
   leave them untidy; there is no history to curate below the squash.
 - **Draft means working; ready means done.** Taking a pull request out of draft
-  is the author's claim that the work is finished. **The gate here is reading
-  the cumulative diff cold, and that is the whole of it** -- there is no check
-  to run, which puts the entire weight on the read. Converting back to draft is
+  is the author's claim that the work is finished. **The gate is reading the
+  cumulative diff cold, and `tools/check` green.** Converting back to draft is
   the right answer to a review that says it is not close.
 
 ## The Pull Request Message
@@ -90,7 +93,7 @@ it.
 ## Writing
 
 - Markdown prose wraps at 80 columns, **by hand, since nothing here reformats
-  it**. `README.org` is org-mode and out of scope.
+  it**. `tools/check` is what catches a line that missed the wrap.
 - Spelling is US English: `behavior`, `recognized`, `license`, `optimization`.
   Quoted material keeps whatever its source wrote.
 - Write ASCII: `--` rather than an em dash, `...` rather than an ellipsis, `->`
