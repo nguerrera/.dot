@@ -22,8 +22,9 @@ conversation.
 
 ## The Trailers
 
-Both are ones this harness already emits, so the default form is the right one.
-`Claude-Session:` takes the `session_...` web identifier rather than the local
-session UUID under `~/.claude/projects`, which is a different keyspace and
-resolves to nothing, so the obvious guess produces a link pointing at nothing.
-`CONTRIBUTING.md` says which trailer goes on a commit and which on a body.
+The two `CONTRIBUTING.md` requires are ones this harness already emits, so the
+default form is the right one. `Claude-Session:` takes the `session_...` web
+identifier rather than the local session UUID under `~/.claude/projects`, which
+is a different keyspace, so the obvious guess produces a link resolving to
+nothing. `CONTRIBUTING.md` says which trailer goes on a commit and which on a
+body.

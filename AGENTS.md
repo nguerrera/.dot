@@ -1,8 +1,8 @@
 # AGENTS.md
 
-Agent rules for this repository. It holds the configuration files deployed to
-the machines that run them -- Arch, Ubuntu, Windows and macOS -- with `deploy`,
-`deploy.cmd` and `deploy.ps1` as the entry points.
+Agent rules for this repository. It is a set of configuration files deployed as
+symlinks from a home directory on Arch, Ubuntu, Windows and macOS, with
+`deploy`, `deploy.cmd` and `deploy.ps1` as the entry points.
 
 Read `CONTRIBUTING.md` first. It is the workflow -- branch, draft pull request,
 review, squash merge -- and it reads the same for a person and an agent, so an
@@ -10,7 +10,8 @@ agent reads it as its own process rather than as background.
 
 ## Scope Of These Files
 
-- `CONTRIBUTING.md`: how a change gets made and landed here.
+- `CONTRIBUTING.md`: how a change gets made and landed here, and the mechanics
+  of writing the markdown that lands with it.
 - `AGENTS.md`: what an agent needs told that a person would not. Any agent can
   follow all of it, wherever it is running.
 - `CLAUDE.md`: Claude Code's own tools and syntax. What is in there is Claude
@@ -19,6 +20,9 @@ agent reads it as its own process rather than as background.
   say it once.
 
 ## Writing Style
+
+`CONTRIBUTING.md` has the mechanics: the 80-column wrap, US English, and ASCII.
+This is what the prose says.
 
 - Start sentences with capital letters and end them with periods, including
   bullet items.
@@ -37,7 +41,7 @@ agent reads it as its own process rather than as background.
 - A comment says what the code cannot: the constraint that decides a value, the
   failure a check catches, the behavior being worked around. Code that speaks
   for itself gets none. Comments describe the code as it stands; the story of
-  the change goes in the commit message.
+  the change goes in the pull request body.
 - **Repository prose does not speak in the first person.** No "I", "my", "mine",
   "me", and no "we", "our", or "us" either, in a document, a comment, a guidance
   file, or a pull request body. Name the thing, and where nothing fits, passive
