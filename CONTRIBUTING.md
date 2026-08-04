@@ -16,9 +16,9 @@ request.
 - **An agent's branch is `agent/<slug>/<what>`. The slug identifies rather than
   describes**: two arbitrary words, `amber-heron` or `slate-marten`, with what
   the branch is for going in `<what>`. A slug naming the work defeats its own
-  purpose, because the next agent on that subject coins the same one -- and in a
-  change spanning repositories it produces one branch name in each, which makes
-  `git rev-parse <branch>` ambiguous the moment two clones are in reach.
+  purpose, because the next agent on that subject coins the same one -- and then
+  one prefix holds two agents' branches, so neither whose branch this is nor
+  what one agent made has an answer any more.
 - **One slug per agent, a subagent included**, checked with
   `git ls-remote --heads origin 'agent/<slug>/*'` before first use. Everything
   one agent creates lives under it: the branch its pull request opens from, a
