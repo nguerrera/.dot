@@ -68,15 +68,15 @@ request.
 ## Merging And Cleanup
 
 The repository owner reviews and merges. `delete_branch_on_merge` is on, so the
-remote branch goes with the merge and what is left to clean up is local:
+remote branch goes with the merge, and what is left to clean up is local:
 `git checkout main`, pull, and delete the branch with `git branch -D`.
 
 A squash merge lands a commit the branch is not an ancestor of, which breaks
 every reachability test git has at once. `git branch --merged` never lists the
 branch, `git branch -d` refuses it, and `git merge-base --is-ancestor` says no.
 
-That is why the delete takes a capital, on every branch this workflow produces
-rather than on an unusual one where a hazard is being overridden.
+That is why the delete takes a capital. It is the normal case for every branch
+this workflow produces rather than a hazard being overridden on an unusual one.
 
 It is also why nothing git says settles whether the work landed. The pull
 request's own state does, and it does not rest on ancestry:
@@ -85,7 +85,7 @@ request's own state does, and it does not rest on ancestry:
 gh pr list --head <branch> --state all --json number,state,mergedAt
 ```
 
-`mergedAt` set is the whole of the check. The `[gone]` marker that
+`mergedAt` being set is the whole of the check. The `[gone]` marker that
 `git branch -vv` shows against a deleted upstream is a hint rather than proof,
 since a remote branch can be deleted without ever having merged.
 
