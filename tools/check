@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-# Check the markdown rules CONTRIBUTING.md states: an 80-column wrap done by
-# hand, ASCII only, and relative links that resolve. Needs nothing but git,
-# awk and a shell, so it runs in a fresh clone and in CI with no install step.
+# Guard the mechanical half of the writing rules over the tracked markdown: a
+# line over 80 columns, a non-ASCII character, and a relative link that does not
+# resolve. Needs nothing but git, awk and a shell, so it runs in a fresh clone
+# and in CI with no install step.
 
 set -u
 
@@ -29,9 +30,10 @@ width_and_ascii() {
             return indent + longest > 80
         }
 
-        /^[ \t]*```/ { fence = !fence; next }
-
+        # ASCII is checked first so that a fence line is checked too.
         /[^\t -~]/ { print FILENAME ":" FNR ": non-ASCII character" }
+
+        /^[ \t]*```/ { fence = !fence; next }
 
         !fence && length($0) > 80 && !unwrappable($0) {
             print FILENAME ":" FNR ": " length($0) " columns"
@@ -65,7 +67,9 @@ broken_links() {
     done
 }
 
-findings=$( { width_and_ascii $files; broken_links $files; } | sort )
+# Sorted by file, then by line number rather than by its digits.
+findings=$( { width_and_ascii $files; broken_links $files; } |
+    sort -t: -k1,1 -k2,2n )
 
 if [ -n "$findings" ]; then
     printf '%s\n' "$findings"

@@ -8,9 +8,10 @@ agent.
 Work on a branch, open a pull request, let it be reviewed. That is the whole of
 it.
 
-`tools/check` is the thing to run, and it needs nothing installed. It enforces
-the markdown rules below over every tracked `.md` file, and CI runs it on every
-push and every pull request.
+`tools/check` is the thing to run, and it needs nothing installed. It reads
+every tracked `.md` file for a line over 80 columns, a non-ASCII character, and
+a relative link that does not resolve. CI runs it on every push and every pull
+request.
 
 - **An agent's branch is `agent/<slug>/<what>`**: two ordinary words naming the
   work, then what this particular branch is. The slug names the work rather than

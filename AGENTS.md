@@ -91,9 +91,9 @@ This is what the prose says.
 
 `CONTRIBUTING.md` gates leaving draft on reading the cumulative diff cold.
 `tools/check` catches a missed wrap, a stray non-ASCII character, and a link
-that stopped resolving; everything about what the prose actually says is the
-read. An agent needs telling how, having been in the conversation the whole time
-with no instinct to fall back on.
+that stopped resolving; whether the prose is true and consistent is the read. An
+agent needs telling how, having been in the conversation the whole time with no
+instinct to fall back on.
 
 - **Read every changed file end to end, not the changed sections.** A diff of
   pure additions cannot show a contradiction with a paragraph that was already
