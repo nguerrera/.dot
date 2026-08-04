@@ -64,6 +64,7 @@ request.
   merges and before anything else: the squash creates a commit the upper layer
   is not a descendant of, so it will offer the merged work a second time,
   deletions included, while reporting `mergeable_state: clean` throughout.
+
 ## Merging And Cleanup
 
 The repository owner reviews and merges. Afterward `git checkout main`, pull,
