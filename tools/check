@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+
+# Guard the mechanical half of the writing rules over the tracked markdown: a
+# line over 80 columns, a non-ASCII character, and a relative link that does not
+# resolve. Needs nothing but git, awk and a shell, so it runs in a fresh clone
+# and in CI with no install step.
+
+set -u
+
+cd "$(dirname "$0")/.." || exit 2
+
+# C collation so awk counts bytes and matches the ASCII range literally.
+export LC_ALL=C
+
+files=$(git ls-files '*.md')
+[ -n "$files" ] || exit 0
+
+# A tracked file missing from the worktree, which a half-finished rename leaves
+# behind, would otherwise reach awk as an error on stderr and leave the run
+# green. Report it and check the rest.
+present=""
+absent=""
+for file in $files; do
+    if [ -f "$file" ]; then
+        present="$present $file"
+    else
+        absent="$absent$file: tracked file is missing from the worktree
+"
+    fi
+done
+
+width_and_ascii() {
+    awk '
+        # A word longer than the columns left to it can never be wrapped into
+        # them, which is what a bare URL or a deep path usually is.
+        function unwrappable(line,   n, i, word, indent, longest) {
+            match(line, /^[ \t]*/)
+            indent = RLENGTH
+            longest = 0
+            n = split(line, word, /[ \t]+/)
+            for (i = 1; i <= n; i++)
+                if (length(word[i]) > longest)
+                    longest = length(word[i])
+            return indent + longest > 80
+        }
+
+        # ASCII is checked first so that a fence line is checked too.
+        /[^\t -~]/ { print FILENAME ":" FNR ": non-ASCII character" }
+
+        /^[ \t]*```/ { fence = !fence; next }
+
+        !fence && length($0) > 80 && !unwrappable($0) {
+            print FILENAME ":" FNR ": " length($0) " columns"
+        }
+    ' "$@"
+}
+
+# Emit one "file|line|target" per relative markdown link, dropping the ones
+# that address a server or a heading rather than a file in the repository.
+link_targets() {
+    awk '
+        {
+            rest = $0
+            while (match(rest, /\]\([^)]+\)/)) {
+                target = substr(rest, RSTART + 2, RLENGTH - 3)
+                rest = substr(rest, RSTART + RLENGTH)
+                if (target ~ /^[a-zA-Z][a-zA-Z0-9+.-]*:/) continue
+                if (target ~ /^[#\/]/) continue
+                print FILENAME "|" FNR "|" target
+            }
+        }
+    ' "$@"
+}
+
+broken_links() {
+    link_targets "$@" | while IFS='|' read -r file line target; do
+        path=${target%%#*}
+        [ -n "$path" ] || continue
+        [ -e "$(dirname "$file")/$path" ] ||
+            echo "$file:$line: link does not resolve: $target"
+    done
+}
+
+# Sorted by file, then by line number rather than by its digits.
+findings=$(
+    {
+        printf '%s' "$absent"
+        if [ -n "$present" ]; then
+            width_and_ascii $present
+            broken_links $present
+        fi
+    } | sort -t: -k1,1 -k2,2n
+)
+
+if [ -n "$findings" ]; then
+    printf '%s\n' "$findings"
+    exit 1
+fi
