@@ -409,14 +409,11 @@ repository checks.
   a sentence.
 - Date anything whose meaning depends on when it was written, in ISO form, and
   write absolute dates rather than "last week".
-- **A date is one tell that a sentence has drifted into narration, and "used
-  to", "previously", "originally" and "no longer" are plainer ones.** The
-  narration is the defect rather than any of the words. What it narrates is the
-  way something worked before, or how a draft got to be ready, and that belongs
-  in the pull request body or nowhere, depending on whether it will matter
-  tomorrow. Cutting the tell alone leaves the narration standing, so cut the
-  sentence. A measurement that can go stale under you is dated for a good reason
-  and keeps its date.
+- **A date is one tell that a sentence has drifted into that narration, and
+  "used to", "previously", "originally" and "no longer" are plainer ones.** The
+  narration is the defect rather than any of the words, so cutting the tell
+  leaves it standing where cutting the sentence does not. The bullet above is
+  where a date earns its place, and this does not reach it.
 - Thinking out loud is conversation, not a work request. Do not turn it into
   repository prose unasked; when something seems worth writing, offer it in one
   sentence and let the owner choose.
