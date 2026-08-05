@@ -28,7 +28,7 @@ title() {
   echo -ne "\033]0;$1\007"
 }
 
-# turn off XON/XOFF flow control so that C-s and C-q reach readline
+# Turn off XON/XOFF flow control so that C-s and C-q reach readline
 # instead of freezing and thawing the terminal. stty needs a terminal on
 # stdin, which an interactive shell does not always have.
 if [ -t 0 ]; then
