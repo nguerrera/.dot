@@ -79,7 +79,9 @@ request.
 
 The repository owner reviews and merges. `delete_branch_on_merge` is on, so the
 remote branch goes with the merge, and what is left to clean up is local:
-`git checkout main`, pull, and delete the branch with `git branch -D`.
+`git checkout main`, `git pull --prune`, and delete the branch with
+`git branch -D`. The prune is what a plain `git pull` skips, and the marker
+below reads wrong without it.
 
 A squash merge lands a commit the branch is not an ancestor of, which breaks
 every reachability test git has at once. `git branch --merged` never lists the
@@ -97,9 +99,9 @@ gh pr list --head <branch> --state all --json number,state,mergedAt
 
 `mergedAt` being set is the whole of the check. The `[gone]` marker that
 `git branch -vv` shows against a deleted upstream is a hint rather than proof,
-since a remote branch can be deleted without ever having merged. Read it after
-`git fetch --prune`, since an unpruned tracking ref shows no marker at all and a
-merged branch then looks like one that was never pushed.
+since a remote branch can be deleted without ever having merged -- and it is
+absent entirely until the prune above has run, so a merged branch then reads as
+one that was never pushed.
 
 Then list the prefix, which should come back empty:
 
