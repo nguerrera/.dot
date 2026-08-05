@@ -28,6 +28,13 @@ title() {
   echo -ne "\033]0;$1\007"
 }
 
+# Turn off XON/XOFF flow control so that C-s and C-q reach readline
+# instead of freezing and thawing the terminal. stty needs a terminal on
+# stdin, which an interactive shell does not always have.
+if [ -t 0 ]; then
+    stty -ixon
+fi
+
 # Set up the prompt with some defense against dumb terminals
 # that don't understand the color escape sequences (e.g. M-x
 # shell on the old version of emacs that ships with Mac OS X.)
