@@ -47,6 +47,14 @@ width_and_ascii() {
         # ASCII is checked first so that a fence line is checked too.
         /[^\t -~]/ { print FILENAME ":" FNR ": non-ASCII character" }
 
+        # YAML frontmatter is metadata a program parses rather than prose
+        # anybody reads at a width, and a skill declares its description there
+        # as one deliberate line. The width rule does not reach it; the ASCII
+        # check above still does.
+        FNR == 1 { front = ($0 == "---") }
+        front && FNR > 1 && /^---[ \t]*$/ { front = 0; next }
+        front { next }
+
         /^[ \t]*```/ { fence = !fence; next }
 
         !fence && length($0) > 80 && !unwrappable($0) {
