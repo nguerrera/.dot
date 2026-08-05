@@ -96,7 +96,7 @@
   ;; sync PATH to exec-path
   (let ((path ""))
     (dolist (p exec-path)
-      (setq path (concat (replace-regexp-in-string "/" "\\\\" path) p ";")))
+      (setq path (concat path (replace-regexp-in-string "/" "\\\\" p) ";")))
     (setenv "PATH" path))
 
   ;; use bash for shell-command

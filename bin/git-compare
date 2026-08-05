@@ -20,5 +20,7 @@ if [[ "$origin" == *"github.com/nguerrera"* && "$arg" != *":"* && "$arg" != *"..
     arg="nguerrera:$arg"
 fi
 
-gh extension install kyanny/gh-browse-compare
+if ! gh extension list | grep -q kyanny/gh-browse-compare; then
+    gh extension install kyanny/gh-browse-compare
+fi
 exec gh browse-compare $arg

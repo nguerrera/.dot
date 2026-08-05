@@ -62,7 +62,7 @@ reused when the config files have not changed.")
       (insert ")\n")
       (dolist (pkg package-alist)
         (insert (format "(push \"%s\" load-path)\n"
-                        (package-desc-dir (cadr pkg)) load-path))))))
+                        (package-desc-dir (cadr pkg))))))))
 
 (defun ng-load-package-lock-file ()
   "Restore package-alist and load-path from lock file and adds

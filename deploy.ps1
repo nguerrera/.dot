@@ -16,18 +16,44 @@ git config --global include.path $gitConfigPath
 Write-Output "Configuring git to disable safe directories..."
 git config --global safe.directory "*"
 
+# Back up an obstruction at $path to a numbered .bak sibling, then remove it.
+function Backup($path) {
+    $bak = "$path.bak"
+    $n = 1
+    while (Test-Path $bak) {
+        $bak = "$path.bak.$n"
+        $n++
+    }
+    Write-Output "Backing up $path -> $bak"
+    Move-Item -Path $path -Destination $bak
+}
+
+# Create or repair a symbolic link or junction at $link pointing to $target.
+# An existing link that already points to $target is left alone. Any other
+# obstruction is backed up first so that re-running converges.
+function Deploy-Link($link, $target, $itemType) {
+    $existing = Get-Item -Path $link -Force -ErrorAction SilentlyContinue
+    if ($existing) {
+        if ($existing.LinkType -in @("SymbolicLink", "Junction") -and
+            $existing.Target -eq $target) {
+            return  # already correct
+        }
+        Backup $link
+    }
+    Write-Output "$link -> $target"
+    New-Item -ItemType $itemType -Path $link -Target $target | Out-Null
+}
+
 # Dot files
 Get-ChildItem -Path "$PSScriptRoot\.*"  | ForEach-Object {
-    if (-not $_.Name.StartsWith(".git")) {
+    # ~/.claude holds the Claude CLI's credentials, transcripts and caches.
+    # A .claude directory here would be linked over the top of them, backing
+    # the live one out of the way.
+    if (-not $_.Name.StartsWith(".git") -and $_.Name -ne ".claude") {
         $link = Join-Path -Path $env:HOME -ChildPath $_.Name
         $target = $_.FullName
-        if (Test-Path $link) {
-           Write-Warning "$link already exists, not overwriting."
-        } else {
-            $itemType = $_.PSIsContainer ? "Junction" : "SymbolicLink"
-            Write-Output "$link -> $target"
-            New-Item -ItemType $itemType -Path $link -Target $_ | Out-Null
-        }
+        $itemType = $_.PSIsContainer ? "Junction" : "SymbolicLink"
+        Deploy-Link $link $target $itemType
     }
 }
 
@@ -40,12 +66,7 @@ foreach ($terminalPath in $terminalPaths) {
     if (-not (Test-Path $terminalPath)) {
         continue
     }
-    if (Test-Path "$terminalPath\settings.json") {
-        Write-Warning "$terminalPath\settings.json already exists, not overwriting."
-    } else {
-        Write-Output "$terminalPath\settings.json -> $PSScriptRoot\etc\settings.json"
-        New-Item -ItemType SymbolicLink -Path "$terminalPath\settings.json" -Target "$PSScriptRoot\etc\settings.json" | Out-Null
-    }
+    Deploy-Link "$terminalPath\settings.json" "$PSScriptRoot\etc\settings.json" "SymbolicLink"
 }
 
 # PowerShell profile
@@ -56,10 +77,15 @@ $docs = [Environment]::GetFolderPath('Personal')
 $psFolder = Join-Path -Path $docs -ChildPath "PowerShell"
 New-Item -ItemType Directory -Path $psFolder -Force | Out-Null
 $psProfile = Join-Path -Path $psFolder -ChildPath "Microsoft.PowerShell_profile.ps1"
+$psContent = ". `"$PSScriptRoot\etc\profile.ps1`""
 
 if (Test-Path -Path $psProfile) {
-    Write-Warning "'$psProfile' already exists, not overwriting"
+    if ((Get-Content -Raw -Path $psProfile).Trim() -ne $psContent.Trim()) {
+        Backup $psProfile
+        Write-Output "$psProfile -> $PSScriptRoot\etc\profile.ps1"
+        Set-Content -Path $psProfile -Value $psContent
+    }
 } else {
     Write-Output "$psProfile -> $PSScriptRoot\etc\profile.ps1"
-    Set-Content -Path $psProfile -Value ". `"$PSScriptRoot\etc\profile.ps1`""
+    Set-Content -Path $psProfile -Value $psContent
 }

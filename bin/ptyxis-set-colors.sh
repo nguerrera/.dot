@@ -2,7 +2,7 @@
 
 # My custom colors for Ptyxis (GNOME 50+)
 #
-# Imports etc/ptyxis.palette into Ptyxis and applies it to the default profile.
+# Imports etc/ptyxis-ng.palette into Ptyxis and applies it to the default profile.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PALETTE_FILE="$SCRIPT_DIR/../etc/ptyxis-ng.palette"
