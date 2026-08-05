@@ -346,6 +346,9 @@ repository checks.
   bullet items.
 - Keep prose direct and information-dense. Remove filler that does not change
   meaning, and say everything the reader needs.
+- **Register follows the file.** A guidance file is a list of rules, so it runs
+  to short sections and bullet lists. A document or a comment carries reasoning,
+  so it runs to prose.
 - **A pull request body is repository prose and a pull request comment is not.**
   The squash makes the body the commit message, so everything here governs what
   it says, and the one exception is how it is wrapped. A comment in the thread
