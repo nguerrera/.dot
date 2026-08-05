@@ -2,9 +2,9 @@
 
 The agent rules that are this repository's alone.
 
-It is a set of configuration files deployed as symlinks from a home directory on
-Arch, Ubuntu, Windows and macOS, with `deploy`, `deploy.cmd` and `deploy.ps1` as
-the entry points.
+This repository is a set of configuration files deployed as symlinks from a home
+directory on Arch, Ubuntu, Windows and macOS, with `deploy`, `deploy.cmd` and
+`deploy.ps1` as the entry points.
 
 ## Command Execution
 
