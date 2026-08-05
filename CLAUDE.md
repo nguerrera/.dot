@@ -24,12 +24,26 @@ goes.
 
 ## The trailers
 
-The two `AGENTS.md` requires are ones this harness already emits, so the default
-form is the right one. `Claude-Session:` takes the `session_...` web identifier
-rather than the local session UUID under `~/.claude/projects`, which is a
-different keyspace, so the obvious guess produces a link that resolves to
-nothing. `AGENTS.md` has the heredoc that gets a message inline, and says which
-trailer goes on a commit and which on a body.
+`AGENTS.md` requires `Co-Authored-By:` on every commit and no co-author trailer
+in the body. The trailer this harness adds to the body is the session link:
+
+```
+Claude-Session: https://claude.ai/code/session_<id>
+```
+
+It takes the `session_...` web identifier rather than the local session UUID
+under `~/.claude/projects`, which is a different keyspace, so the obvious guess
+produces a link that resolves to nothing. Both are the default form this harness
+already emits, so emitting them needs no special effort.
+
+**The link is live rather than a citation.** Opening it returns to the session
+that produced the change, from any machine, and carries on talking to it -- so a
+commit on `main` is a way back into the conversation behind it rather than a
+record that one happened. That is what earns the width in the message, ahead of
+the audit trail it also provides. It opens for the account that created it and
+costs every other reader nothing to ignore.
+
+`AGENTS.md` has the heredoc that gets a message inline.
 
 ## Skills leave nothing uncommitted
 

@@ -22,9 +22,10 @@ not expand an import has to open it.
   is identical in every repository, so a change to it is a change to all of
   them.
 - `AGENTS.CUSTOM.md`: the agent rules that are this repository's alone.
-- `CLAUDE.md` and `CLAUDE.CUSTOM.md`: Claude Code's own tools and syntax, split
-  the same way. What is in there is Claude Code's, not a rule another harness
-  has to translate.
+- A file named for a particular harness, and the `CUSTOM` counterpart beside it:
+  that tool's own syntax and mechanics, split the same way. What is in one
+  belongs to the harness it is named for. **Another harness reading it can skip
+  it**, and nothing in it is a rule anyone else has to translate.
 - If guidance changes behavior, write it in whichever file owns it, and say it
   once.
 - **Where a rule would name this repository, it belongs in a `CUSTOM` file.**
@@ -65,12 +66,15 @@ commit describe two things and the review two reviews. Work that turns out to be
 several concerns becomes a stack, each pull request based on the branch below
 it, and merging a layer lands every unmerged layer under it.
 
-**Maintenance of this repository's own meta is one concern.** Guidance, skills
-and documentation batch together into a single pull request however many files
-they touch, and however unrelated they look. Nothing bisects to a prose edit, so
-the property the rule protects is not there to protect, and a pull request per
-edit costs more attention than it returns. The condition is that the body lists
-every change in it, since a batch is only legible if something enumerates it.
+**Maintenance of this repository's own meta is one concern.** Guidance, skills,
+documentation, and whatever the repository uses to track its own work batch
+together into a single pull request however many files they touch, and however
+unrelated they look. The list is what meta happens to mean here rather than a
+closed set, so a repository keeping a kind of its own has it covered too.
+Nothing bisects to a prose edit, so the property the rule protects is not there
+to protect, and a pull request per edit costs more attention than it returns.
+The condition is that the body lists every change in it, since a batch is only
+legible if something enumerates it.
 
 One concern per pull request is the whole of history curation. Commits inside a
 branch are working notes, so commit as often as is useful and leave them untidy.
@@ -174,13 +178,20 @@ and what is left is local:
 
 ```sh
 git checkout main
-git pull --prune
+git pull --ff-only --prune
 git branch -D <branch>
 ```
 
 **The prune is what a plain `git pull` skips**, and the `[gone]` marker below
 reads wrong without it: absent until the prune runs, so a merged branch shows as
 one that was never pushed.
+
+**`--ff-only` is what keeps a merge commit off `main`.** A local `main` that has
+somehow gained a commit of its own makes a plain `git pull` merge rather than
+fast-forward, which lands on `main` something no pull request produced, in a
+workflow where the squash is meant to be the only way anything gets there.
+Refusing is the right failure: it says the tree is in a state worth looking at
+rather than quietly resolving it.
 
 A squash merge lands a commit the branch is not an ancestor of, which breaks
 every reachability test git has at once. `git branch --merged` never lists the
@@ -223,28 +234,16 @@ It is what puts the agent's avatar beside each commit in the web interface, and
 that rendering comes from the trailer rather than from anything else in the
 message.
 
-**The body carries the session link and no co-author trailer**:
+**The body carries no co-author trailer.** GitHub gathers co-authors from the
+squashed commits and appends them under a `---------` rule of its own, so a
+`Co-Authored-By:` in the body arrives twice in the landed message. Measured
+2026-08-02. It also means the trailer on the commits is what carries
+attribution, rather than being the belt to the body's braces.
 
-```
-Claude-Session: https://claude.ai/code/session_<id>
-```
-
-GitHub gathers co-authors from the squashed commits and appends them under a
-`---------` rule of its own, so a `Co-Authored-By:` in the body arrives twice in
-the landed message. Measured 2026-08-02. It also means the trailer on the
-commits is what carries attribution, rather than being the belt to the body's
-braces.
-
-**The link is live rather than a citation.** Opening it returns to the session
-that produced the change, from any machine, and carries on talking to it -- so a
-commit on `main` is a way back into the conversation behind it rather than a
-record that one happened. That is what earns the width in the message, ahead of
-the audit trail it also provides. It opens for the account that created it and
-costs every other reader nothing to ignore.
-
-**The trailers are not optional, and their form is the harness's business.** A
-trailer invented locally risks colliding with an official one later, and buys
-nothing meanwhile.
+**A harness may put its own trailer in the body**, and what that trailer is
+belongs to the harness rather than to this file. Do not invent one: a trailer
+coined locally risks colliding with an official one later, and buys nothing
+meanwhile.
 
 ## The Cold Read
 
@@ -277,8 +276,10 @@ it and push the commit. What has actually turned up:
   session wrote.
 - The same fact stated twice in one section, against "say it once".
 - An index entry that drifted from what it points at.
-- Anything the gate still reports after a formatting run: a link to a file that
-  was renamed, an anchor that no longer matches its heading.
+- Anything the gate still reports after a formatting run, such as a link to a
+  file that was renamed. What a gate covers varies, so a class of defect it
+  never checks is one the read has to catch: not every gate resolves an anchor
+  against the heading it points at.
 - A verbatim quotation whose line breaks the wrap ate.
 - Prose that only parses if you already know the superseded version -- "now a
   maintenance bill rather than a saving", or a premise resting on a role
