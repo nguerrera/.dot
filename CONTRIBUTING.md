@@ -12,6 +12,9 @@ and every pull request.
 - A fenced block keeps whatever width it came with, since a command or a
   transcript is not prose to rewrap. The non-ASCII check still reaches inside
   one.
+- YAML frontmatter is exempt from the width for the same reason: it is metadata
+  a program parses, and a skill declares its description there as one
+  deliberate line. The non-ASCII check reaches it too.
 - A line is left alone when its indent plus its longest word already passes 80.
   That is the bare URL and the deep path, which no wrap could have saved.
 - A link is checked as far as its path. `README.md#no-such-heading` passes, so a
