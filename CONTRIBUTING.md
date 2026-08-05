@@ -97,7 +97,22 @@ gh pr list --head <branch> --state all --json number,state,mergedAt
 
 `mergedAt` being set is the whole of the check. The `[gone]` marker that
 `git branch -vv` shows against a deleted upstream is a hint rather than proof,
-since a remote branch can be deleted without ever having merged.
+since a remote branch can be deleted without ever having merged. Read it after
+`git fetch --prune`, since an unpruned tracking ref shows no marker at all and a
+merged branch then looks like one that was never pushed.
+
+Then list the prefix, which should come back empty:
+
+```sh
+git branch --list 'agent/<slug>/*'
+```
+
+Deleting the branch a pull request opened from is not the same as sweeping the
+slug. Everything one agent creates lives under that prefix -- a second attempt,
+a backup taken before a rewrite -- and the steps above only ever look at a
+branch already in hand, so nothing else would surface one. What the listing
+turns up carried no pull request and is the owner's to keep or discard rather
+than a sweep's.
 
 ### Attribution and provenance
 
@@ -132,9 +147,7 @@ since a remote branch can be deleted without ever having merged.
 
 ## Agents
 
-An agent works the way this file describes, because the process is the same one
-either way. What it needs beyond that is what a person would not have to be
-told.
+What an agent needs beyond this file is what a person would not have to be told.
 
 [`AGENTS.md`](AGENTS.md) is that: the research discipline, what belongs in a
 comment versus a pull request body, what may leave this machine, and whose
