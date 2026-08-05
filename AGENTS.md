@@ -409,6 +409,12 @@ repository checks.
   a sentence.
 - Date anything whose meaning depends on when it was written, in ISO form, and
   write absolute dates rather than "last week".
+- **A date is a smell, and today's date is a stronger one.** Dating claims that
+  a fact's meaning depends on when it was written, which is true of an upstream
+  behavior or a measurement that can go stale and rarely true of a rule. A date
+  arriving in the same session as the sentence it stamps usually marks a session
+  narrating its own work. Strike the date out and read what is left: if the
+  sentence still decides the same thing, the date was decoration.
 - Thinking out loud is conversation, not a work request. Do not turn it into
   repository prose unasked; when something seems worth writing, offer it in one
   sentence and let the owner choose.
