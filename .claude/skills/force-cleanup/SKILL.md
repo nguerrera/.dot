@@ -5,11 +5,10 @@ description: Delete every agent/* branch in this repository, on the remote and l
 
 # Delete every leftover branch here
 
-`cleanup` deletes a local branch once its pull request merged, and
-`delete_branch_on_merge` had already taken the remote one. What it leaves is
-every branch whose pull request was closed unmerged or never opened, on both
-sides. Those accumulate across a stretch of not sweeping, and nothing else will
-ever go looking for them.
+`cleanup` deletes a branch on both sides once its pull request finished, merged
+or closed. What it leaves is every branch that never had one: pushed and never
+opened, or never pushed at all. Those accumulate across a stretch of not
+sweeping, and nothing else will ever go looking for them.
 
 This deletes all of them, in this repository, on the user's word that none of it
 is wanted.
@@ -104,7 +103,8 @@ Both sides go together, so neither is a backup for the other.
   `refs/pull/<n>/head` after the branch is gone, so
   `git fetch origin refs/pull/<n>/head` brings the commits back. Measured
   2026-08-05 against a pull request whose branch `delete_branch_on_merge` had
-  already deleted.
+  already deleted, and against one closed unmerged whose branch had just been
+  deleted from both sides.
 - **A branch that never had one leaves the hash, and sometimes the objects.**
   Where the local side existed, git holds the unreachable commit for
   `gc.pruneExpire`, two weeks by default, so the hash still resolves here and
@@ -117,9 +117,9 @@ Both sides go together, so neither is a backup for the other.
 One line per branch. No narration.
 
 ```
-deleted  agent/quiet-kestrel/wip   b31f0c4  both    closed unmerged  <pull request URL>
 deleted  agent/slate-marten/spike  a01f3c9  local   never pushed
 deleted  agent/copper-otter/nas    8f21a04  remote  no pull request
+deleted  agent/quiet-kestrel/wip   b31f0c4  both    closed unmerged  <pull request URL>
 ```
 
 **Which sides existed is a column**, since a branch on one side only is the
