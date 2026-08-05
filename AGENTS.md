@@ -55,11 +55,21 @@ Taking over somebody else's pull request means pushing to their branch, which
 belongs to the pull request rather than to a session. What a slug governs is
 what an agent creates.
 
+**Where a harness assigns the branch, that name is the one.** A slug governs
+what an agent chooses, so an agent handed a branch has nothing to choose and
+renaming to fit the scheme would only lose the name the harness knows it by. Say
+which branch the work is on.
+
 **Open a draft pull request when the work starts**, not when it finishes, and
 push to it freely. The branch is where the journey lives -- half-finished
 attempts, a commit that says "try the other thing", the detour that got
 reverted. None of it reaches `main`, because the merge squashes, and the closed
 pull request keeps it afterward.
+
+**Where the harness cannot open a draft, an ordinary pull request does.** What
+the rule wants is the work visible early, and nobody but the owner merges either
+one. Where the harness opens it on its own terms, that is the rule satisfied.
+Where it cannot open one at all, finish the work and report the branch.
 
 **One pull request, one concern.** Two orthogonal changes in one make the squash
 commit describe two things and the review two reviews. Work that turns out to be
