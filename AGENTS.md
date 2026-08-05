@@ -470,8 +470,11 @@ repository checks.
 - A session that writes a file commits it. A file left loose gets swept into the
   next unrelated commit, on whatever branch that turns out to be.
 
-- Write a commit message or a pull request body inline rather than through a
-  temporary file:
+- **A message goes in as text rather than through a temporary file.** What that
+  protects is a message written at the length the reasoning warrants, instead of
+  one trimmed to survive a command line. Where a harness commits through a tool
+  that takes the message as a parameter, that is the whole of the rule. Where it
+  runs `git` itself, the shape is a heredoc:
 
   ```
   git commit -m "$(cat <<'EOF'
@@ -483,8 +486,8 @@ repository checks.
   ```
 
   `gh pr create --title ... --body "$(cat <<'EOF' ... EOF )"` is the same shape.
-  Use `git commit -F` or `gh pr create --body-file` only when message size makes
-  inline input impractical.
+  Reach for `git commit -F` or `gh pr create --body-file` only when the size
+  makes inline input impractical.
 
 - **Re-read git state before acting on it or reporting it.** The owner commits,
   pushes, and edits files while a session is running, so whatever the
