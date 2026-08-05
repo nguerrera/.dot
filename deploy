@@ -30,7 +30,13 @@ fi
 
 for file in .*; do
     case $file in
-        .|..|.git*)
+        # ~/.claude holds the Claude CLI's credentials, transcripts and
+        # caches. A .claude directory here would be linked over the top of
+        # them, backing the live one out of the way. Excluding the whole
+        # directory also rules out deploying chosen files into ~/.claude the
+        # way .emacs.d is deployed, which is the trade until a file in there
+        # is worth versioning.
+        .|..|.git*|.claude)
             :
             ;;
         *)
