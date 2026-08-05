@@ -60,16 +60,12 @@ what an agent chooses, so an agent handed a branch has nothing to choose and
 renaming to fit the scheme would only lose the name the harness knows it by. Say
 which branch the work is on.
 
-**Open a draft pull request when the work starts**, not when it finishes, and
-push to it freely. The branch is where the journey lives -- half-finished
-attempts, a commit that says "try the other thing", the detour that got
-reverted. None of it reaches `main`, because the merge squashes, and the closed
-pull request keeps it afterward.
-
-**Where the harness cannot open a draft, an ordinary pull request does.** What
-the rule wants is the work visible early, and nobody but the owner merges either
-one. Where the harness opens it on its own terms, that is the rule satisfied.
-Where it cannot open one at all, finish the work and report the branch.
+**Open the pull request when the work starts**, not when it finishes, and push
+to it freely. Make it a draft if the harness has them. The branch is where the
+journey lives -- half-finished attempts, a commit that says "try the other
+thing", the detour that got reverted. None of it reaches `main`, because the
+merge squashes, and the closed pull request keeps it afterward. Where a pull
+request cannot be opened at all, finish the work and report the branch.
 
 **One pull request, one concern.** Two orthogonal changes in one make the squash
 commit describe two things and the review two reviews. Work that turns out to be
@@ -90,11 +86,13 @@ One concern per pull request is the whole of history curation. Commits inside a
 branch are working notes, so commit as often as is useful and leave them untidy.
 There is no rebasing to do and no history to rewrite.
 
-**Draft means working; ready means done.** A draft is open to review the whole
-time, so comment on one to steer it. Taking it out of draft is the author's
-claim that the work is finished, and the claim comes with a gate: read the
-cumulative diff cold, and the gate `CONTRIBUTING.md` names green. Converting
-back to draft is the right answer to a review that says it is not close.
+**Say when the work is finished**, by taking the pull request out of draft if it
+is one, and in the thread if it is not. The pull request is open to review
+throughout, so comment on one to steer it, and nothing else marks the moment the
+work stops moving. The claim comes with a gate: read the cumulative diff cold,
+and the gate `CONTRIBUTING.md` names green. Making it is the author's act rather
+than something to report and wait on, and saying the work is unfinished again is
+the right answer to a review that says it is not close.
 
 ### The pull request message
 
@@ -257,9 +255,9 @@ meanwhile.
 
 ## The Cold Read
 
-Leaving draft is gated on reading the cumulative diff cold. A person does that
-their own way. This is how an agent does it, since an agent was in the
-conversation the whole time and has no instinct to fall back on.
+Claiming the work is finished is gated on reading the cumulative diff cold. A
+person does that their own way. This is how an agent does it, since an agent was
+in the conversation the whole time and has no instinct to fall back on.
 
 Cold means the conversation is not evidence: anything on the branch was written
 by someone who was in it, and the person who reads it in six months sees only
@@ -521,9 +519,10 @@ repository checks.
 
 - **Never write to the outside world unasked.**
 - Pushing an `agent/` branch to this repository, opening the pull request it
-  carries, and replying in that pull request's thread are the normal course of
-  work and need no separate ask. This file is what authorizes them, and under
-  draft-first the push comes at the start of the work rather than at the end.
+  carries, saying in it that the work is finished, and replying in its thread
+  are the normal course of work and need no separate ask. This file is what
+  authorizes them, and the push comes at the start of the work rather than at
+  the end.
 - Everything else that leaves this machine waits to be asked for: a merge, a
   comment on somebody else's pull request or issue, an issue of one's own, a
   post to a forum, mail, a change to a repository's settings, or any other
