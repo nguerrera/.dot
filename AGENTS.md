@@ -407,13 +407,13 @@ repository checks.
   as settled fact.
 - Include a number when it decides something. Leave out numbers that only color
   a sentence.
-- Date anything whose meaning depends on when it was written, in ISO form, and
-  write absolute dates rather than "last week".
 - **A date is one tell that a sentence has drifted into that narration, and
   "used to", "previously", "originally" and "no longer" are plainer ones.** The
   narration is the defect rather than any of the words, so cutting the tell
-  leaves it standing where cutting the sentence does not. The bullet above is
-  where a date earns its place, and this does not reach it.
+  leaves it standing where cutting the sentence does not.
+- Date anything whose meaning depends on when it was written, in ISO form, and
+  write absolute dates rather than "last week". That is not the tell above: a
+  fact that can go stale under you carries its date for a reason.
 - Thinking out loud is conversation, not a work request. Do not turn it into
   repository prose unasked; when something seems worth writing, offer it in one
   sentence and let the owner choose.
