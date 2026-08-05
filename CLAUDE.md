@@ -43,7 +43,23 @@ record that one happened. That is what earns the width in the message, ahead of
 the audit trail it also provides. It opens for the account that created it and
 costs every other reader nothing to ignore.
 
-`AGENTS.md` has the heredoc that gets a message inline.
+## Getting a message in
+
+`git commit -F` truncates nothing but costs a temporary file, and a long `-m`
+loses newlines. A heredoc gets the message in as written:
+
+```
+git commit -m "$(cat <<'EOF'
+Subject line
+
+Body...
+EOF
+)"
+```
+
+`gh pr create --title ... --body "$(cat <<'EOF' ... EOF )"` is the same shape.
+Reach for `git commit -F` or `gh pr create --body-file` only where the size
+makes inline input impractical.
 
 ## Skills leave nothing uncommitted
 

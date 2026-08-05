@@ -470,24 +470,9 @@ repository checks.
 - A session that writes a file commits it. A file left loose gets swept into the
   next unrelated commit, on whatever branch that turns out to be.
 
-- **A message goes in as text rather than through a temporary file.** What that
-  protects is a message written at the length the reasoning warrants, instead of
-  one trimmed to survive a command line. Where a harness commits through a tool
-  that takes the message as a parameter, that is the whole of the rule. Where it
-  runs `git` itself, the shape is a heredoc:
-
-  ```
-  git commit -m "$(cat <<'EOF'
-  Subject line
-
-  Body...
-  EOF
-  )"
-  ```
-
-  `gh pr create --title ... --body "$(cat <<'EOF' ... EOF )"` is the same shape.
-  Reach for `git commit -F` or `gh pr create --body-file` only when the size
-  makes inline input impractical.
+- **A message is written at the length the reasoning warrants**, not trimmed to
+  whatever survives the way it gets submitted. However a harness commits is its
+  own business.
 
 - **Re-read git state before acting on it or reporting it.** The owner commits,
   pushes, and edits files while a session is running, so whatever the
