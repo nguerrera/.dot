@@ -248,6 +248,12 @@ squashed commits and appends them under a `---------` rule of its own, so a
 2026-08-02. It also means the trailer on the commits is what carries
 attribution, rather than being the belt to the body's braces.
 
+**Every other trailer survives only in the body.** The squash message is the
+title, the body, and the harvested co-authors, so a trailer written on a branch
+commit goes with the commit message GitHub discards and cannot reach `main` by
+any route. Nothing warns about it: the commits look right, the pull request
+looks right, and the loss is visible only in the landed message afterward.
+
 **A harness may put its own trailer in the body**, and what that trailer is
 belongs to the harness rather than to this file. Do not invent one: a trailer
 coined locally risks colliding with an official one later, and buys nothing

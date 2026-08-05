@@ -25,16 +25,25 @@ goes.
 ## The trailers
 
 `AGENTS.md` requires `Co-Authored-By:` on every commit and no co-author trailer
-in the body. The trailer this harness adds to the body is the session link:
+in the body. The trailer this harness adds is the session link:
 
 ```
 Claude-Session: https://claude.ai/code/session_<id>
 ```
 
-It takes the `session_...` web identifier rather than the local session UUID
-under `~/.claude/projects`, which is a different keyspace, so the obvious guess
-produces a link that resolves to nothing. Both are the default form this harness
-already emits, so emitting them needs no special effort.
+**It goes in the pull request body.** `AGENTS.md` has the mechanism: the squash
+keeps the body and harvests the co-authors, and discards every other trailer
+along with the commit messages. What is this harness's own is that its standing
+instruction is to end every commit message with both trailers, which is right
+about the co-author and reaches past where the session link survives. That
+instruction fires at `git commit`, and the body is written later by a different
+command, so a run that follows it and stops there writes the trailer twice and
+lands it zero times.
+
+The link takes the `session_...` web identifier rather than the local session
+UUID under `~/.claude/projects`, which is a different keyspace, so the obvious
+guess produces a link that resolves to nothing. Both trailers are the default
+form this harness already emits, so neither needs looking up.
 
 **The link is live rather than a citation.** Opening it returns to the session
 that produced the change, from any machine, and carries on talking to it -- so a
