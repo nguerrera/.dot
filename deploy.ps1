@@ -18,7 +18,10 @@ git config --global safe.directory "*"
 
 # Dot files
 Get-ChildItem -Path "$PSScriptRoot\.*"  | ForEach-Object {
-    if (-not $_.Name.StartsWith(".git")) {
+    # ~/.claude holds the Claude CLI's credentials, transcripts and caches.
+    # Linking it here would have the CLI write them inside this repository's
+    # checkout.
+    if (-not $_.Name.StartsWith(".git") -and $_.Name -ne ".claude") {
         $link = Join-Path -Path $env:HOME -ChildPath $_.Name
         $target = $_.FullName
         if (Test-Path $link) {
