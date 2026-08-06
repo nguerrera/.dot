@@ -504,8 +504,9 @@ repository checks.
   `sudo -n true`, `ssh-add -l`, network egress. A throwaway sandbox may grant
   passwordless `sudo`, which is a thing to find out rather than to assume either
   way.
-- Filtered egress can arrive as a DNS `REFUSED`, so an unreachable mirror reads
-  as a name that does not exist.
+- Filtered egress rarely announces itself as a refusal, so an unreachable host
+  reads as whatever the filter's own failure looks like. Suspect the policy
+  before the far side.
 - Run commands expected to take a minute or more in the background with logged
   output. Say so before running anything long in the foreground.
 - Append to logs and timestamp start and end, so a retry preserves the evidence.
