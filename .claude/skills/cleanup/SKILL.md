@@ -55,19 +55,22 @@ it is the user's call rather than a sweep's.
 Get to a current `main` first rather than requiring one. Being on a feature
 branch and being behind `origin/main` are both the ordinary state at the moment
 somebody runs this: the branch that just merged is usually the one checked out,
-and the merge that prompted the sweep is why `main` is behind.
+and the merge that prompted the sweep is why `main` is behind. Four things, in
+order: the tree is clean or the run stops, `main` is what is checked out, the
+remote's view is refreshed with deleted upstreams pruned from it before anything
+reads a tracking column, and `main` is fast-forwarded to what the remote has.
 
 ```sh
-git status --short                 # clean, or stop
+git status --short
 git checkout main
-git fetch --prune                  # before reading the tracking column
-git merge --ff-only origin/main    # refuses a diverged main, which is a stop
+git fetch --prune
+git merge --ff-only origin/main
 ```
 
-Stop only for what the sweep cannot fix: a dirty tree, or a `main` that
-`--ff-only` refuses because it carries commits of its own. The premise of the
-sweep is that `main` is what landed, and the fast-forward is how that becomes
-true rather than a condition to be met beforehand.
+Stop only for what the sweep cannot fix: a dirty tree, or a `main` that will not
+fast-forward because it carries commits of its own. The premise of the sweep is
+that `main` is what landed, and the fast-forward is how that becomes true rather
+than a condition to be met beforehand.
 
 Then read both sides. Locally that is every branch other than `main`. On the
 remote it is the prefix this workflow creates and nothing else, since the remote
@@ -80,17 +83,18 @@ git ls-remote --heads origin 'refs/heads/agent/*'
 
 Ask GitHub about each name that came up, and sort:
 
-- **Its pull request merged.** Delete it wherever it is:
-  `git branch -D <branch>` locally, `git push origin --delete <branch>` where
-  the remote still carries it. The capital is the normal case here, per
-  `AGENTS.md`, not a hazard being overridden.
+- **Its pull request merged.** Delete it wherever it is: locally with
+  `git branch -D <branch>`, and on the remote with
+  `git push origin --delete <branch>` where it is still carried there. Forcing
+  the local delete is the normal case here, per `AGENTS.md`, rather than a
+  hazard being overridden.
 - **Its pull request was closed unmerged.** Delete it the same way, on the
   ground above.
 - **Its pull request is open.** Keep it. Work in flight.
 - **It has no pull request.** Keep it and report it. Never pushed, or pushed and
   never opened, so nothing else holds it.
 
-One `push --delete` and one `branch -D` carry every branch.
+Each side is one deletion call however many branches it carries.
 
 ## Sweeping the slug is not deleting the branch
 
