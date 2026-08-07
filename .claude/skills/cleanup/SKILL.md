@@ -123,9 +123,9 @@ report it and stop.
 One line per ref and nothing else. No narration, no summary paragraph.
 
 ```
-deleted  agent/slate-marten/workflow  f089d6a  local   merged as #2
-deleted  agent/copper-otter/nas       8f21a04  both    #11 closed unmerged
-kept     agent/quiet-kestrel/wip      b31f0c4  local   no pull request, never pushed
+deleted  agent/4b71a2/workflow  f089d6a  local   merged as #2
+deleted  agent/9c03fe/nas       8f21a04  both    #11 closed unmerged
+kept     agent/d15e07/wip       b31f0c4  local   no pull request, never pushed
 ```
 
 **Which sides existed is a column**, since a branch on one side only is the

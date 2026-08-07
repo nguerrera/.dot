@@ -117,9 +117,9 @@ Both sides go together, so neither is a backup for the other.
 One line per branch. No narration.
 
 ```
-deleted  agent/slate-marten/spike  a01f3c9  local   never pushed
-deleted  agent/copper-otter/nas    8f21a04  remote  no pull request
-deleted  agent/quiet-kestrel/wip   b31f0c4  both    closed unmerged  <pull request URL>
+deleted  agent/4b71a2/spike  a01f3c9  local   never pushed
+deleted  agent/9c03fe/nas    8f21a04  remote  no pull request
+deleted  agent/d15e07/wip    b31f0c4  both    closed unmerged  <pull request URL>
 ```
 
 **Which sides existed is a column**, since a branch on one side only is the

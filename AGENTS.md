@@ -37,28 +37,46 @@ not expand an import has to open it.
 Work on a branch, open a pull request, and let it be reviewed. That is the whole
 of it.
 
-An agent's branch is `agent/<slug>/<what>`. **The slug identifies rather than
-describes**: two arbitrary words, `amber-heron` or `slate-marten`, with what the
-branch is for going in `<what>`. A slug naming the work defeats its own purpose,
-because the next agent on that subject coins the same one -- and then one prefix
-holds two agents' branches, so neither whose branch this is nor what one agent
-made has an answer any more.
+An agent's branch is `agent/<slug>/<what>`, with what the branch is for going in
+`<what>`. **The slug identifies rather than describes, and it comes from the
+shell rather than from the agent**: six hex digits, asked of whatever the host
+has.
 
-**One slug per agent, a nested one included**, checked with
-`git ls-remote --heads origin 'agent/<slug>/*'` before first use. Everything one
-agent creates lives under it: the branch its pull request opens from, a second
-attempt, a backup taken before a rewrite. That makes an agent's whole output one
-prefix to list and one prefix to sweep, and it makes whose branch this is a
-question the name answers.
+```sh
+openssl rand -hex 3
+```
+
+```powershell
+'{0:x6}' -f (Get-Random -Maximum 0x1000000)
+```
+
+**An agent cannot coin one.** Asked for an arbitrary word it returns its modal
+word, and every session shares the mode, so slugs cluster where they are meant
+to scatter: one of them collected seventeen pull requests over three days,
+measured 2026-08-07. Six hex digits are sixteen million values drawn from
+outside the agent, which makes a distinct slug a property of the scheme rather
+than an intention an agent has to carry out.
+
+**The randomness is the rule and a command is one instance of it.** Either line
+above asks the host for three bytes, and a shell carrying neither asks with
+whatever it does carry. `openssl` is the one thing this file names that a shell
+may not have on its path: on Windows it arrives with Git Bash rather than with
+PowerShell.
+
+**One slug per agent, a nested one included.** Everything one agent creates
+lives under it: the branch its pull request opens from, a second attempt, a
+backup taken before a rewrite. That makes an agent's whole output one prefix to
+list and one prefix to sweep, and it makes whose branch this is a question the
+name answers.
 
 Taking over somebody else's pull request means pushing to their branch, which
 belongs to the pull request rather than to a session. What a slug governs is
 what an agent creates.
 
-**Where a harness assigns the branch, that name is the one.** A slug governs
-what an agent chooses, so an agent handed a branch has nothing to choose and
-renaming to fit the scheme would only lose the name the harness knows it by. Say
-which branch the work is on.
+**Where a harness assigns the branch, that name is the one.** A slug governs the
+branches an agent opens for itself, so an agent handed a branch has none to
+open, and renaming to fit the scheme would only lose the name the harness knows
+it by. Say which branch the work is on.
 
 **Open the pull request when the work starts**, not when it finishes, and push
 to it freely. Make it a draft if the harness has them. The branch is where the
@@ -101,6 +119,15 @@ lands, so the body carries the reasoning for the change and the evidence behind
 any claim it makes, exactly as a commit message would. Write the subject as a
 plain sentence -- a capital letter, no full stop, no category prefix like
 `docs:` -- which is the form a branch commit's subject takes as well.
+
+**Keep the subject short.** git-commit(1) asks for "a single short (no more than
+50 characters) line summarizing the change", and the squash makes the pull
+request title exactly that line. Aim at 50 and treat 72 as the ceiling,
+remembering that GitHub appends ` (#N)` to what you wrote. A subject that will
+not fit is usually two concerns or a body sentence that wandered upward: say the
+narrower thing and let the first line of the body carry the full statement. The
+length binds the title alone, since a branch commit's subject is a working note
+the squash discards and stopping mid-work to shorten one buys nothing.
 
 **The body describes the change, not the process that produced it.** No citing
 the rule that allowed a batch, no noting which convention is being followed. A
