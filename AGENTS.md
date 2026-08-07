@@ -141,6 +141,17 @@ the end is how it gets forgotten, and a reviewer reads it to know what they are
 looking at. Verification evidence goes stale silently in particular: a run named
 in the body has to be the run that covers the last commit.
 
+**The body names no commit from the branch.** The squash lands none of them, and
+a clone of `main` fetches none of them, so a SHA written in the body arrives in
+the landed message as something `git show` answers with nothing:
+`git cat-file -t` on a merged branch's head fails in a fresh clone, measured
+2026-08-07. GitHub resolves it for as long as `refs/pull/<n>/head` survives,
+which is what keeps the loss invisible from the pull request page, where the
+same SHA is a working link. Name what was verified rather than the commit it ran
+against -- the gate green on the finished branch rather than "gate clean
+`a1c0d`" -- and identify a change by pull request number, which resolves from
+anywhere and outlives the objects.
+
 **Do not hard wrap the body**, which is the one exception to the width
 everything else wraps at. A browser reflows it to the width of the window, so
 hard-wrapped prose renders jagged against a soft-wrapped edge. Write each
@@ -209,7 +220,8 @@ own work. Check it after every merge into a stack.
 
 **The repository owner reviews and merges.** Nothing reaches `main` any other
 way. `delete_branch_on_merge` is on, so the remote branch goes with the merge
-and what is left is local:
+and what is left is local: get onto `main`, fast-forward it to what landed,
+prune the remote-tracking refs, and delete the branch.
 
 ```sh
 git checkout main
@@ -527,6 +539,12 @@ repository checks.
 
 ## Command Execution
 
+- **A command line in guidance is one way to satisfy the rule above it.** What
+  binds is the property -- the tree is clean, the pull request's own state says
+  it merged -- and `git` and `gh` are how a shell asks for it. An agent reaching
+  git and GitHub some other way, a server speaking the API among them, satisfies
+  the same rule through that, and the translation is its own business rather
+  than a departure to report.
 - Detect what the host will allow before branching on it, rather than assuming:
   `sudo -n true`, `ssh-add -l`, network egress. A throwaway sandbox may grant
   passwordless `sudo`, which is a thing to find out rather than to assume either

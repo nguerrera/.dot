@@ -33,6 +33,9 @@ something they decided about.
 
 ## The one check
 
+Ask GitHub for every pull request open in this repository, with the URL of each,
+the branch it is on, and whether it is a draft.
+
 ```sh
 gh pr list --state open --json url,isDraft,headRefName
 ```
@@ -52,6 +55,10 @@ deletion.
 
 ## The sweep
 
+Four steps: every `agent/*` branch the remote carries, every one held locally
+with the commit each points at, then the remote set deleted and the local set
+deleted.
+
 ```sh
 git ls-remote --heads origin 'refs/heads/agent/*'
 git branch --list 'agent/*' --format='%(refname:short) %(objectname:short)'
@@ -59,14 +66,15 @@ git push origin --delete <branch> <branch> ...
 git branch -D <branch> <branch> ...
 ```
 
-`ls-remote` reads the remote itself, so nothing has to be fetched first and a
-stale checkout does not matter. Record the hashes both listings print before
-deleting anything.
+Reading the remote's refs directly is what makes a fetch unnecessary and a stale
+checkout harmless. Record the hashes both listings print before deleting
+anything.
 
-**`-D` takes a capital because a squash merge broke ancestry**, which is the
-normal case for every branch this workflow produces rather than a hazard being
-overridden here. The sides are independent: a branch can exist on one and not
-the other, and each is deleted where it is found.
+**A local delete here overrides the safety check every time.** A squash merge
+broke ancestry, so the guarded delete refuses every branch this workflow
+produces, and forcing it -- the capital in `-D` -- is the normal case rather
+than a hazard being overridden here. The sides are independent: a branch can
+exist on one and not the other, and each is deleted where it is found.
 
 **A branch that is checked out cannot be deleted.** Get to `main` before the
 local pass, and where a worktree holds one:
@@ -93,7 +101,7 @@ a deleted branch, and a branch matching nothing had no pull request at all.
 whatever else a listing turns up, and a branch that is neither `main` nor under
 `agent/` is reported and left.
 
-One `push --delete` and one `branch -D` carry every branch.
+Each side is one deletion call however many branches it carries.
 
 ## What a deletion costs
 
