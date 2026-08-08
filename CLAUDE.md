@@ -42,8 +42,12 @@ lands it zero times.
 
 The link takes the `session_...` web identifier rather than the local session
 UUID under `~/.claude/projects`, which is a different keyspace, so the obvious
-guess produces a link that resolves to nothing. Both trailers are the default
-form this harness already emits, so neither needs looking up.
+guess produces a link that resolves to nothing.
+
+**A session that is not remote controllable has no web identifier**, and that is
+fine: leave the trailer off rather than substitute the UUID. Where a session has
+one, both trailers are the default form this harness already emits, so neither
+needs looking up.
 
 **The link is live rather than a citation.** Opening it returns to the session
 that produced the change, from any machine, and carries on talking to it -- so a
