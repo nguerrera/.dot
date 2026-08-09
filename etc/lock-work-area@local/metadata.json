@@ -1,0 +1,7 @@
+{
+  "uuid": "lock-work-area@local",
+  "name": "Lock Work Area",
+  "description": "Keeps the work area's top edge fixed while the session is locked, so windows are not pushed down by the stock top bar's strut appearing when panel extensions are disabled at lock. Works around dash-to-panel issue #2395.",
+  "shell-version": ["50"],
+  "session-modes": ["user", "unlock-dialog"]
+}
