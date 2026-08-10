@@ -333,15 +333,15 @@ it and push the commit. What has actually turned up:
   file that was renamed. What a gate covers varies, so a class of defect it
   never checks is one the read has to catch: not every gate resolves an anchor
   against the heading it points at.
-- A verbatim quotation whose line breaks the wrap ate.
+- What a rewrap moved, where the repository's tooling does one. A verbatim
+  quotation loses the line breaks the wrap ate. Text landing at the start of a
+  line can parse as markup -- `Remote - SSH` broken after "Remote" becomes
+  `\- SSH` -- and the escape is correct but reads as damage, so reword to keep
+  the phrase off the break.
 - Prose that only parses if you already know the superseded version -- "now a
   maintenance bill rather than a saving", or a premise resting on a role
   something was about to take and no longer is. This is the commonest finding
   after a decision changes.
-- A backslash the formatter added. Rewrapping can land text at the start of a
-  line where it would parse as markup -- `Remote - SSH` broken after "Remote"
-  becomes `\- SSH` -- and the escape is correct but reads as damage. Reword so
-  the phrase does not sit on the break.
 - **A term the change renamed, surviving in prose the diff never touched.**
   Vocabulary drifts one section at a time, so the copy that contradicts is
   usually three sections away from the copy that was fixed.
