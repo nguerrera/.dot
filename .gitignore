@@ -9,6 +9,9 @@
 # ignore byte-compiled elisp
 *.elc
 
+# ignore byte-compiled python
+__pycache__/
+
 # ignore all the transient stuff in .emacs.d/
 .emacs.d/*
 !.emacs.d/init.el
