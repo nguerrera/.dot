@@ -80,7 +80,7 @@ class WikiError(Exception):
 
 
 def default_cache(env: Mapping[str, str]) -> Path:
-    """Where a downloaded copy lives. Same precedence as the lab's directory.
+    """Where a downloaded copy lives.
 
     A cache directory because every byte is a re-download away, and because
     that is the one place a program may write without asking.
