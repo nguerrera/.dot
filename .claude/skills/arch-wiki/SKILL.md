@@ -14,7 +14,7 @@ whole of it is static HTML on disk. Reach for this before the web.
 library and nothing else, so it works the same on every host.
 
 ```sh
-python .claude/skills/arch-wiki/wiki.py search dm-crypt          # titles
+python .claude/skills/arch-wiki/wiki.py search dm-crypt             # titles
 python .claude/skills/arch-wiki/wiki.py search luksHeaderBackup -f  # and bodies
 python .claude/skills/arch-wiki/wiki.py read Dm-crypt/Device_encryption
 python .claude/skills/arch-wiki/wiki.py status
@@ -58,8 +58,8 @@ nothing but HTML.
 English only. The package carries 60-odd languages and 236 MB, and the other 143
 MB answer no question asked here.
 
-Unpacking needs `bsdtar`, which reads `.tar.zst` natively, since the standard
-library gained zstd only in Python 3.14.
+Unpacking needs `bsdtar`, which reads `.tar.zst` natively. The standard library
+gained zstd in Python 3.14, and this runs on whatever interpreter a host has.
 
 ## Citing what it says
 
