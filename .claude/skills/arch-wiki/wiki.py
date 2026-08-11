@@ -66,9 +66,10 @@ HTTP_TIMEOUT = 60
 # one to stop waiting on, because the copy on disk is already the answer.
 PROBE_TIMEOUT = 5
 
-# How far a cached copy may trail the current package before it is refetched.
-# A week, because the package is rebuilt every few days and a copy inside that
-# window is as likely as not to be the current one already.
+# How far a cached copy may trail the current package before it is refetched,
+# and how long an answer about what is published is kept. A week, because a
+# week of drift on a snapshot of a wiki changes no answer anybody asks it, and
+# the alternative is spending 19 MB on the pages moving underneath.
 STALE_DAYS = 7
 
 # The date in a package filename: arch-wiki-docs-20260702-1-any.pkg.tar.zst.
@@ -110,6 +111,37 @@ def _stamp(env: Mapping[str, str]) -> Path:
     return default_cache(env) / "package"
 
 
+def _checked(env: Mapping[str, str]) -> Path:
+    """The day this last learned what the current package is.
+
+    A download and a probe that got an answer both write it, being the same
+    fact arrived at two ways.
+    """
+    return default_cache(env) / "checked"
+
+
+def last_check(env: Mapping[str, str] | None = None) -> date | None:
+    """When the copy on disk was last measured against the published one.
+
+    None where nothing has been recorded -- a cache written before this was
+    kept -- and where the file holds something this did not write.
+    """
+    try:
+        stored = _checked(os.environ if env is None else env).read_text().strip()
+    except OSError:
+        return None
+    try:
+        return date.fromisoformat(stored)
+    except ValueError:
+        return None
+
+
+def _record_check(env: Mapping[str, str], day: date) -> None:
+    path = _checked(env)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(f"{day.isoformat()}\n")
+
+
 def populated(root: Path) -> bool:
     return (root / LANGUAGE).is_dir()
 
@@ -144,13 +176,16 @@ def ensure(env: Mapping[str, str] | None = None, today: date | None = None) -> P
     the thing being asked for is 19 MB and two seconds.
     """
     e = os.environ if env is None else env
+    day = today or date.today()
     root = find(e)
     if root is None:
-        return fetch(e)
-    if _worth_probing(e, root, today or date.today()) and behind(
-        version(e), latest_package()
-    ):
-        return fetch(e)
+        return fetch(e, day)
+    if _worth_probing(e, root, day):
+        latest = latest_package()
+        if behind(version(e), latest):
+            return fetch(e, day)
+        if latest is not None:
+            _record_check(e, day)
     return root
 
 
@@ -158,11 +193,23 @@ def _worth_probing(env: Mapping[str, str], root: Path, today: date) -> bool:
     """Whether asking the network what the current package is could change the
     answer.
 
-    The wall clock decides whether to ask at all, which is what keeps the
-    promise that nothing here touches the network once a copy is here. Upstream
-    cannot have published later than today, so a copy less than STALE_DAYS old
-    cannot be more than STALE_DAYS behind whatever is current, and the request
-    would be spent to learn nothing.
+    The wall clock decides whether to ask at all, and it measures from the
+    later of two dates. One is the snapshot's own: upstream cannot have
+    published later than today, so a package built inside the window cannot be
+    more than STALE_DAYS behind whatever is current, however long ago it was
+    downloaded and whatever has been asked since. The
+    other is the last check this made, which is what keeps a copy that is
+    current but not new from paying a round trip on every command. Upstream
+    rebuilds when it rebuilds -- the 20260702 package was still the published
+    one on 2026-08-11 -- and by the package date alone every day of a stretch
+    like that looks like a reason to ask again.
+
+    SO THE CHECK IS RATE-LIMITED RATHER THAN EXACT. Between two checks the
+    published package can move out of reach without this noticing, which puts
+    the copy up to a week further behind than the window says before a fetch
+    replaces it. That is the trade: a week of drift on a snapshot of a wiki,
+    against a request in front of every search on a host that is otherwise
+    reading its own disk.
 
     Only a copy this downloaded is a candidate. An installed tree is pacman's
     and stays current with the system; an ARCH_WIKI tree is the caller's.
@@ -180,7 +227,9 @@ def _worth_probing(env: Mapping[str, str], root: Path, today: date) -> bool:
     stamped = package_date(v)
     if stamped is None:
         return False
-    return (today - stamped).days > STALE_DAYS
+    checked = last_check(env)
+    known = max(stamped, checked) if checked else stamped
+    return (today - known).days > STALE_DAYS
 
 
 def latest_package(timeout: int = PROBE_TIMEOUT) -> str | None:
@@ -235,7 +284,7 @@ def behind(cached: str | None, latest: str | None) -> bool:
 # ------------------------------------------------------------------- fetch
 
 
-def fetch(env: Mapping[str, str] | None = None) -> Path:
+def fetch(env: Mapping[str, str] | None = None, today: date | None = None) -> Path:
     """Download the package and extract the English pages into the cache.
 
     EXTRACTED ASIDE AND THEN RENAMED. `populated()` is the flag that says a
@@ -296,6 +345,11 @@ def fetch(env: Mapping[str, str] | None = None) -> Path:
         package.unlink(missing_ok=True)
 
     _stamp(e).write_text(f"{name}\n")
+    # The download answered the question a probe asks, so it counts as a check.
+    # Without this the first search after a fetch probes again, and a fetch of
+    # a package that upstream built months ago probes on every command after
+    # that until upstream builds another one.
+    _record_check(e, today or date.today())
     print(f"{name}: {len(pages(root))} pages in {root}", file=sys.stderr)
     return root
 
@@ -825,6 +879,24 @@ class StalenessTest(Tree):
         self.stamp(self.NAME)
         self.assertTrue(_worth_probing(self.env, self.root, date(2026, 8, 1)))
 
+    def test_an_old_package_checked_recently_is_not(self):
+        """A package built in July can still be the published one in August,
+        and by its own date alone it looks worse every day."""
+        self.stamp(self.NAME)
+        _record_check(self.env, date(2026, 8, 1))
+        self.assertFalse(_worth_probing(self.env, self.root, date(2026, 8, 5)))
+
+    def test_a_check_older_than_the_window_does_not_hold(self):
+        self.stamp(self.NAME)
+        _record_check(self.env, date(2026, 8, 1))
+        self.assertTrue(_worth_probing(self.env, self.root, date(2026, 8, 9)))
+
+    def test_a_check_this_did_not_write_is_ignored(self):
+        self.stamp(self.NAME)
+        _checked(self.env).write_text("yesterday\n")
+        self.assertIsNone(last_check(self.env))
+        self.assertTrue(_worth_probing(self.env, self.root, date(2026, 8, 1)))
+
     def test_the_probe_reads_the_filename_it_is_redirected_to(self):
         response = mock.MagicMock()
         response.url = f"https://mirror.example/{self.NAME}"
@@ -841,6 +913,38 @@ class StalenessTest(Tree):
         self.stamp(self.NAME)
         with mock.patch("urllib.request.urlopen", side_effect=OSError("offline")):
             self.assertEqual(ensure(self.env, date(2026, 7, 5)), self.root)
+
+    def answering(self):
+        """A HEAD that reports the package the cached copy already holds."""
+        response = mock.MagicMock()
+        response.url = f"https://mirror.example/{self.NAME}"
+        response.__enter__.return_value = response
+        return mock.patch("urllib.request.urlopen", return_value=response)
+
+    def test_a_probe_that_found_nothing_newer_answers_the_next_command(self):
+        """The one this is for: several searches in a row cost one request
+        between them rather than one apiece."""
+        _page(self.root, "Btrfs", "<p>x</p>")
+        self.stamp(self.NAME)
+        with self.answering() as urlopen:
+            ensure(self.env, date(2026, 8, 1))
+            self.assertEqual(urlopen.call_count, 1)
+            ensure(self.env, date(2026, 8, 1))
+            ensure(self.env, date(2026, 8, 5))
+            self.assertEqual(urlopen.call_count, 1)
+            ensure(self.env, date(2026, 8, 9))
+            self.assertEqual(urlopen.call_count, 2)
+
+    def test_a_probe_the_network_could_not_answer_is_not_a_check(self):
+        """Learning nothing is not learning the copy is current, and a host
+        that was offline for one command may be online for the next."""
+        _page(self.root, "Btrfs", "<p>x</p>")
+        self.stamp(self.NAME)
+        with mock.patch("urllib.request.urlopen", side_effect=OSError()) as urlopen:
+            ensure(self.env, date(2026, 8, 1))
+            ensure(self.env, date(2026, 8, 1))
+            self.assertEqual(urlopen.call_count, 2)
+        self.assertIsNone(last_check(self.env))
 
 
 class TitleTest(Tree):
