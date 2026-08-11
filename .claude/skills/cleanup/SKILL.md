@@ -20,17 +20,19 @@ breaks every reachability test at once: `git branch --merged` never lists it,
 `git branch -d` refuses it, and `git merge-base --is-ancestor` says no. All
 three are answering a question about history that squashing made unanswerable.
 
-The authoritative test is the pull request's own state:
+The authoritative test is the pull request's own state, asked once for the whole
+repository rather than once per branch:
 
 ```sh
-gh pr list --head <branch> --state all --json number,state,mergedAt
+gh pr list --state all --limit 200 --json number,state,mergedAt,headRefName
 ```
 
 `mergedAt` set is the whole of the merge check, `state` separates a closed pull
-request from an open one, and no rows at all is the branch that never had one. A
-`[gone]` upstream is a hint rather than proof -- a remote branch can be deleted
-without merging -- and it is absent entirely until a prune has run, so before
-that a merged branch reads as one that was never pushed.
+request from an open one, `headRefName` is what matches a row back to a branch,
+and no rows at all is the branch that never had one. A `[gone]` upstream is a
+hint rather than proof -- a remote branch can be deleted without merging -- and
+it is absent entirely until a prune has run, so before that a merged branch
+reads as one that was never pushed.
 
 ## A pull request is a second copy
 
@@ -57,8 +59,8 @@ branch and being behind `origin/main` are both the ordinary state at the moment
 somebody runs this: the branch that just merged is usually the one checked out,
 and the merge that prompted the sweep is why `main` is behind. Four things, in
 order: the tree is clean or the run stops, `main` is what is checked out, the
-remote's view is refreshed with deleted upstreams pruned from it before anything
-reads a tracking column, and `main` is fast-forwarded to what the remote has.
+remote's view is refreshed with deleted upstreams pruned from it, and `main` is
+fast-forwarded to what the remote has.
 
 ```sh
 git status --short
@@ -74,27 +76,44 @@ than a condition to be met beforehand.
 
 Then read both sides. Locally that is every branch other than `main`. On the
 remote it is the prefix this workflow creates and nothing else, since the remote
-is shared ground and a sweep has no business deleting what it did not put there:
+is shared ground and a sweep has no business deleting what it did not put there.
+Those two listings and GitHub's answer go to `branches.py` beside this file,
+which sorts them and prints the report below, each command's output as it came:
 
 ```sh
-git branch --format='%(refname:short) %(upstream:track)'
-git ls-remote --heads origin 'refs/heads/agent/*'
+tmp=$(mktemp -d)
+git branch --format='%(refname:short) %(objectname:short)' > $tmp/local.txt
+git ls-remote --heads origin 'refs/heads/agent/*' > $tmp/remote.txt
+gh pr list --state all --limit 200 \
+  --json number,state,mergedAt,headRefName > $tmp/pulls.json
+python3 .claude/skills/cleanup/branches.py \
+  $tmp/local.txt $tmp/remote.txt $tmp/pulls.json
 ```
 
-Ask GitHub about each name that came up, and sort:
+**The three listings go outside the tree.** Written into it they would be left
+behind for the next commit to sweep up, and this run has already checked that
+the tree is clean -- so a sweep that wrote them there would dirty the tree it
+just approved, and stop the next sweep on a mess it made itself.
 
-- **Its pull request merged.** Delete it wherever it is: locally with
-  `git branch -D <branch>`, and on the remote with
+**The local listing asks for the hash**, which the report prints against
+everything deleted, and the snippet leaves `main` out of the sweep.
+
+What the sort says, and why:
+
+- **Its pull request merged**, or **was closed unmerged.** Delete it wherever it
+  is: locally with `git branch -D <branch>`, and on the remote with
   `git push origin --delete <branch>` where it is still carried there. Forcing
   the local delete is the normal case here, per `AGENTS.md`, rather than a
   hazard being overridden.
-- **Its pull request was closed unmerged.** Delete it the same way, on the
-  ground above.
 - **Its pull request is open.** Keep it. Work in flight.
 - **It has no pull request.** Keep it and report it. Never pushed, or pushed and
   never opened, so nothing else holds it.
+- **Its pull requests disagree**, a reused branch carrying a merged one and an
+  open one at once. Keep it and report it. Nothing above covers that case, and a
+  sweep resolving it would be deciding rather than sorting.
 
-Each side is one deletion call however many branches it carries.
+The snippet names the deletions and makes none of them. Each side is then one
+deletion call however many branches it carries.
 
 ## Sweeping the slug is not deleting the branch
 
