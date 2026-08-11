@@ -38,8 +38,11 @@ python3 .claude/skills/arch-wiki/wiki.py fetch
   manual way to take a newer snapshot.
 
 `search` and `read` fetch a missing copy first, and refresh one that has fallen
-more than a week behind the published package. Nothing touches the network once
-a copy is here and current.
+more than a week behind the published package. Asking what is published costs a
+HEAD request, and the answer is kept for a week, so a copy that is here and
+current is read off disk and reaches the network at most once every seven days.
+A copy that a newer package has since left behind is replaced up to a week later
+than the window says, which is what buys the silence between checks.
 
 ## Where the pages come from
 
