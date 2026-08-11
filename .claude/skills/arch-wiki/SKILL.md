@@ -52,16 +52,7 @@ grep -rn -A3 luksHeaderBackup "$WIKI/Dm-crypt"
 article. Grep with context, or strip the tags where the noise gets in the way:
 
 ```sh
-python3 -c 'import html.parser,re,sys
-class P(html.parser.HTMLParser):
-    def __init__(s):
-        super().__init__(); s.out=[]; s.skip=0
-    def handle_starttag(s,t,a): s.skip += t in ("script","style")
-    def handle_endtag(s,t): s.skip -= t in ("script","style")
-    def handle_data(s,d):
-        if not s.skip: s.out.append(d)
-p=P(); p.feed(open(sys.argv[1]).read())
-print(re.sub(r"\n{3,}","\n\n","".join(p.out)))' "$WIKI/Dm-crypt.html"
+python .claude/skills/arch-wiki/strip.py "$WIKI/Dm-crypt.html"
 ```
 
 **Where an `arch-wiki` command is on `PATH` it does all of the above more
