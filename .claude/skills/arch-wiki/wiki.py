@@ -6,11 +6,11 @@ SKILL.md beside this file has when to reach for the wiki and how to cite it.
 This is the reading: getting the pages onto the host, keeping that copy current,
 searching them, and rendering one.
 
-    python .claude/skills/arch-wiki/wiki.py search dm-crypt
-    python .claude/skills/arch-wiki/wiki.py search luksHeaderBackup -f
-    python .claude/skills/arch-wiki/wiki.py read Dm-crypt/Device_encryption
-    python .claude/skills/arch-wiki/wiki.py status
-    python .claude/skills/arch-wiki/wiki.py fetch
+    python3 .claude/skills/arch-wiki/wiki.py search dm-crypt
+    python3 .claude/skills/arch-wiki/wiki.py search luksHeaderBackup -f
+    python3 .claude/skills/arch-wiki/wiki.py read Dm-crypt/Device_encryption
+    python3 .claude/skills/arch-wiki/wiki.py status
+    python3 .claude/skills/arch-wiki/wiki.py fetch
 
 `arch-wiki-docs` is an `any`-architecture package -- static HTML, no
 architecture, no scriptlets, nothing built -- so having it on a host with no

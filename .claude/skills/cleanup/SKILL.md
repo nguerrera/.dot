@@ -81,12 +81,19 @@ Those two listings and GitHub's answer go to `branches.py` beside this file,
 which sorts them and prints the report below, each command's output as it came:
 
 ```sh
-git branch --format='%(refname:short) %(objectname:short)' > local.txt
-git ls-remote --heads origin 'refs/heads/agent/*' > remote.txt
+tmp=$(mktemp -d)
+git branch --format='%(refname:short) %(objectname:short)' > $tmp/local.txt
+git ls-remote --heads origin 'refs/heads/agent/*' > $tmp/remote.txt
 gh pr list --state all --limit 200 \
-  --json number,state,mergedAt,headRefName > pulls.json
-python .claude/skills/cleanup/branches.py local.txt remote.txt pulls.json
+  --json number,state,mergedAt,headRefName > $tmp/pulls.json
+python3 .claude/skills/cleanup/branches.py \
+  $tmp/local.txt $tmp/remote.txt $tmp/pulls.json
 ```
+
+**The three listings go outside the tree.** Written into it they would be left
+behind for the next commit to sweep up, and this run has already checked that
+the tree is clean -- so a sweep that wrote them there would dirty the tree it
+just approved, and stop the next sweep on a mess it made itself.
 
 **The local listing asks for the hash**, which the report prints against
 everything deleted, and the snippet leaves `main` out of the sweep.

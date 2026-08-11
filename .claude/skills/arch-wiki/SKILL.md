@@ -14,11 +14,11 @@ whole of it is static HTML on disk. Reach for this before the web.
 library and nothing else, so it works the same on every host.
 
 ```sh
-python .claude/skills/arch-wiki/wiki.py search dm-crypt             # titles
-python .claude/skills/arch-wiki/wiki.py search luksHeaderBackup -f  # and bodies
-python .claude/skills/arch-wiki/wiki.py read Dm-crypt/Device_encryption
-python .claude/skills/arch-wiki/wiki.py status
-python .claude/skills/arch-wiki/wiki.py fetch
+python3 .claude/skills/arch-wiki/wiki.py search dm-crypt             # titles
+python3 .claude/skills/arch-wiki/wiki.py search luksHeaderBackup -f  # and bodies
+python3 .claude/skills/arch-wiki/wiki.py read Dm-crypt/Device_encryption
+python3 .claude/skills/arch-wiki/wiki.py status
+python3 .claude/skills/arch-wiki/wiki.py fetch
 ```
 
 - **`search` walks the titles**, ranked: an exact title, then one that starts

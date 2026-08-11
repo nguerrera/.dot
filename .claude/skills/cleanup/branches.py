@@ -10,7 +10,7 @@ rather than made.
     git ls-remote --heads origin 'refs/heads/agent/*' > remote.txt
     gh pr list --state all --limit 200 \
       --json number,state,mergedAt,headRefName > pulls.json
-    python .claude/skills/cleanup/branches.py local.txt remote.txt pulls.json
+    python3 .claude/skills/cleanup/branches.py local.txt remote.txt pulls.json
 
 The three commands go in as they came out, so nothing between them has to be
 converted by hand.
