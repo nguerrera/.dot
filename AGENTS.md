@@ -1,46 +1,52 @@
 # AGENTS.md
 
-Agent rules for this repository. Every rule here is one any agent can carry out,
-wherever it is running, and this file reads the same in every repository the
-owner keeps.
+Rules for agents working here. Everything holds anywhere, and this file is
+identical in every repository the owner keeps.
 
-Read `CONTRIBUTING.md` first. It has this repository's commands, what each does,
-and the gate a change has to pass.
-
-**Then read `AGENTS.CUSTOM.md`, which is this repository's own and overrides
-anything here it disagrees with.** It is imported below, and a harness that does
-not expand an import has to open it.
+Read `CONTRIBUTING.md` for this repository's commands and gate. Then read
+`AGENTS.CUSTOM.md`, which is this repository's own and wins where the two
+disagree.
 
 - @AGENTS.CUSTOM.md
 
-## Scope Of These Files
+## Write these files short
 
-- `CONTRIBUTING.md`: this repository's commands, prerequisites and gate, and the
-  rough edges in its tooling. It is a lookup rather than a process, and it
-  belongs to this repository alone.
-- `AGENTS.md`: the working process and every agent rule that holds anywhere. It
-  is identical in every repository, so a change to it is a change to all of
-  them.
-- `AGENTS.CUSTOM.md`: the agent rules that are this repository's alone.
-- A file named for a particular harness, and the `CUSTOM` counterpart beside it:
-  that tool's own syntax and mechanics, split the same way. What is in one
-  belongs to the harness it is named for. **Another harness reading it can skip
-  it**, and nothing in it is a rule anyone else has to translate.
-- If guidance changes behavior, write it in whichever file owns it, and say it
-  once.
-- **Where a rule would name this repository, it belongs in a `CUSTOM` file.**
-  The shared files carry no hostname, no account name, and no repository name,
-  which is what lets them be copied rather than reconciled.
+Guidance and skills are instructions to follow, not a case to argue. Lead with
+the rule, and add a reason only where an agent would otherwise get it wrong.
 
-## How A Change Gets Made
+Cut on sight:
 
-Work on a branch, open a pull request, and let it be reviewed. That is the whole
-of it.
+- The sentence answering an objection nobody raised.
+- The restatement of the previous sentence in a fresh figure.
+- The clause that emphasizes the sentence it hangs off rather than adding to it.
+- The aside about what something is not, or is not merely.
+- The paragraph explaining why the rule above it is a good rule.
+- The date a rule was measured, which sends the next session to re-derive it
+  instead of following it. A source read still carries its date.
+- The rule or reason that exists because of one past incident. This is narration
+  with no tell in it, so ask instead whether an agent would go wrong unprompted.
 
-An agent's branch is `agent/<slug>/<what>`, with what the branch is for going in
-`<what>`. **The slug identifies rather than describes, and it comes from the
-shell rather than from the agent**: six hex digits, asked of whatever the host
-has.
+The test is whether deleting it would make an agent do the wrong thing.
+
+## Which file owns a rule
+
+- `CONTRIBUTING.md` -- this repository's commands, gate and tooling quirks.
+- `AGENTS.md` -- the working process and every rule that holds anywhere. A
+  change here changes every repository.
+- `AGENTS.CUSTOM.md` -- the rules that are this repository's alone.
+- A file named for a harness, with its `CUSTOM` counterpart -- that tool's own
+  syntax. Other harnesses skip it.
+
+Say a rule once, in the file that owns it. A rule naming this repository goes in
+a `CUSTOM` file, so the shared files carry no hostname, account name or
+repository name and can be copied instead of reconciled.
+
+## How a change gets made
+
+Work on a branch, open a pull request, let it be reviewed.
+
+Name the branch `agent/<slug>/<what>`, with a slug of six random hex digits from
+the shell:
 
 ```sh
 openssl rand -hex 3
@@ -50,178 +56,79 @@ openssl rand -hex 3
 '{0:x6}' -f (Get-Random -Maximum 0x1000000)
 ```
 
-**An agent cannot coin one.** Asked for an arbitrary word it returns its modal
-word, and every session shares the mode, so slugs cluster where they are meant
-to scatter: one of them collected seventeen pull requests over three days,
-measured 2026-08-07. Six hex digits are sixteen million values drawn from
-outside the agent, which makes a distinct slug a property of the scheme rather
-than an intention an agent has to carry out.
-
-**The randomness is the rule and a command is one instance of it.** Either line
-above asks the host for three bytes, and a shell carrying neither asks with
-whatever it does carry. `openssl` is the one thing this file names that a shell
-may not have on its path: on Windows it arrives with Git Bash rather than with
-PowerShell.
-
-**One slug per agent, a nested one included.** Everything one agent creates
-lives under it: the branch its pull request opens from, a second attempt, a
-backup taken before a rewrite. That makes an agent's whole output one prefix to
-list and one prefix to sweep, and it makes whose branch this is a question the
-name answers.
-
-Taking over somebody else's pull request means pushing to their branch, which
-belongs to the pull request rather than to a session. What a slug governs is
-what an agent creates.
-
-**Where a harness assigns the branch, that name is the one.** A slug governs the
-branches an agent opens for itself, so an agent handed a branch has none to
-open, and renaming to fit the scheme would only lose the name the harness knows
-it by. Say which branch the work is on.
-
-**Open the pull request when the work starts**, not when it finishes, and push
-to it freely. Make it a draft if the harness has them. The branch is where the
-journey lives -- half-finished attempts, a commit that says "try the other
-thing", the detour that got reverted. None of it reaches `main`, because the
-merge squashes, and the closed pull request keeps it afterward. Where a pull
-request cannot be opened at all, finish the work and report the branch.
-
-**One pull request, one concern.** Two orthogonal changes in one make the squash
-commit describe two things and the review two reviews. Work that turns out to be
-several concerns becomes a stack, each pull request based on the branch below
-it, and merging a layer lands every unmerged layer under it.
-
-**Maintenance of this repository's own meta is one concern.** Guidance, skills,
-documentation, and whatever the repository uses to track its own work batch
-together into a single pull request however many files they touch, and however
-unrelated they look. The list is what meta happens to mean here rather than a
-closed set, so a repository keeping a kind of its own has it covered too.
-Nothing bisects to a prose edit, so the property the rule protects is not there
-to protect, and a pull request per edit costs more attention than it returns.
-The condition is that the body lists every change in it, since a batch is only
-legible if something enumerates it.
-
-One concern per pull request is the whole of history curation. Commits inside a
-branch are working notes, so commit as often as is useful and leave them untidy.
-There is no rebasing to do and no history to rewrite.
-
-**Say when the work is finished**, by taking the pull request out of draft if it
-is one, and in the thread if it is not. The pull request is open to review
-throughout, so comment on one to steer it, and nothing else marks the moment the
-work stops moving. The claim comes with a gate: read the cumulative diff cold,
-and the gate `CONTRIBUTING.md` names green. Making it is the author's act rather
-than something to report and wait on, and saying the work is unfinished again is
-the right answer to a review that says it is not close.
+- **One slug per agent, nested agents included.** Every branch an agent creates
+  lives under its prefix.
+- Where a harness assigns the branch, use that name and say which branch the
+  work is on. Taking over somebody's pull request means pushing to their branch.
+- **Open the pull request when the work starts**, as a draft if the harness has
+  them, and push to it freely. Where none can be opened, finish the work and
+  report the branch.
+- **One pull request, one concern.** Work that turns out to be several becomes a
+  stack, each layer based on the one below, and merging a layer lands every
+  unmerged layer under it.
+- **Maintenance of this repository's own meta is one concern** -- guidance,
+  skills, documentation, work tracking -- however many files it touches. The
+  body must list every change in it.
+- Commits inside a branch are working notes: commit as often as is useful, leave
+  them untidy, rewrite nothing.
+- **Say when the work is finished**: undraft the pull request and say so in the
+  thread, after reading the cumulative diff cold and getting the gate green.
+  Saying it is unfinished again answers a review that says it is not close.
 
 ### The pull request message
 
-**The pull request title and body are the commit message.** The squash is what
-lands, so the body carries the reasoning for the change and the evidence behind
-any claim it makes, exactly as a commit message would. Write the subject as a
-plain sentence -- a capital letter, no full stop, no category prefix like
-`docs:` -- which is the form a branch commit's subject takes as well.
+**The title and body are the commit message**, since the squash is what lands,
+so the body carries the reasoning and the evidence behind any claim.
 
-**Keep the subject short.** git-commit(1) asks for "a single short (no more than
-50 characters) line summarizing the change", and the squash makes the pull
-request title exactly that line. Aim at 50 and treat 72 as the ceiling,
-remembering that GitHub appends ` (#N)` to what you wrote. A subject that will
-not fit is usually two concerns or a body sentence that wandered upward: say the
-narrower thing and let the first line of the body carry the full statement. The
-length binds the title alone, since a branch commit's subject is a working note
-the squash discards and stopping mid-work to shorten one buys nothing.
+- Write the subject as a plain sentence: a capital, no full stop, no `docs:`
+  prefix, 50 characters with 72 the ceiling, and GitHub appends ` (#N)`.
+- A subject that will not fit is two concerns, or a body sentence that wandered
+  upward.
+- Describe the change, not the process that produced it.
+- Keep the body current as the branch changes; a run named as evidence has to
+  cover the last commit.
+- **Name no commit from the branch.** A SHA in the body resolves to nothing on
+  `main` while still working from the pull request page, so the loss is
+  invisible where you would check it. Identify a change by pull request number.
+- **Do not hard wrap it**, the one exception to the 80-column wrap. Write each
+  paragraph as one long line.
 
-**The body describes the change, not the process that produced it.** No citing
-the rule that allowed a batch, no noting which convention is being followed. A
-reader on `main` in two years wants the change; spending the first sentence on
-the workflow spends the sentence that decides whether they read the rest.
-
-**Keep the body current as the branch changes.** It describes what will land
-rather than what was intended when the work started, so a branch that gains a
-concern or revises a claim has its body updated in the same round. Leaving it to
-the end is how it gets forgotten, and a reviewer reads it to know what they are
-looking at. Verification evidence goes stale silently in particular: a run named
-in the body has to be the run that covers the last commit.
-
-**The body names no commit from the branch.** The squash lands none of them, and
-a clone of `main` fetches none of them, so a SHA written in the body arrives in
-the landed message as something `git show` answers with nothing:
-`git cat-file -t` on a merged branch's head fails in a fresh clone, measured
-2026-08-07. GitHub resolves it for as long as `refs/pull/<n>/head` survives,
-which is what keeps the loss invisible from the pull request page, where the
-same SHA is a working link. Name what was verified rather than the commit it ran
-against -- the gate green on the finished branch rather than "gate clean
-`a1c0d`" -- and identify a change by pull request number, which resolves from
-anywhere and outlives the objects.
-
-**Do not hard wrap the body**, which is the one exception to the width
-everything else wraps at. A browser reflows it to the width of the window, so
-hard-wrapped prose renders jagged against a soft-wrapped edge. Write each
-paragraph as one long line and let GitHub break it, which it does when it builds
-the squash commit message.
-
-Since the squash discards the branch's own commit messages, a change's story
-splits three ways, and each part has one home:
-
-- **The body** is what landed and why -- the commit message someone reading
-  `main` will find years later.
-- **The thread** is how it got there: what was tried, what a review changed,
-  what was ruled out.
-- **The branch commits** are working notes and reach nothing.
+**The body** is what landed and why, **the thread** is how it got there, and
+**the branch commits** reach nothing.
 
 ### Review
 
-**Answer review comments by pushing more commits to the same branch**, and by
-replying in the thread. Never a force-push and never a fresh pull request: the
-squash means extra commits cost nothing, and a reviewer who cannot see what
-changed since their last look has to read all of it again.
-
-**Act on a comment only where its premise holds and you have checked that it
-does. Reply on everything else.** A premise verification refutes and a premise
-nobody has checked yet are the same case: neither is something to commit
-against. Say what you checked and how, or say plainly that you could not check
-it, and leave the branch alone until the reviewer has rethought and asked again.
-
-Acting anyway commits a decision they have not made, and it puts the
-disagreement in a commit message, where it gets argued with the reviewer instead
-of to them. A thread is the cheap place to be wrong; a branch is not.
-
-Recording a measurement is not acting on one. Writing down what a command
-returned rests on a premise just verified, and it is often the thing that was
-asked for. **The tell is grammatical**: a sentence reporting what was measured
-is a measurement, and a sentence turning on "therefore" or "belongs" is a
-decision wearing a measurement's clothes.
-
-One held-back item does not hold up the rest of the batch. Everything whose
-premise checks out still lands in the same round.
+- **Answer review comments by pushing more commits to the same branch**, and by
+  replying in the thread. Never force-push and never open a fresh pull request.
+- **Act on a comment only where you have checked that its premise holds.** Reply
+  on everything else, saying what you checked or that you could not, and leave
+  the branch alone until the reviewer asks again.
+- A premise you refuted and a premise nobody has checked are the same case.
+- **Recording a measurement is not acting on one.** The tell is grammatical: a
+  sentence reporting what a command returned is a measurement, and one turning
+  on "therefore" or "belongs" is a decision.
+- One held-back item does not hold up the rest of the batch.
 
 ### Stacks
 
-Restacking is the one force-push there is. When a lower layer of a stack gains
-commits, the layers above it are rebased onto it and pushed with
-`--force-with-lease`, because that is the only way their base moves. It rewrites
-nothing a reviewer has already read on the layer itself, which is what separates
-it from force-pushing a branch a reviewer has read.
+Restacking is the one force-push there is, with `--force-with-lease`.
 
-**Restack again once the layer below merges**, and before anything else. The
-squash creates a commit that is not an ancestor of the layers above it, so
-GitHub retargets their base to `main` and leaves their content untouched --
-which offers the merged work a second time, deletions included. Rebase onto the
-tip the layer was based on:
+**Restack when the layer below merges, before anything else.** The squash
+creates a commit the upper layers are not descended from, so GitHub retargets
+them to `main` and offers the merged work a second time, deletions included:
 
 ```sh
 git rebase --onto origin/main <old base tip> <branch>
 git push --force-with-lease
 ```
 
-Nothing warns about this. The pull request reports `mergeable_state: clean`
-throughout, and the only symptom is a changed-file count larger than the layer's
-own work. Check it after every merge into a stack.
+Nothing warns about this: `mergeable_state` reads `clean` throughout, and the
+only symptom is a changed-file count larger than the layer's own work.
 
 ### Merging and cleanup
 
-**The repository owner reviews and merges.** Nothing reaches `main` any other
-way. `delete_branch_on_merge` is on, so the remote branch goes with the merge
-and what is left is local: get onto `main`, fast-forward it to what landed,
-prune the remote-tracking refs, and delete the branch.
+**The repository owner reviews and merges.** `delete_branch_on_merge` is on, so
+what is left afterwards is local:
 
 ```sh
 git checkout main
@@ -229,34 +136,12 @@ git pull --ff-only --prune
 git branch -D <branch>
 ```
 
-**The prune is what a plain `git pull` skips**, and the `[gone]` marker below
-reads wrong without it: absent until the prune runs, so a merged branch shows as
-one that was never pushed.
-
-**`--ff-only` is what keeps a merge commit off `main`.** A local `main` that has
-somehow gained a commit of its own makes a plain `git pull` merge rather than
-fast-forward, which lands on `main` something no pull request produced, in a
-workflow where the squash is meant to be the only way anything gets there.
-Refusing is the right failure: it says the tree is in a state worth looking at
-rather than quietly resolving it.
-
-A squash merge lands a commit the branch is not an ancestor of, which breaks
-every reachability test git has at once. `git branch --merged` never lists the
-branch, `git branch -d` refuses it, and `git merge-base --is-ancestor` says no.
-**That is why the delete takes a capital.** It is the normal case for every
-branch this workflow produces rather than a hazard being overridden on an
-unusual one.
-
-It is also why nothing git says settles whether the work landed. The pull
-request's own state does, and it does not rest on ancestry:
+Nothing git says settles whether the work landed. The pull request does, and
+`mergedAt` being set is the whole check:
 
 ```sh
 gh pr list --head <branch> --state all --json number,state,mergedAt
 ```
-
-`mergedAt` being set is the whole of the check. The `[gone]` marker that
-`git branch -vv` shows against a deleted upstream is a hint rather than proof,
-since a remote branch can be deleted without ever having merged.
 
 Then list the prefix, which should come back empty:
 
@@ -264,340 +149,233 @@ Then list the prefix, which should come back empty:
 git branch --list 'agent/<slug>/*'
 ```
 
-**Deleting the branch a pull request opened from is not sweeping the slug.**
-Everything one agent creates lives under that prefix -- a second attempt, a
-backup taken before a rewrite -- and the steps above all take the branch name as
-given, so none of them asks whether the prefix holds anything else. What the
-listing turns up is the owner's to keep or discard rather than a sweep's.
+**Deleting the branch is not sweeping the slug**, since every step above takes a
+branch name as given. What the listing turns up is the owner's to keep or
+discard.
 
-### Attribution and provenance
+### Attribution
 
-A commit written with an agent carries a `Co-Authored-By:` trailer naming it.
-The log says how the repository was written, which is the practice rather than
-something to manage.
+- **Every commit carries a `Co-Authored-By:` trailer** naming the agent, working
+  notes included. The trailer is what renders the agent's avatar beside it.
+- **The body carries no co-author trailer.** GitHub harvests them from the
+  squashed commits and appends them under a `---------` rule, so one in the body
+  lands twice.
+- **Every other trailer survives only in the body.** The squash message is the
+  title, the body and the harvested co-authors, so a trailer on a branch commit
+  cannot reach `main` by any route, and nothing warns about it.
+- A harness may put its own trailer in the body.
 
-**The trailer goes on every commit even though the commits are working notes.**
-It is what puts the agent's avatar beside each commit in the web interface, and
-that rendering comes from the trailer rather than from anything else in the
-message.
+## The cold read
 
-**The body carries no co-author trailer.** GitHub gathers co-authors from the
-squashed commits and appends them under a `---------` rule of its own, so a
-`Co-Authored-By:` in the body arrives twice in the landed message. Measured
-2026-08-02. It also means the trailer on the commits is what carries
-attribution, rather than being the belt to the body's braces.
-
-**Every other trailer survives only in the body.** The squash message is the
-title, the body, and the harvested co-authors, so a trailer written on a branch
-commit goes with the commit message GitHub discards and cannot reach `main` by
-any route. Nothing warns about it: the commits look right, the pull request
-looks right, and the loss is visible only in the landed message afterward.
-
-**A harness may put its own trailer in the body**, and what that trailer is
-belongs to the harness rather than to this file. Do not invent one: a trailer
-coined locally risks colliding with an official one later, and buys nothing
-meanwhile.
-
-## The Cold Read
-
-Claiming the work is finished is gated on reading the cumulative diff cold. A
-person does that their own way. This is how an agent does it, since an agent was
-in the conversation the whole time and has no instinct to fall back on.
-
-Cold means the conversation is not evidence: anything on the branch was written
-by someone who was in it, and the person who reads it in six months sees only
-the files.
+Before claiming the work is finished, read the cumulative diff cold. Cold means
+the conversation is not evidence.
 
 - **Read every changed file end to end, not the changed sections.** A diff of
-  pure additions cannot show a contradiction with a paragraph that was already
-  there, and that is where most of them are. A decision made in one section goes
-  stale in another the diff never touched, through several reads that covered
-  only what had changed.
+  pure additions cannot show a contradiction with a paragraph it never touched.
 - Then read what the new text cross-references, and the index entries pointing
   at it.
-- A claim that only makes sense because of something said in chat is a finding,
-  not a memory to fill in from.
+- A claim that only makes sense because of something said in chat is a finding.
 
-**An inconsistency is a disagreement.** The files contradict each other, or a
-file contradicts itself, or the text contradicts the repository's own rules. Fix
-it and push the commit. What has actually turned up:
+**An inconsistency is a disagreement**: the files contradict each other, or a
+file contradicts itself, or the text contradicts the repository's rules. Fix it
+and push. What has turned up:
 
 - A section opening with a claim its own later prose exempts something from.
-- A table column header that is false for one row, or a column carrying two
-  kinds of value so one row reads differently.
-- A summary in one file contradicting a reconciliation in another that the same
-  session wrote.
-- The same fact stated twice in one section, against "say it once".
+- A table column header false for one row, or carrying two kinds of value.
+- A summary in one file contradicting a reconciliation in another.
+- The same fact stated twice in one section.
 - An index entry that drifted from what it points at.
-- Anything the gate still reports after a formatting run, such as a link to a
-  file that was renamed. What a gate covers varies, so a class of defect it
-  never checks is one the read has to catch: not every gate resolves an anchor
-  against the heading it points at.
-- What a rewrap moved, where the repository's tooling does one. A verbatim
-  quotation loses the line breaks the wrap ate. Text landing at the start of a
-  line can parse as markup -- `Remote - SSH` broken after "Remote" becomes
-  `\- SSH` -- and the escape is correct but reads as damage, so reword to keep
-  the phrase off the break.
-- Prose that only parses if you already know the superseded version -- "now a
-  maintenance bill rather than a saving", or a premise resting on a role
-  something was about to take and no longer is. This is the commonest finding
-  after a decision changes.
-- **A term the change renamed, surviving in prose the diff never touched.**
-  Vocabulary drifts one section at a time, so the copy that contradicts is
-  usually three sections away from the copy that was fixed.
+- Anything the gate still reports after a formatting run, and any anchor the
+  gate does not resolve.
+- What a rewrap moved, where the tooling does one: a quotation loses the line
+  breaks the wrap ate, and text landing at the start of a line can parse as
+  markup, as `Remote - SSH` broken after "Remote" becomes `\- SSH`. Reword to
+  keep the phrase off the break.
+- Prose that only parses if you know the superseded version, such as "now a
+  maintenance bill rather than a saving". This is the commonest finding after a
+  decision changes.
+- **A term the change renamed, surviving in prose the diff never touched.** The
+  copy that contradicts is usually three sections from the copy that was fixed.
 
-**An omission is something the files need that never came up.** Do not write it.
-Ask, one question at a time, showing the text that would land, and mean the
-option to write nothing: most omissions are correctly omitted, and a repository
-that answers every question a stranger could ask is padding. Something the
-conversation already covered is not an omission -- it was discussed and
-deliberately left out, so it stays out.
+**An omission is something the files need that never came up.** Do not write it:
+ask, one question at a time, showing the text that would land, and mean the
+option to write nothing. Something the conversation covered and left out stays
+out.
 
-**A misplacement is live prose that has stopped deciding anything.** Raise it
-like an omission, one at a time, since where it moves to is the owner's call and
-a section is easier to argue about than to reinstate. It looks like a survey of
-options against a choice that is now firm, a dated record whose conclusions are
-already stated as decisions elsewhere, a section that says so itself
-("conditional on X being reconsidered, which the decision above rules out"), or
-anything a reader has to wade through to reach the design. Then watch for the
-sections that borrowed the moved one's vocabulary -- they read fine to whoever
-moved it and cold to everyone else.
+**A misplacement is live prose that has stopped deciding anything** -- a survey
+of options against a firm choice, a dated record whose conclusions are stated as
+decisions elsewhere, anything a reader wades through to reach the design. Raise
+it like an omission, then check the sections that borrowed its vocabulary.
 
-**Any fix earns another read of what it touched**, end to end, plus anything its
-new text points at. Files the fix left alone were already read and stay done.
-**The read right after your own fix is the one most likely to be fake**: you
-wrote that text a minute ago, which puts you further from the stranger it is for
-rather than closer, and the finding that catches you is somewhere else in the
-file.
+**Any fix earns another read of what it touched**, plus anything its new text
+points at; files the fix left alone stay done. **The read right after your own
+fix is the one most likely to be fake**, so the finding that catches you is
+somewhere else in the file.
 
 Skipping a later read is allowed. Saying you made one is not.
 
-## Writing Style
+## Writing style
 
 Prose wraps at 80 columns. Spelling is US English -- `behavior`, `recognized`,
-`license`, `optimization` -- and quoted material keeps whatever its source
-wrote. Write ASCII: `--` rather than an em dash, `...` rather than an ellipsis,
-`->` rather than an arrow, with output from a tool underneath passing through as
-it comes. **Which of these a gate enforces varies, so none of them is a rule the
-gate is trusted to remember for you**; `CONTRIBUTING.md` says what this
-repository checks.
+`license`, `optimization`. Write ASCII: `--` for an em dash, `...` for an
+ellipsis, `->` for an arrow. Quoted material and tool output keep whatever they
+came with. `CONTRIBUTING.md` says which of these the gate checks; assume none.
 
-- **Repository prose does not speak in the first person.** No "I", "my", "mine",
-  "me", and no "we", "our", or "us" either, in a document, a comment, a guidance
-  file, or a pull request body. Name the thing, and where nothing fits, passive
-  voice is the lesser evil.
-- The reason is attribution rather than register. Repository prose is authored
-  by the account that pushed it, so a first-person sentence has the owner
-  asserting something in their own voice that a session may have arrived at by
-  misreading them, and nobody has the bandwidth to stand behind every sentence
-  that lands. Third person leaves the sentence honest about where it came from.
-- Chat replies are exempt, and a reply takes whatever voice suits it. So is
-  anything the repository is carrying rather than saying: a quotation, and a
-  draft of text meant to be published elsewhere. Those are the artifact, and
-  rewriting one damages it.
-- Start sentences with capital letters and end them with periods, including
-  bullet items.
-- Keep prose direct and information-dense. Remove filler that does not change
-  meaning, and say everything the reader needs.
-- **Register follows the file.** A guidance file is a list of rules, so it runs
-  to short sections and bullet lists. A document or a comment carries reasoning,
-  so it runs to prose.
+- **No first person** in a document, comment, guidance file or pull request body
+  -- no "I", "we", "our", "us". Name the thing, or fall back on passive voice.
+  Repository prose is authored by the account that pushed it, so a first-person
+  sentence has the owner asserting in their own voice something a session may
+  have reached by misreading them.
+- Chat replies are exempt, and so is anything the repository is carrying rather
+  than saying: a quotation, or a draft meant to be published elsewhere.
+- Start sentences with capitals and end them with periods, bullets included.
+- **Register follows the file.** A guidance file is short sections and bullets;
+  a document or comment carries reasoning, so it runs to prose.
 - **A pull request body is repository prose and a pull request comment is not.**
-  The squash makes the body the commit message, so everything here governs what
-  it says, and the one exception is how it is wrapped. A comment in the thread
-  is conversation and takes the voice a chat reply takes, where warmth is doing
-  work rather than padding.
-- Say what something is, not what it is not. Contrast earns its place only where
-  a reader would otherwise land on the wrong answer.
-- Where it earns its place, vary how it is built. A consequence often says more
-  than a denial: "device paths move between boots" over "not device paths".
-- A phrase that keeps turning up wants varying too, "load-bearing" among them.
-  Write "useless" for "vacuous".
-- Leave out the defense against an accusation nobody made: "X is not ceremony",
-  "not merely tidiness", "the difference is not pedantry". Nothing here is
-  decoration, so saying it of one thing implies it of the rest. Open with the
-  reason the sentence was already carrying.
+  A comment takes the voice of a chat reply.
+- Say what something is, not what it is not. A consequence beats a denial:
+  "device paths move between boots" over "not device paths".
+- Vary a phrase that keeps turning up, "load-bearing" among them. Write
+  "useless" for "vacuous".
+- Leave out the defense against an accusation nobody made -- "X is not
+  ceremony", "not merely tidiness" -- and open with the reason the sentence was
+  already carrying.
 - Leave out the restatement that reaches a consequence through its own subject:
   "a lab that needs three secrets remembered is a lab that gets driven by hand".
   Say the consequence.
-- Capitals mark a hazard worth stopping at, not a heading. Shout where getting
-  it wrong fails silently; write an ordinary sentence everywhere else. What is
-  shouted says what a thing is, with any contrast in the prose under it.
-- Keep bullet lists flat, and prefer unnumbered lists. Number only when order or
-  reference matters.
+- **Capitals mark a hazard, not a heading.** Shout where getting it wrong fails
+  silently.
+- Keep bullet lists flat and unnumbered. Number only where order or reference
+  matters.
 - Set a verbatim quotation off as a blockquote, or in quotation marks where the
   format has none.
-- A table earns its place when the same handful of fields repeat across rows.
-- A comment says what the code cannot: the constraint that decides a value, the
+- A table earns its place when the same fields repeat across rows.
+- **A comment says what the code cannot**: the constraint behind a value, the
   failure a check catches, the upstream behavior being worked around. Code that
   speaks for itself gets none.
-- Comments describe the code as it stands. The story of the change -- what was
-  tried, what was ruled out, what it used to be -- goes in the pull request
-  body.
-- Keep a hazard the code prevents, phrased as what the code is for rather than
-  as an anecdote. A regression test may name the bug that prompted it, in terms
-  that still exist.
+- Comments describe the code as it stands, and what was tried and ruled out goes
+  in the pull request body. A hazard the code prevents stays, phrased as what
+  the code is for, and a regression test may name its bug.
 
-## Where Knowledge Goes
+## Where knowledge goes
 
-- Put durable conventions in these versioned files, not in ephemeral agent
-  memory.
+- Put durable conventions in these versioned files, not in agent memory.
 - Update guidance when it becomes wrong.
-- Say it once in the canonical location.
-- **A document describes the plan as it stands.** The story of how it got there
-  -- what it used to be, which document promoted a recommendation to a
-  requirement, what the first draft said -- goes in the pull request body, which
-  is the message that lands and the only one anybody reads later. Rewriting a
-  superseded decision as the merits of the current one is the work; a reader
-  implementing from a document should not have to carry a settled argument to
-  understand what to build.
+- Say it once, in the canonical location.
+- **A document describes the plan as it stands**, and how it got there goes in
+  the pull request body. A reader implementing from a document should not have
+  to carry a settled argument.
 - Keep what still decides something: a measurement, an upstream behavior, a
-  constraint's reason. A dated findings section is a record of what was measured
-  and stays as it was written. What goes is the narration of a change of mind.
+  constraint's reason. A dated findings section stays as written; what goes is
+  the narration of a change of mind.
 - A discarded option earns a line where somebody would otherwise propose it
-  again, saying what it costs. It does not earn the story of when it lost.
-- Leave out the worry that has not happened yet. When something is deferred, say
-  so and say what symptom would reopen it, rather than filing it as an open
-  question that implies work is owed.
-- A guess is labeled as a guess or left out, because an unmarked one reads later
-  as settled fact.
-- Include a number when it decides something. Leave out numbers that only color
-  a sentence.
-- **A date is one tell that a sentence has drifted into that narration, and
-  "used to", "previously", "originally" and "no longer" are plainer ones.** The
-  narration is the defect rather than any of the words, so cutting the tell
-  leaves it standing where cutting the sentence does not.
-- Date anything whose meaning depends on when it was written, in ISO form, and
-  write absolute dates rather than "last week". That is not the tell above: a
-  fact that can go stale under you carries its date for a reason.
-- Thinking out loud is conversation, not a work request. Do not turn it into
-  repository prose unasked; when something seems worth writing, offer it in one
-  sentence and let the owner choose.
+  again, saying what it costs, and not the story of when it lost.
+- Leave out a worry that has not happened. Where something is deferred, say what
+  symptom would reopen it.
+- Label a guess as a guess, or leave it out.
+- Include a number when it decides something.
+- **"used to", "previously", "originally" and "no longer" are tells of
+  narration**, and so is a date. Cut the sentence, not just the tell, and watch
+  for the narration that carries neither.
+- Date anything whose meaning depends on when it was written, in ISO form and
+  absolute. That is not the tell above: a fact that can go stale carries its
+  date for a reason.
+- Thinking out loud is conversation. Offer it in one sentence and let the owner
+  choose.
 
-## Research Discipline
+## Research discipline
 
-- Separate what was measured, what was read, and what was reasoned. A claim that
-  blurs the three cannot be rechecked.
-- Verify documentary claims from primary sources: the project's own
-  documentation, the manual page, the specification, the vendor's page. Quote
-  exactly where the wording decides the answer.
-- Give the date read for anything from the web, and name the source in the text
-  as well as linking it. The name survives a dead link.
-- Verify mechanical claims by running something, where running it is cheap. What
-  a command actually prints beats reasoning about what it would.
+- Separate what was measured, what was read, and what was reasoned.
+- Verify documentary claims from primary sources, and quote exactly where the
+  wording decides the answer.
+- Give the date read, and name the source in the text as well as linking it,
+  since the name survives a dead link.
+- Verify mechanical claims by running something, where running it is cheap.
 - Label an unverified claim as unverified and say how to verify it.
-- Report a search that found nothing as a search that found nothing. Absence of
-  a result is a result, and inventing a plausible answer to fill the gap is the
-  one unrecoverable failure.
-- **Absence from one interface is not absence from the system.** A reference
-  listing what an API offers is authoritative about that API and silent about
-  the rest, so where a thing looks impossible, ask the schema what the system
-  can express. A page that does not mention a mechanism has not ruled it out.
+- **Report a search that found nothing as a search that found nothing.**
+  Inventing a plausible answer is the one unrecoverable failure.
+- **Absence from one interface is not absence from the system.** A reference is
+  authoritative about its own API and silent about the rest, so ask the schema
+  what the system can express.
 - **Prove it with the smallest disposable artifact.** A throwaway pull request
   settles against a live service in minutes what documentation leaves open.
-  Build the thing that can be deleted, and delete it.
-- **Hand the owner anything behind a login, and let them find what is stale.**
-  The account is theirs, so they are the one who can reach it; the benefit worth
-  naming is the second one. Reading one fact out of a vendor portal turns up the
-  redesigned site, the enrollment to redo, and the firmware behind on the unit,
-  none of which the answer needed and all of which matter. An agent routing
-  around a login gets the fact and buries the rest.
-- **Ask the owner to read a panel.** What a front-panel display, a label on the
-  back of a device, or a switch position says is a measurement no command
-  reaches, and they are standing next to it. Ask before writing a physical fact
-  off as unreadable.
-- The owner's recollection is a prior rather than a source. It is worth testing
-  before it is worth arguing with, since checking usually costs one command and
-  it decides what to check first. It never makes a claim verified, and a result
-  that comes back mixed is reported as mixed.
-- A delegated agent's report is evidence, not a source. Check whatever a
-  conclusion rests on before it lands in the repository.
-- Read the output you got rather than the one you expected. Summarizing a
-  command from memory of an earlier run describes a state that may no longer
-  exist, and it reads exactly like one that was checked.
-- Cite where a reader would otherwise have to take the repository's word for it,
-  not once per sentence.
+- **Hand the owner anything behind a login.** Reading one fact out of a vendor
+  portal turns up the redesigned site, the enrollment to redo and the firmware
+  behind on the unit, and an agent routing around the login buries all of it.
+- **Ask the owner to read a panel.** What a front-panel display, a label, or a
+  switch position says is a measurement no command reaches.
+- The owner's recollection is a prior, worth testing before arguing with. It
+  never makes a claim verified, and a mixed result is reported as mixed.
+- A delegated agent's report is evidence, not a source: check what a conclusion
+  rests on before it lands in the repository.
+- Read the output you got rather than the one you expected.
+- Cite where a reader would otherwise take the repository's word for it, not
+  once per sentence.
 
-## Writing A Message Git Or GitHub Will Keep
+## Git and GitHub state
 
-- A session that writes a file commits it. A file left loose gets swept into the
-  next unrelated commit, on whatever branch that turns out to be.
+- **A session that writes a file commits it**, or it gets swept into the next
+  unrelated commit on whatever branch that turns out to be.
+- Write a message at the length the reasoning warrants. How a harness gets it in
+  is the harness's business.
+- **Re-read git state before acting on it or reporting it**, since the owner
+  commits and edits files while a session runs. `git fetch` and `git status -sb`
+  are the whole check, and neither is optional before amending, resetting or
+  rebasing.
 
-- **A message is written at the length the reasoning warrants**, not trimmed to
-  whatever survives the way it gets submitted. However a harness commits is its
-  own business.
-
-- **Re-read git state before acting on it or reporting it.** The owner commits,
-  pushes, and edits files while a session is running, so whatever the
-  conversation established earlier is a guess by the time it is used.
-  `git fetch` and `git status -sb` cost nothing and are the whole check.
-  Reporting a branch as four commits ahead is a claim about now, not about when
-  it was last looked at.
-
-- That check is not optional before amending, resetting, or rebasing. Restacking
-  is the one rewrite this workflow asks for, and the section above bounds it.
-
-## Command Execution
+## Running commands
 
 - **A command line in guidance is one way to satisfy the rule above it.** What
-  binds is the property -- the tree is clean, the pull request's own state says
-  it merged -- and `git` and `gh` are how a shell asks for it. An agent reaching
-  git and GitHub some other way, a server speaking the API among them, satisfies
-  the same rule through that, and the translation is its own business rather
-  than a departure to report.
-- Detect what the host will allow before branching on it, rather than assuming:
-  `sudo -n true`, `ssh-add -l`, network egress. A throwaway sandbox may grant
-  passwordless `sudo`, which is a thing to find out rather than to assume either
-  way.
-- Filtered egress rarely announces itself as a refusal, so an unreachable host
-  reads as whatever the filter's own failure looks like. Suspect the policy
+  binds is the property -- the tree is clean, the pull request says it merged.
+- Detect what the host allows before branching on it: `sudo -n true`,
+  `ssh-add -l`, network egress.
+- **Filtered egress rarely announces itself as a refusal**, so an unreachable
+  host reads as whatever the filter's own failure looks like. Suspect the policy
   before the far side.
-- Run commands expected to take a minute or more in the background with logged
-  output. Say so before running anything long in the foreground.
+- Run anything expected to take a minute or more in the background with logged
+  output, and say so before running anything long in the foreground.
 - Append to logs and timestamp start and end, so a retry preserves the evidence.
-- The exit code of `cmd > log; echo "EXIT=$?"` is the echo's. Report the real
-  one.
-- Prefer readiness checks and pattern waits over `sleep`.
-- Use specific process targeting; never broad kills like `pkill -f python`.
-- If state is uncertain, re-establish the baseline instead of patching unknowns.
+- **The exit code of `cmd > log; echo "EXIT=$?"` is the echo's.** Report the
+  real one.
+- Prefer readiness checks and pattern waits to `sleep`.
+- Target processes specifically. Never `pkill -f python`.
+- Where state is uncertain, re-establish the baseline instead of patching
+  unknowns.
 
-## Privileged Commands
+## Privileged commands
 
-- On a machine the owner keeps, `sudo` is theirs. Hand a privileged operation
-  over rather than attempting it.
-- In a disposable guest, `sudo` is the agent's.
+- **`sudo` is the owner's. Ask rather than attempting it.**
+- The exception is a named disposable-guest signal:
+  `RUNNER_ENVIRONMENT=github-hosted`, `CODESPACES=true`, or one a harness's own
+  file names. Nothing else counts.
+- **A capability probe answers a different question.** `sudo -n true` reports
+  what would run and not whose it is to run, so a yes on the owner's machine is
+  a finding to report.
 
-## Never Write To The Outside World Unasked
+## Writing to the outside world
 
-- **Never write to the outside world unasked.**
-- Pushing an `agent/` branch to this repository, opening the pull request it
-  carries, saying in it that the work is finished, and replying in its thread
-  are the normal course of work and need no separate ask. This file is what
-  authorizes them, and the push comes at the start of the work rather than at
-  the end.
-- Everything else that leaves this machine waits to be asked for: a merge, a
-  comment on somebody else's pull request or issue, an issue of one's own, a
-  post to a forum, mail, a change to a repository's settings, or any other
-  outward write. Report what you would send and let the owner ask for it.
-- **A write the owner does ask for carries attribution**, and all of it goes out
-  under their account. Where a mechanism carries it the prose does not repeat
-  it: a pull request's commits take the `Co-Authored-By:` trailer, which renders
-  the agent's avatar beside each one, and the squash carries that into the
-  landed message.
-- **Everything else says so in its own text, a comment in a pull request thread
-  included.** A comment takes no trailer and shows no avatar, so nothing
-  whatever separates it from a sentence the owner typed. The same holds for a
-  forum post, mail, and an issue. An agent writing under the owner's account is
-  indistinguishable from the owner to anything that reads the thread later,
-  including another agent, so the sentence saying who wrote it is the whole of
-  the difference.
-- Reading the outside world is free. Search, fetch, and read as widely as the
-  question needs.
+**Never write to the outside world unasked.**
 
-## Response Style
+This file authorizes four things with no separate ask: pushing an `agent/`
+branch to this repository, opening the pull request it carries, saying in it
+that the work is finished, and replying in its thread.
 
-- Chat replies have no length target. Match the question: a sentence for a
-  sentence, and pages where the research earned them.
-- Chat voice can be natural. Repository writing is the disciplined register
-  above; a reply is not.
-- Compress wording, not substance: do not omit important details.
+Everything else waits to be asked for -- a merge, a comment on somebody else's
+pull request or issue, an issue of your own, a forum post, mail, a repository
+setting. Report what you would send.
+
+**A write the owner asks for carries attribution** and goes out under their
+account. Where a mechanism carries it the prose does not repeat it, as a
+commit's `Co-Authored-By:` trailer renders the agent's avatar.
+
+**Everything else says so in its own text**, a pull request comment included,
+which takes no trailer and shows no avatar.
+
+Reading the outside world is free. Search, fetch and read as widely as the
+question needs.
+
+## Replies
+
+Chat is casual, and the register above governs what gets committed rather than
+what gets said. Match the question: a sentence for a sentence, and pages only
+where the research earned them. Compress wording, not substance.
