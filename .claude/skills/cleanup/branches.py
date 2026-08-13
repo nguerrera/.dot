@@ -6,8 +6,10 @@ SKILL.md has why ancestry cannot answer this and what each verdict costs. This
 is the sort itself: rows in, one report line each out, and the deletions named
 rather than made.
 
-    git branch --format='%(refname:short) %(objectname:short)' > local.txt
-    git ls-remote --heads origin 'refs/heads/agent/*' > remote.txt
+    git branch --list 'agent/*' 'copilot/*' 'claude/*' \
+      --format='%(refname:short) %(objectname:short)' > local.txt
+    git ls-remote --heads origin 'refs/heads/agent/*' 'refs/heads/copilot/*' \
+      'refs/heads/claude/*' > remote.txt
     gh pr list --state all --limit 200 \
       --json number,state,mergedAt,headRefName > pulls.json
     python3 .claude/skills/cleanup/branches.py local.txt remote.txt pulls.json
@@ -40,13 +42,22 @@ TRUNK = "main"
 
 REF = "refs/heads/"
 
+# What git's own `%(objectname:short)` abbreviates to on a repository this size.
+# Enough to resolve a hash by hand, which is all a deleted branch's row is for.
+ABBREV = 7
+
 
 def parse_branches(text):
     """Local branches as name -> hash, the trunk left out.
 
-    From `git branch --format='%(refname:short) %(objectname:short)'`. The
-    format is asked for rather than taken from the default output, which marks
-    the current branch with an asterisk in the same column as a name.
+    From `git branch --list <patterns> --format='%(refname:short)
+    %(objectname:short)'`. The format is asked for rather than taken from the
+    default output, which marks the current branch with an asterisk in the same
+    column as a name.
+
+    The trunk is dropped here as well as by the patterns, so that handing this
+    an unfiltered listing degrades to reporting extra branches rather than to
+    offering `main` up for deletion.
     """
     found = {}
     for line in text.splitlines():
@@ -61,12 +72,17 @@ def parse_refs(text):
 
     From `git ls-remote --heads origin`, whose lines are the hash, a tab, and
     the full ref. The prefix comes off so both sides key on the same name.
+
+    The hash is cut to the width git abbreviates to, because `ls-remote` prints
+    all forty characters where `%(objectname:short)` on the local side prints
+    seven. A branch the local clone never had is reported from this side alone,
+    so without the cut those rows alone would run the column wide.
     """
     found = {}
     for line in text.splitlines():
         fields = line.split("\t")
         if len(fields) == 2 and fields[1].startswith(REF):
-            found[fields[1].removeprefix(REF)] = fields[0]
+            found[fields[1].removeprefix(REF)] = fields[0][:ABBREV]
     return found
 
 
@@ -206,6 +222,10 @@ class ParseRefsTest(unittest.TestCase):
         line = "8f21a04\trefs/heads/agent/a/x"
         self.assertEqual(parse_refs(line), {"agent/a/x": "8f21a04"})
 
+    def test_the_hash_is_cut_to_the_local_side_s_width(self):
+        line = "8f21a04f6c1e2b3d4a5f60718293a4b5c6d7e8f9\trefs/heads/agent/a/x"
+        self.assertEqual(parse_refs(line), {"agent/a/x": "8f21a04"})
+
     def test_a_tag_ref_is_not_a_branch(self):
         self.assertEqual(parse_refs("8f21a04\trefs/tags/v1"), {})
 
@@ -310,6 +330,18 @@ class ReportTest(unittest.TestCase):
     def test_the_sides_column_pads_for_remote_even_with_none_present(self):
         local = {"agent/a/one": "f089d6a"}
         self.assertIn("local   no pull request", report(local, {}, {})[0])
+
+    def test_the_prefix_decides_nothing(self):
+        """Every swept prefix sorts the same way.
+
+        The sweep collects three and the sort is told about none of them, so a
+        filter added here would silently spare whichever it did not name.
+        """
+        names = ("agent/a/x", "claude/fix-a-thing", "copilot/fix-the-thing")
+        local = {name: "f089d6a" for name in names}
+        pulls = {name: [pull(2, "MERGED", "2026-08-02")] for name in names}
+        actions = [line.split()[0] for line in report(local, {}, pulls)]
+        self.assertEqual(actions, ["deleted"] * len(names))
 
     def test_the_branch_column_pads_to_the_widest(self):
         local = {"agent/a/one": "f089d6a", "agent/a/longer-one": "8f21a04"}

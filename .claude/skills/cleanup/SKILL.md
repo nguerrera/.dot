@@ -55,15 +55,20 @@ git merge --ff-only origin/main
 Stop only for what the sweep cannot fix: a dirty tree, or a `main` that will not
 fast-forward because it carries commits of its own.
 
-Then read both sides. Locally that is every branch other than `main`. On the
-remote it is the prefix this workflow creates and nothing else, since the remote
-is shared ground. Both listings and GitHub's answer go to `branches.py` beside
-this file, which sorts them and prints the report below:
+Then read both sides for the prefixes an agent's work lands under and nothing
+else: `agent/*` from the naming rule, `copilot/*` from GitHub's Copilot coding
+agent, and `claude/*` from a Claude Code cloud session. The last two name
+themselves and take no instruction about it. **A finished pull request is a
+finished pull request whichever prefix carries it**, so the sort below draws no
+distinction between them. Both listings and GitHub's answer go to `branches.py`
+beside this file, which sorts them and prints the report below:
 
 ```sh
 tmp=$(mktemp -d)
-git branch --format='%(refname:short) %(objectname:short)' > $tmp/local.txt
-git ls-remote --heads origin 'refs/heads/agent/*' > $tmp/remote.txt
+git branch --list 'agent/*' 'copilot/*' 'claude/*' \
+  --format='%(refname:short) %(objectname:short)' > $tmp/local.txt
+git ls-remote --heads origin 'refs/heads/agent/*' 'refs/heads/copilot/*' \
+  'refs/heads/claude/*' > $tmp/remote.txt
 gh pr list --state all --limit 200 \
   --json number,state,mergedAt,headRefName > $tmp/pulls.json
 python3 .claude/skills/cleanup/branches.py \
@@ -74,7 +79,13 @@ python3 .claude/skills/cleanup/branches.py \
 tree this run just approved, and stop the next sweep on a mess it made itself.
 
 **The local listing asks for the hash**, which the report prints against
-everything deleted. The snippet leaves `main` out of the sweep.
+everything deleted.
+
+**Both sides read the same three patterns**, which is what makes the sides
+column mean anything. A branch missing from one listing is then genuinely on one
+side only, where filtering the remote alone would report every locally named
+branch as never pushed -- the strongest claim in the report, and false whenever
+such a branch had in fact been pushed.
 
 What the sort says:
 
@@ -101,28 +112,48 @@ git branch --list 'agent/<slug>/*'
 git ls-remote --heads origin 'refs/heads/agent/<slug>/*'
 ```
 
+**`copilot/*` and `claude/*` have no slug to sweep.** Each names a branch for
+the task rather than for the agent, so nothing groups one session's branches
+together and the deletions above are the whole of what reaches them.
+
 What that turns up is the user's to keep or discard. Report it and stop.
 
 ## Also report, and do not touch
 
-- **Any local branch or tag** the sweep does not recognize, and any ref outside
-  `refs/heads`, which `git branch` never shows. `git for-each-ref` finds those.
-- **A tag is reported and never deleted.** A tag has no reflog, so deleting one
-  leaves the hash as the only handle. Name it, name what it points at, and let
-  the user decide.
+Everything the three patterns did not reach, which one pass finds:
+
+```sh
+git for-each-ref --format='%(refname) %(objectname:short)' \
+  | grep -Ev '^refs/(remotes|heads/(main|agent|copilot|claude))[ /]'
+```
+
+- **A local branch outside the three prefixes.** It did not come from the naming
+  rule or from a harness that names its own, so what to do with it is the user's
+  to say. Report it under its full `refs/heads/` name, which is what marks it as
+  something the sort never saw.
+- **A tag, and any ref outside `refs/heads`**, which `git branch` never shows. A
+  tag is reported and never deleted: it has no reflog, so deleting one leaves
+  the hash as the only handle. Name it, name what it points at, and let the user
+  decide.
 
 ## Report
 
 One line per ref and nothing else. No narration, no summary paragraph.
 
 ```
-deleted  agent/4b71a2/workflow  f089d6a  local   merged as #2
-deleted  agent/9c03fe/nas       8f21a04  both    #11 closed unmerged
-kept     agent/d15e07/wip       b31f0c4  local   no pull request, never pushed
+deleted  agent/4b71a2/workflow   f089d6a  local   merged as #2
+deleted  agent/9c03fe/nas        8f21a04  both    #11 closed unmerged
+deleted  copilot/add-a-fixture   3d7be10  remote  merged as #14
+kept     agent/d15e07/wip        b31f0c4  local   no pull request, never pushed
+kept     refs/heads/scratch      425044d          outside the swept prefixes
+kept     refs/tags/v1            9a1c07b          tag, points at main
 ```
 
 **Which sides existed is a column.** A merged branch has already lost its
 remote, and a local one may never have been pushed.
+
+**What the patterns did not reach keeps its full ref name and no sides**, since
+neither listing looked for it and saying which side it was on would be a guess.
 
 Print the hash of everything deleted. Git holds an unreachable object for
 `gc.pruneExpire`, two weeks by default, and `git fsck --unreachable` is the
