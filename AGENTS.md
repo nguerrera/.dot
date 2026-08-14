@@ -368,8 +368,10 @@ setting. Report what you would send.
 account. Where a mechanism carries it the prose does not repeat it, as a
 commit's `Co-Authored-By:` trailer renders the agent's avatar.
 
-**Everything else says so in its own text**, a pull request comment included,
-which takes no trailer and shows no avatar.
+**Everything else opens with a sentence naming the agent** -- a pull request
+comment, an issue, mail, a forum post. None of them takes a trailer or shows an
+avatar, so nothing separates one from a sentence the owner typed, and that
+sentence is the whole of the difference.
 
 Reading the outside world is free. Search, fetch and read as widely as the
 question needs.
