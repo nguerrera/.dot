@@ -43,11 +43,15 @@ fi
 
 for file in .*; do
     case $file in
-        # ~/.claude holds the Claude CLI's credentials, transcripts and
-        # caches, and .claude here holds this repository's own skills. Either
-        # one linked over the top of the other loses something live, so the
-        # directory is skipped and the files under it that are worth
-        # versioning are deployed one at a time below.
+        # .claude here is this repository's own, holding the skills a session
+        # working on it gets, so the home directory's .claude is deployed from
+        # .claude.user instead. The name is the only thing special about it:
+        # what is versioned inside is opted into by .gitignore, and the
+        # credentials, transcripts and caches the Claude CLI writes are left
+        # untracked in place, the way .emacs.d carries its own transient half.
+        .claude.user)
+            link_to "$(pwd)/$file" ~/.claude
+            ;;
         .|..|.git*|.claude)
             :
             ;;
@@ -55,13 +59,4 @@ for file in .*; do
             link_to "$(pwd)/$file" ~/"$file"
         ;;
     esac
-done
-
-# etc/claude is what belongs to the home directory rather than to this
-# repository. Claude Code rewrites settings.json as settings are changed, the
-# way emacs rewrites custom.el, so the link is what keeps those edits versioned
-# instead of stranding them in the home directory.
-mkdir -p ~/.claude || exit $?
-for file in settings.json hooks; do
-    link_to "$(pwd)/etc/claude/$file" ~/.claude/"$file"
 done

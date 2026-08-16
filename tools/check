@@ -89,10 +89,23 @@ broken_links() {
     done
 }
 
+# .claude.user is deployed as the home directory's ~/.claude, so the Claude
+# CLI's credentials, transcripts, uploads and pasted images accumulate inside
+# this working tree. .gitignore opts a short list back in, and anything else
+# that gets tracked reaches a public repository: a git add -f, or a tool that
+# writes where .gitignore does not reach, is all it takes. The list is checked
+# here rather than trusted.
+claude_user_strays() {
+    git ls-files .claude.user |
+        grep -Ev '^\.claude\.user/(CLAUDE\.md|settings\.json|(hooks|skills)/.+)$' |
+        sed 's/$/: not on the .claude.user allowlist/'
+}
+
 # Sorted by file, then by line number rather than by its digits.
 findings=$(
     {
         printf '%s' "$absent"
+        claude_user_strays
         if [ -n "$present" ]; then
             width_and_ascii $present
             broken_links $present

@@ -21,3 +21,12 @@ __pycache__/
 !.emacs.d/lisp/
 !.emacs.d/themes/
 
+# ignore all the transient stuff in .claude.user/, which is deployed as the
+# home directory's ~/.claude and fills with credentials, transcripts, uploads
+# and pasted images. tools/check enforces this list rather than trusting it.
+.claude.user/*
+!.claude.user/CLAUDE.md
+!.claude.user/settings.json
+!.claude.user/hooks/
+!.claude.user/skills/
+
