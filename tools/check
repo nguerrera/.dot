@@ -89,10 +89,23 @@ broken_links() {
     done
 }
 
+# A tracked file the rules would otherwise ignore got there past them, by
+# git add -f or by a tool that writes where .gitignore does not reach. It
+# matters most under .claude.user, deployed as the home directory's ~/.claude
+# and filling with credentials, transcripts, uploads and pasted images while
+# this repository is public. --no-index is what makes the question answerable:
+# it asks what the rules say about a path rather than what the index does, so
+# what is versioned stays written in .gitignore and is not restated here.
+ignored_but_tracked() {
+    git ls-files | git check-ignore --no-index --stdin |
+        sed 's/$/: tracked, but .gitignore would ignore it/'
+}
+
 # Sorted by file, then by line number rather than by its digits.
 findings=$(
     {
         printf '%s' "$absent"
+        ignored_but_tracked
         if [ -n "$present" ]; then
             width_and_ascii $present
             broken_links $present

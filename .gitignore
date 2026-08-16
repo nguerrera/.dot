@@ -12,6 +12,12 @@
 # ignore byte-compiled python
 __pycache__/
 
+# ignore the permission rules Claude Code writes when a prompt is answered with
+# "don't ask again". They name absolute paths and are one machine's answers
+# rather than anything to share. Git's global ignore carries this too, in a file
+# no repository deploys, so the copy here is what a fresh machine and CI get.
+**/.claude/settings.local.json
+
 # ignore all the transient stuff in .emacs.d/
 .emacs.d/*
 !.emacs.d/init.el
@@ -20,4 +26,14 @@ __pycache__/
 !.emacs.d/.mc-lists.el
 !.emacs.d/lisp/
 !.emacs.d/themes/
+
+# ignore all the transient stuff in .claude.user/, which is deployed as the
+# home directory's ~/.claude and fills with credentials, transcripts, uploads
+# and pasted images. This list is the whole statement of what is versioned in
+# there, and tools/check fails on anything tracked that it would ignore.
+.claude.user/*
+!.claude.user/CLAUDE.md
+!.claude.user/settings.json
+!.claude.user/hooks/
+!.claude.user/skills/
 

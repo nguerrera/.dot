@@ -14,6 +14,19 @@ backup() {
     mv -v "$link" "$bak" || exit $?
 }
 
+link_to() {
+    local target=$1
+    local link=$2
+    if [ -L "$link" ] && [ "$(readlink "$link")" = "$target" ]; then
+        : # already linked correctly
+    elif [ -e "$link" ] || [ -L "$link" ]; then
+        backup "$link"
+        ln -s -v "$target" "$link" || exit $?
+    else
+        ln -s -v "$target" "$link" || exit $?
+    fi
+}
+
 cd $(dirname $0) || exit $?
 if [ -d /mnt/c/windows ]; then
   git config --global include.path ~/.dot/etc/wsl.gitconfig
@@ -30,26 +43,20 @@ fi
 
 for file in .*; do
     case $file in
-        # ~/.claude holds the Claude CLI's credentials, transcripts and
-        # caches. A .claude directory here would be linked over the top of
-        # them, backing the live one out of the way. Excluding the whole
-        # directory also rules out deploying chosen files into ~/.claude the
-        # way .emacs.d is deployed, which is the trade until a file in there
-        # is worth versioning.
+        # .claude here is this repository's own, holding the skills a session
+        # working on it gets, so the home directory's .claude is deployed from
+        # .claude.user instead. The name is the only thing special about it:
+        # what is versioned inside is opted into by .gitignore, and the
+        # credentials, transcripts and caches the Claude CLI writes are left
+        # untracked in place, the way .emacs.d carries its own transient half.
+        .claude.user)
+            link_to "$(pwd)/$file" ~/.claude
+            ;;
         .|..|.git*|.claude)
             :
             ;;
         *)
-            target=$(pwd)/$file
-            link=~/$file
-            if [ -L "$link" ] && [ "$(readlink "$link")" = "$target" ]; then
-                : # already linked correctly
-            elif [ -e "$link" ] || [ -L "$link" ]; then
-                backup "$link"
-                ln -s -v "$target" "$link" || exit $?
-            else
-                ln -s -v "$target" "$link" || exit $?
-            fi
+            link_to "$(pwd)/$file" ~/"$file"
         ;;
     esac
 done
