@@ -150,6 +150,7 @@
  ("<escape>"        . keyboard-quit)
  ("C-M-g"           . keyboard-escape-quit)
  ("M-Q"             . ng-unfill-paragraph)
+ ("C-c q"           . ng-fill-buffer)
  ("<mouse-3>"       . menu-bar-open))
 
 (ng-unbind-keys

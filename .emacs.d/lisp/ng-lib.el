@@ -142,4 +142,10 @@ line of text."
         (emacs-lisp-docstring-fill-column t))
     (fill-paragraph nil region)))
 
+(defun ng-fill-buffer ()
+  "Fills every paragraph in the buffer, as if `fill-paragraph'
+were invoked on each one in turn."
+  (interactive)
+  (fill-region (point-min) (point-max)))
+
 (provide 'ng-lib)
