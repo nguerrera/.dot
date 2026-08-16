@@ -20,8 +20,9 @@ the name is the only thing the arrangement does differently.
 
 - **The Claude CLI's credentials, transcripts, uploads and pasted images live in
   that directory**, which puts them inside this working tree, untracked.
-  **This repository is public**, so `tools/check` enforces the allowlist rather
-  than leaving it to `.gitignore` alone. Widening it means both files.
+  **This repository is public**, so `tools/check` fails on any tracked file the
+  rules would ignore, which a `git add -f` is otherwise all it takes to create.
+  Widen what is versioned in `.gitignore`, the one place that states it.
 - **What is on the allowlist reaches every session in every repository**:
   `CLAUDE.md` as user instructions, `skills/` as skills offered everywhere,
   `settings.json`, and `hooks/`. Something true of one project belongs in that
