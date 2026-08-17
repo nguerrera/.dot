@@ -388,14 +388,28 @@ Everything else waits to be asked for -- a merge, a comment on somebody else's
 pull request or issue, an issue of your own, a forum post, mail, a repository
 setting. Report what you would send.
 
-**A write the owner asks for carries attribution** and goes out under their
-account. Where a mechanism carries it the prose does not repeat it, as a commit
-records the agent in its author field or its trailers without being told to.
+**Attribution follows the mechanism, not the ask.** Whether a write was
+authorized above or asked for separately decides nothing here. A commit carries
+attribution in its author field and its trailers, and the pull request body
+carries it through the squash that makes it a commit message. An account with an
+identity of its own carries it in the name and avatar on every write. Where a
+mechanism carries it, the prose does not repeat it.
 
-**Everything else opens with a sentence naming the agent** -- a pull request
-comment, an issue, mail, a forum post. None of them takes a trailer or shows an
-avatar, so nothing separates one from a sentence the owner typed, and that
-sentence is the whole of the difference.
+**What no mechanism attributes leads with one line**, before any other text -- a
+pull request comment, an issue, mail, a forum post:
+
+```
+*Written by {Model} in {Harness}*
+```
+
+Fill both slots and change nothing else. For example:
+
+- `*Written by Claude Opus 5 in Claude Code*`
+- `*Written by GPT-5.3 in GitHub Copilot*`
+
+Where the medium has no markdown, the words stand without the asterisks. Nothing
+else separates such a write from a sentence the owner typed, and a model name
+alone does not say which tool it came through.
 
 Reading the outside world is free. Search, fetch and read as widely as the
 question needs.
