@@ -175,9 +175,10 @@ discard.
 - **Every commit names everyone with a hand in it**, working notes included --
   the person steering, the model that wrote it, and the account it is authored
   under. The author field names one and a `Co-Authored-By:` trailer names each
-  of the rest. The trailer is what renders an avatar beside the commit, and
-  GitHub counts a co-authored commit toward the contributions of every co-author
-  whose trailer carries an address their account owns.
+  of the rest, and someone in two of those roles is named once, as the owner
+  authoring a commit they steered. The trailer is what renders an avatar beside
+  the commit, and GitHub counts a co-authored commit toward the contributions of
+  every co-author whose trailer carries an address their account owns.
 - **An identity of the agent's own in the author field displaces neither of the
   others**, so a commit authored as a bot carries a trailer for the owner and
   one for the model. The squash harvests branch authors as co-authors as well as
