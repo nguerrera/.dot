@@ -77,6 +77,22 @@ output on whatever happened to be checked out.
 misplacement: one question at a time, a preview showing the text that would
 land, and a "nothing" option that is meant.
 
+## The review between the cold read and undrafting
+
+`/code-review` reads the same diff the cold read just did and finds different
+things: whether a command does what the prose beside it says, and whether a
+claim outruns what was measured to support it.
+
+Run it after the cold read and before undrafting. What it returns is review
+comments and gets what `AGENTS.md` gives any other -- act where the premise
+holds, reply where it does not. **The fixes then earn the second read that file
+already requires**, and undrafting waits on that read rather than on the review.
+
+**Once per pull request rather than once per revision.** It runs for minutes,
+and the reviewers after it are the owner and whatever the repository has
+configured, so a revision made in answer to it is covered by the second read and
+by them.
+
 ## Handing a privileged command to the user
 
 Print the command and ask for the output. Do not say how to run it.
