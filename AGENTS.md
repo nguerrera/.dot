@@ -172,15 +172,18 @@ discard.
 
 ### Attribution
 
-- **Every commit names both parties**, working notes included. Whichever of the
-  owner and the agent authored it, a `Co-Authored-By:` trailer names the other.
-  The trailer is what renders an avatar beside the commit, and GitHub counts a
-  co-authored commit toward the contributions of every co-author whose trailer
-  carries an address their account owns.
-- **Where the agent authors under an identity of its own, that trailer is the
-  only thing recording the owner.** The squash harvests branch authors as
-  co-authors as well as the trailers, so an owner who authored no commit and was
-  named in none appears nowhere on what lands.
+- **Every commit names everyone with a hand in it**, working notes included --
+  the person steering, the model that wrote it, and the account it is authored
+  under. The author field names one and a `Co-Authored-By:` trailer names each
+  of the rest, and someone in two of those roles is named once, as the owner
+  authoring a commit they steered. The trailer is what renders an avatar beside
+  the commit, and GitHub counts a co-authored commit toward the contributions of
+  every co-author whose trailer carries an address their account owns.
+- **An identity of the agent's own in the author field displaces neither of the
+  others**, so a commit authored as a bot carries a trailer for the owner and
+  one for the model. The squash harvests branch authors as co-authors as well as
+  the trailers, so anyone who authored no commit and was named in none appears
+  nowhere on what lands.
 - **The body carries no co-author trailer.** GitHub harvests them from the
   squashed commits and appends them under a `---------` rule, so one in the body
   lands twice.
@@ -388,14 +391,31 @@ Everything else waits to be asked for -- a merge, a comment on somebody else's
 pull request or issue, an issue of your own, a forum post, mail, a repository
 setting. Report what you would send.
 
-**A write the owner asks for carries attribution** and goes out under their
-account. Where a mechanism carries it the prose does not repeat it, as a commit
-records the agent in its author field or its trailers without being told to.
+**Attribution follows the mechanism, not the ask.** Whether a write was
+authorized above or asked for separately decides nothing here. A commit carries
+attribution in its author field and its trailers, and the pull request body
+carries it through the squash that makes it a commit message. Where a mechanism
+carries it, the prose does not repeat it.
 
-**Everything else opens with a sentence naming the agent** -- a pull request
-comment, an issue, mail, a forum post. None of them takes a trailer or shows an
-avatar, so nothing separates one from a sentence the owner typed, and that
-sentence is the whole of the difference.
+**What no mechanism attributes leads with one line**, before any other text -- a
+pull request comment, an issue, mail, a forum post:
+
+```
+*Written by {Model} in {Harness}*
+```
+
+Fill both slots and change nothing else. For example:
+
+- `*Written by Claude Opus 5 in Claude Code*`
+- `*Written by GPT-5.3 in GitHub Copilot*`
+
+Where the medium has no markdown, the words stand without the asterisks. Nothing
+else separates such a write from a sentence the owner typed, and a model name
+alone does not say which tool it came through.
+
+**An account of the agent's own carries the write and not the model**, so a
+comment or an issue from one leads with the line as well. What the mechanism
+settles is that no person typed it.
 
 Reading the outside world is free. Search, fetch and read as widely as the
 question needs.
