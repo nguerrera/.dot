@@ -172,15 +172,17 @@ discard.
 
 ### Attribution
 
-- **Every commit names both parties**, working notes included. Whichever of the
-  owner and the agent authored it, a `Co-Authored-By:` trailer names the other.
-  The trailer is what renders an avatar beside the commit, and GitHub counts a
-  co-authored commit toward the contributions of every co-author whose trailer
-  carries an address their account owns.
-- **Where the agent authors under an identity of its own, that trailer is the
-  only thing recording the owner.** The squash harvests branch authors as
-  co-authors as well as the trailers, so an owner who authored no commit and was
-  named in none appears nowhere on what lands.
+- **Every commit names everyone with a hand in it**, working notes included --
+  the person steering, the model that wrote it, and the account it is authored
+  under. The author field names one and a `Co-Authored-By:` trailer names each
+  of the rest. The trailer is what renders an avatar beside the commit, and
+  GitHub counts a co-authored commit toward the contributions of every co-author
+  whose trailer carries an address their account owns.
+- **An identity of the agent's own in the author field displaces neither of the
+  others**, so a commit authored as a bot carries a trailer for the owner and
+  one for the model. The squash harvests branch authors as co-authors as well as
+  the trailers, so anyone who authored no commit and was named in none appears
+  nowhere on what lands.
 - **The body carries no co-author trailer.** GitHub harvests them from the
   squashed commits and appends them under a `---------` rule, so one in the body
   lands twice.
