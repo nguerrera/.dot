@@ -77,16 +77,17 @@ output on whatever happened to be checked out.
 misplacement: one question at a time, a preview showing the text that would
 land, and a "nothing" option that is meant.
 
-## The review between the cold read and undrafting
+## The review between the cold read and the claim
 
 `/code-review` reads the same diff the cold read just did and finds different
 things: whether a command does what the prose beside it says, and whether a
 claim outruns what was measured to support it.
 
-Run it after the cold read and before undrafting. What it returns is review
-comments and gets what `AGENTS.md` gives any other -- act where the premise
-holds, reply where it does not. **The fixes then earn the second read that file
-already requires**, and undrafting waits on that read rather than on the review.
+Run it after the cold read and before telling the owner the work is finished.
+What it returns is review comments and gets what `AGENTS.md` gives any other --
+act where the premise holds, reply where it does not. **The fixes then earn the
+second read that file already requires**, and the claim waits on that read
+rather than on the review.
 
 **Once per pull request rather than once per revision.** It runs for minutes,
 and the reviewers after it are the owner and whatever the repository has
@@ -97,9 +98,12 @@ by them.
 
 Print the command and ask for the output. Do not say how to run it.
 
-**Never suggest `!` for one.** `sudo` authenticating through `pam_pkcs11`
-segfaults rather than prompting, the prompt having to appear inside the tool's
-own process where nobody is watching.
+**Never suggest `!` for one.** It runs the command in the tool's own process,
+where a setuid `sudo` has to authenticate with no terminal to do it on. What
+that produces varies by implementation and none of them is useful: a refusal, a
+hang, or a prompt nobody can answer. Wrapping it in a pty to get past that puts
+a prompt for the owner's credential in front of the session, which is the hazard
+rather than the way through.
 
 **`CLAUDE_CODE_REMOTE=true` is this harness's disposable-guest signal.** A cloud
 session's VM carries it and a local session never does, per Anthropic's
