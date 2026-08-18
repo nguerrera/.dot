@@ -71,15 +71,31 @@ openssl rand -hex 3
   body must list every change in it.
 - Commits inside a branch are working notes: commit as often as is useful, leave
   them untidy, rewrite nothing.
-- **Say when the work is finished**: undraft the pull request and say so in the
-  thread, after reading the cumulative diff cold and getting the gate green.
-  Saying it is unfinished again answers a review that says it is not close.
-- **Opening a pull request ready is leaving draft**, so the read comes first
-  there too. An automatic reviewer reads one the moment it becomes ready, and a
-  read left until afterwards spends a review on what the author was going to
+- **Say the work is finished in a reply to the owner, and never take a pull
+  request out of draft.** That click is theirs, and no write to the pull request
+  stands in for the claim. The claim comes after reading the cumulative diff
+  cold and getting the gate green, and it names what each of those covered, so
+  what the owner acts on is a report rather than a verdict. Saying it is
+  unfinished again answers a review that says it is not close.
+- **That click is a backstop and not a check to lean on.** What the owner acts
+  on is the claim, so a loose one spends their review all the same, and every
+  step gating it is mandatory. The cumulative read is one of them, and
+  re-reading only what a late fix touched does not stand in for it.
+- **Skipping one of those steps takes the owner asking for it.** A judgment that
+  a step is unnecessary this time is not the ask, and neither is running short
+  of context or of patience. Where a step cannot be completed, say what stopped
+  it instead of claiming the work is finished.
+- **Following a branch the rules document is not skipping** -- a step that
+  applies only where a harness has drafts, say. What is skipped is a step that
+  applied.
+- **Reporting a step as done that was not is the failure nothing downstream
+  catches**, the owner acting on the report and no reviewer seeing what it
+  claimed.
+- **An automatic reviewer reads a pull request the moment it becomes ready**, so
+  a read left until afterwards spends a review on what the author was going to
   find anyway, then answers it in a thread rather than in the branch. Where a
-  harness has no drafts the pull request is open from the start, and what the
-  read comes before is saying the work is finished.
+  harness has no drafts the pull request is open from the start, and the read
+  still comes before the claim.
 
 ### The pull request message
 
@@ -194,7 +210,7 @@ discard.
 
 ## The cold read
 
-Before the pull request leaves draft, read the cumulative diff cold. Cold means
+Before claiming the work is finished, read the cumulative diff cold. Cold means
 the conversation is not evidence.
 
 - **Read every changed file end to end, not the changed sections.** A diff of
@@ -239,7 +255,7 @@ points at; files the fix left alone stay done. **The read right after your own
 fix is the one most likely to be fake**, so the finding that catches you is
 somewhere else in the file.
 
-Skipping a later read is allowed. Saying you made one is not.
+These reads are gates on the claim above rather than steps to weigh.
 
 ## Writing style
 
@@ -379,17 +395,26 @@ came with. `CONTRIBUTING.md` says which of these the gate checks; assume none.
   what would run and not whose it is to run, so a yes on the owner's machine is
   a finding to report.
 
+## Writing to a device
+
+**Changing a device is the owner's, whatever the OS allows.** An account that
+can open a device usually needs no privilege to configure, reset or erase it,
+and the change outlives the machine. Ask first, and do not read a command that
+runs without prompting as one that was permitted.
+
+Reading a device is free.
+
 ## Writing to the outside world
 
 **Never write to the outside world unasked.**
 
-This file authorizes four things with no separate ask: pushing an `agent/`
-branch to this repository, opening the pull request it carries, saying in it
-that the work is finished, and replying in its thread.
+This file authorizes three things with no separate ask: pushing an `agent/`
+branch to this repository, opening the pull request it carries, and replying in
+its thread.
 
-Everything else waits to be asked for -- a merge, a comment on somebody else's
-pull request or issue, an issue of your own, a forum post, mail, a repository
-setting. Report what you would send.
+Everything else waits to be asked for -- taking your own pull request out of
+draft, a merge, a comment on somebody else's pull request or issue, an issue of
+your own, a forum post, mail, a repository setting. Report what you would send.
 
 **Attribution follows the mechanism, not the ask.** Whether a write was
 authorized above or asked for separately decides nothing here. A commit carries
