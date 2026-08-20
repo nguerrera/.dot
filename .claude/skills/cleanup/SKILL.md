@@ -5,45 +5,31 @@ description: Delete the branches whose pull requests have finished, merged or cl
 
 # Clean up after finished pull requests
 
-A merge takes the remote branch with it where `delete_branch_on_merge` is on, so
-a landed pull request leaves a local branch. A close takes nothing, so an
-abandoned one leaves a branch on both sides. This deletes both kinds and reports
-whatever is left.
+Start this only when the user asks. It deletes the branches whose pull request
+merged or closed, on both sides, and reports everything else.
 
-**Start this only when the user asks.** Leftover branches cost nothing while
-they sit there.
+## Ask GitHub, never ancestry
 
-## Ancestry cannot answer this, so ask GitHub
+A squash merge lands a commit the branch is not an ancestor of, so
+`git branch --merged`, `git branch -d` and `git merge-base --is-ancestor` all
+answer wrong. A `[gone]` upstream is a hint, absent until a prune has run.
 
-A squash merge lands a commit the branch is not an ancestor of, which breaks
-every reachability test at once: `git branch --merged` never lists it,
-`git branch -d` refuses it, and `git merge-base --is-ancestor` says no.
-
-Ask for the whole repository once rather than once per branch:
+Ask once for the whole repository:
 
 ```sh
 gh pr list --state all --limit 200 --json number,state,mergedAt,headRefName
 ```
 
-`mergedAt` set is the merge check, `state` separates a closed pull request from
-an open one, `headRefName` matches a row back to a branch, and no rows at all is
-the branch that never had one. A `[gone]` upstream is a hint rather than proof,
-and it is absent entirely until a prune has run.
+`mergedAt` set is merged; `state` separates closed from open; `headRefName`
+matches a row to a branch; no row is a branch that never had a pull request.
 
-## A pull request is a second copy
-
-GitHub retains `refs/pull/<n>/head` after the branch is gone from both sides,
-with no expiry, and offers the branch back from the pull request page. So a
-closed one counts as finished and its branch is not a last copy.
-
-**A branch that never had a pull request is the one that keeps.** Nothing on the
-remote retains it, so discarding it is the user's call.
+GitHub retains `refs/pull/<n>/head` after both branches are gone, so a closed
+pull request's branch is not a last copy. A branch that never had a pull request
+is the one that keeps.
 
 ## Sweep
 
-Get to a current `main` first rather than requiring one. Being on a feature
-branch and being behind `origin/main` are both the ordinary state when somebody
-runs this.
+Get to a current `main` first:
 
 ```sh
 git status --short
@@ -52,16 +38,11 @@ git fetch --prune
 git merge --ff-only origin/main
 ```
 
-Stop only for what the sweep cannot fix: a dirty tree, or a `main` that will not
-fast-forward because it carries commits of its own.
+Stop only for a dirty tree or a `main` that will not fast-forward.
 
-Then read both sides for the prefixes an agent's work lands under and nothing
-else: `agent/*` from the naming rule, `copilot/*` from GitHub's Copilot coding
-agent, and `claude/*` from a Claude Code cloud session. The last two name
-themselves and take no instruction about it. **A finished pull request is a
-finished pull request whichever prefix carries it**, so the sort below draws no
-distinction between them. Both listings and GitHub's answer go to `branches.py`
-beside this file, which sorts them and prints the report below:
+Then list both sides for the agent prefixes (`agent/*`, `copilot/*`,
+`claude/*`), ask GitHub, and hand all three to `branches.py` beside this file,
+which sorts and prints the report:
 
 ```sh
 tmp=$(mktemp -d)
@@ -75,70 +56,48 @@ python3 .claude/skills/cleanup/branches.py \
   $tmp/local.txt $tmp/remote.txt $tmp/pulls.json
 ```
 
-**The three listings go outside the tree.** Written into it they would dirty the
-tree this run just approved, and stop the next sweep on a mess it made itself.
+- Write the listings outside the tree.
+- Read both sides with the same three patterns, or the sides column lies.
+- Treat every prefix alike; a finished pull request is finished whichever
+  carries it.
 
-**The local listing asks for the hash**, which the report prints against
-everything deleted.
+The sort:
 
-**Both sides read the same three patterns**, which is what makes the sides
-column mean anything. A branch missing from one listing is then genuinely on one
-side only, where filtering the remote alone would report every locally named
-branch as never pushed -- the strongest claim in the report, and false whenever
-such a branch had in fact been pushed.
+- Pull request merged or closed unmerged: delete it wherever it is,
+  `git branch -D <branch>` locally and `git push origin --delete <branch>`
+  remotely.
+- Pull request open: keep it.
+- No pull request: keep it and report it.
+- Pull requests disagree (a reused branch with a merged and an open one): keep
+  it and report it.
 
-What the sort says:
+The snippet names the deletions and makes none.
 
-- **Its pull request merged**, or **was closed unmerged.** Delete it wherever it
-  is: `git branch -D <branch>` locally, `git push origin --delete <branch>` on
-  the remote.
-- **Its pull request is open.** Keep it. Work in flight.
-- **It has no pull request.** Keep it and report it. Nothing else holds it.
-- **Its pull requests disagree**, a reused branch carrying a merged one and an
-  open one at once. Keep it and report it; resolving that is deciding rather
-  than sorting.
+## Then list the slug
 
-The snippet names the deletions and makes none of them. Each side is then one
-deletion call however many branches it carries.
-
-## Sweeping the slug is not deleting the branch
-
-Everything one agent creates lives under `agent/<slug>/*` -- a second attempt, a
-backup taken before a rewrite -- and every step above takes a branch name as
-given. After the deletions, list each slug that came up, on both sides:
+After the deletions, list each `agent/<slug>` that came up, both sides, and
+report what is left without deleting it:
 
 ```sh
 git branch --list 'agent/<slug>/*'
 git ls-remote --heads origin 'refs/heads/agent/<slug>/*'
 ```
 
-**`copilot/*` and `claude/*` have no slug to sweep.** Each names a branch for
-the task rather than for the agent, so nothing groups one session's branches
-together and the deletions above are the whole of what reaches them.
-
-What that turns up is the user's to keep or discard. Report it and stop.
+`copilot/*` and `claude/*` have no slug to list.
 
 ## Also report, and do not touch
-
-Everything the three patterns did not reach, which one pass finds:
 
 ```sh
 git for-each-ref --format='%(refname) %(objectname:short)' \
   | grep -Ev '^refs/(remotes|heads/(main|agent|copilot|claude))[ /]'
 ```
 
-- **A local branch outside the three prefixes.** It did not come from the naming
-  rule or from a harness that names its own, so what to do with it is the user's
-  to say. Report it under its full `refs/heads/` name, which is what marks it as
-  something the sort never saw.
-- **A tag, and any ref outside `refs/heads`**, which `git branch` never shows. A
-  tag is reported and never deleted: it has no reflog, so deleting one leaves
-  the hash as the only handle. Name it, name what it points at, and let the user
-  decide.
+Report a local branch outside the three prefixes under its full `refs/heads/`
+name. Report a tag with what it points at and never delete it.
 
 ## Report
 
-One line per ref and nothing else. No narration, no summary paragraph.
+One line per ref, nothing else:
 
 ```
 deleted  agent/4b71a2/workflow   f089d6a  local   merged as #2
@@ -149,12 +108,6 @@ kept     refs/heads/scratch      425044d          outside the swept prefixes
 kept     refs/tags/v1            9a1c07b          tag, points at main
 ```
 
-**Which sides existed is a column.** A merged branch has already lost its
-remote, and a local one may never have been pushed.
-
-**What the patterns did not reach keeps its full ref name and no sides**, since
-neither listing looked for it and saying which side it was on would be a guess.
-
-Print the hash of everything deleted. Git holds an unreachable object for
-`gc.pruneExpire`, two weeks by default, and `git fsck --unreachable` is the
-fallback when no hash was written down.
+Print the hash of everything deleted; `git fsck --unreachable` is the fallback
+where none was written down, within `gc.pruneExpire`. A ref the patterns did not
+reach keeps its full name and no sides.
