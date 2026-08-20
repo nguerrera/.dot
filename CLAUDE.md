@@ -3,54 +3,33 @@
 - @CLAUDE.CUSTOM.md
 - @AGENTS.md
 
-Claude Code's own tools and syntax: how it carries out the rules
-`CONTRIBUTING.md` and `AGENTS.md` set. Another harness takes its rules from
-those two and can skip this file. This one is identical in every repository the
-owner keeps; `CLAUDE.CUSTOM.md` is where this one's own work goes.
+How Claude Code carries out `AGENTS.md` with its own tools. This file is
+identical in every repository the owner keeps; `CLAUDE.CUSTOM.md` is this
+repository's own.
 
 ## Waiting on something long
 
-- Start it with `run_in_background: true` and wait for the completion
-  notification. That is the one-minute backgrounding threshold in `AGENTS.md`.
-- Foreground `sleep` is blocked, and chaining shorter sleeps does not get around
-  it. Polling a background command is wasted, since its completion re-invokes
-  you.
-- Read the log file for interim output. That needs no wait.
+- Start anything that may run a minute or more with `run_in_background: true`
+  and wait for the completion notification. Never poll it, and never chain
+  `sleep`s; foreground `sleep` is blocked.
+- Read the log file for interim output.
 - Wait on a condition with `Monitor` and an until-loop.
-- **A completion notification carries the whole command's exit code**, which in
-  a logged run is the trailing echo's. Read the real one out of the log.
+- Read the real exit code out of the log; the completion notification carries
+  the trailing echo's.
 
 ## The trailers
 
-`AGENTS.md` requires `Co-Authored-By:` on every commit and no co-author trailer
-in the body. This harness adds a second one, the session link:
-
-```
-Claude-Session: https://claude.ai/code/session_<id>
-```
-
-**It goes in the pull request body.** The squash keeps the body, harvests the
-co-authors, and discards every other trailer. This harness's standing
-instruction is to end every commit message with both, which fires at
-`git commit` -- before the body is written by a different command -- so a run
-that follows it and stops there writes the trailer twice and lands it zero
-times.
-
-**Take the `session_...` web identifier, not the local session UUID** under
-`~/.claude/projects`. Different keyspace, and the obvious guess produces a link
-that resolves to nothing.
-
-**A session that is not remote controllable has no web identifier.** Leave the
-trailer off rather than substitute the UUID.
-
-**The link is live rather than a citation.** Opening it returns to the session
-that produced the change, from any machine, and carries on talking to it. That
-is what earns it the width. It opens for the account that created it and costs
-every other reader nothing to ignore.
+- End every commit message with the `Co-Authored-By:` trailers `AGENTS.md`
+  requires, one per party not in the author field.
+- Put the session link in the pull request body, never in a commit, in this
+  form: `Claude-Session: https://claude.ai/code/session_<id>`. Use the
+  `session_...` web identifier, never the local UUID under `~/.claude/projects`.
+  Where the session has no web identifier, leave the trailer off.
 
 ## Getting a message in
 
-A long `-m` loses newlines. A heredoc gets the message in as written:
+Pass a multi-line commit or pull request message through a quoted heredoc, since
+`-m` with a long string loses newlines:
 
 ```
 git commit -m "$(cat <<'EOF'
@@ -61,61 +40,31 @@ EOF
 )"
 ```
 
-`gh pr create --title ... --body "$(cat <<'EOF' ... EOF )"` is the same shape.
-Reach for `git commit -F` or `gh pr create --body-file` only where the size
-makes inline input impractical.
-
-## Skills leave nothing uncommitted
-
-`AGENTS.md` has the rule that a session commits what it writes. A skill branches
-off `main` and names the branch before writing anything, rather than landing its
-output on whatever happened to be checked out.
+`gh pr create --body "$(cat <<'EOF' ... EOF )"` takes the same shape. Use
+`git commit -F` or `gh pr create --body-file` only where the size makes inline
+input impractical.
 
 ## Asking about a finding
 
-`AskUserQuestion` is what the cold read in `AGENTS.md` uses for an omission or a
-misplacement: one question at a time, a preview showing the text that would
-land, and a "nothing" option that is meant.
+Use `AskUserQuestion` for the question the `AGENTS.md` checklist asks about an
+omission, with the text that would land in the option preview.
 
-## The review between the cold read and the claim
+## The code review
 
-`/code-review` reads the same diff the cold read just did and finds different
-things: whether a command does what the prose beside it says, and whether a
-claim outruns what was measured to support it.
-
-Run it after the cold read and before telling the owner the work is finished.
-What it returns is review comments and gets what `AGENTS.md` gives any other --
-act where the premise holds, reply where it does not. **The fixes then earn the
-second read that file already requires**, and the claim waits on that read
-rather than on the review.
-
-**Once per pull request rather than once per revision.** It runs for minutes,
-and the reviewers after it are the owner and whatever the repository has
-configured, so a revision made in answer to it is covered by the second read and
-by them.
+`/code-review` is the harness's code review named in `AGENTS.md`'s checklist;
+treat what it returns as review comments.
 
 ## Handing a privileged command to the user
 
-Print the command and ask for the output. Do not say how to run it.
-
-**Never suggest `!` for one.** It runs the command in the tool's own process,
-where a setuid `sudo` has to authenticate with no terminal to do it on. What
-that produces varies by implementation and none of them is useful: a refusal, a
-hang, or a prompt nobody can answer. Wrapping it in a pty to get past that puts
-a prompt for the owner's credential in front of the session, which is the hazard
-rather than the way through.
-
-**`CLAUDE_CODE_REMOTE=true` is this harness's disposable-guest signal.** A cloud
-session's VM carries it and a local session never does, per Anthropic's
-"Configure cloud environments", read 2026-08-11 at
-<https://code.claude.com/docs/en/cloud-environments>.
+- Never say how to run it.
+- Never suggest the `!` prefix for a privileged command. It runs in the tool's
+  own process, where `sudo` has no terminal to authenticate on, and wrapping it
+  in a pty puts a prompt for the owner's credential in front of the session.
+- `CLAUDE_CODE_REMOTE=true` is this harness's disposable-guest signal, per
+  `AGENTS.md`. A cloud session's VM carries it; a local session never does.
 
 ## A pasted image is already a file
 
-Claude Code reads a pasted image off the system clipboard and writes it to
-`~/.claude/image-cache/<session-id>/`, numbered in paste order, where it stays
-after the session ends. A screenshot of a bank statement, a document, or a
-console showing credentials is on disk the moment it is pasted.
-
-Remind the user to clear that directory when a session involved anything
-sensitive.
+Claude Code writes every pasted image to `~/.claude/image-cache/<session-id>/`,
+where it stays after the session ends. Remind the user to clear that directory
+when a session involved anything sensitive.
