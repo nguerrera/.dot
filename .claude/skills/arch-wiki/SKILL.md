@@ -46,6 +46,6 @@ GFDL 1.3-or-later.
 
 - It is a snapshot; the package filename carries the build date. For anything
   recent, check that date and go to the web.
-- The download is unauthenticated static HTML; that reasoning extends to nothing
-  that runs.
+- The download is unauthenticated; accept that only because it is static HTML
+  nothing executes.
 - Go to the web for release notes, a kernel commit, or a bug tracker.

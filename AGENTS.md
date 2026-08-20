@@ -12,11 +12,12 @@ Read `CONTRIBUTING.md` for this repository's commands and gate, then
 - Add a reason only where an agent would misapply the rule without it, and keep
   it to one sentence.
 - Never write a date, an incident, a measurement, a source, or a cut option into
-  guidance, and never point from guidance at a note or research file for the
-  reason behind a rule. Guidance stands alone; an agent follows it without
-  reading why. A note a procedure reads as input (a roster, a README) is named.
+  guidance.
+- Never point from guidance at a note or research file for the reason behind a
+  rule; an agent follows guidance without reading why.
+- Name a note a procedure reads as input (a roster, a README).
 - Never restate a rule or answer an objection nobody raised.
-- Put a rule once, in the file that owns it. `CONTRIBUTING.md` owns this
+- Put a rule once, in the file that owns it: `CONTRIBUTING.md` owns this
   repository's commands, gate and tooling quirks; `AGENTS.md` the rules that
   hold in every repository; `AGENTS.CUSTOM.md` the rules for this repository
   alone; a file named for a harness, with its `CUSTOM` counterpart, that tool's
@@ -31,7 +32,8 @@ Read `CONTRIBUTING.md` for this repository's commands and gate, then
   `'{0:x6}' -f (Get-Random -Maximum 0x1000000)`) and use it for every branch the
   agent and its subagents create.
 - Where the harness assigns a branch, use it and say which branch the work is
-  on. To take over somebody's pull request, push to their branch.
+  on.
+- To take over somebody's pull request, push to their branch.
 - Open the pull request when the work starts, as a draft where the harness has
   them, and push to it freely. Where no pull request can be opened, report the
   branch when done.

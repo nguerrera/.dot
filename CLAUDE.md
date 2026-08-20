@@ -41,8 +41,8 @@ EOF
 ```
 
 `gh pr create --body "$(cat <<'EOF' ... EOF )"` takes the same shape. Use
-`git commit -F` or `--body-file` only where the size makes inline input
-impractical.
+`git commit -F` or `gh pr create --body-file` only where the size makes inline
+input impractical.
 
 ## Asking about a finding
 
