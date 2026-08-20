@@ -22,8 +22,9 @@ account="$(id -un)@$(uname -n)"
 # compact or clear. The pause belongs to a session that is starting, so an
 # auto-compaction mid-task leaves work the user already approved running. Stdin
 # is read once and read to EOF, which returns non-zero with the payload set; the
-# timeout covers a run with no stdin at all, and an unread or unparsed payload
-# leaves the source empty and prints the account fact alone.
+# timeout covers stdin left open with nothing written to it, and a payload that
+# is missing or unparsed leaves the source empty, which prints the account fact
+# and the person paragraph without the greeting or the pause.
 payload=""
 IFS= read -r -d '' -t 5 payload
 session_source="$(printf '%s' "$payload" |
