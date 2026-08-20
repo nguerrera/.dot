@@ -8,9 +8,9 @@
 # think to check it. Stating it up front costs one line and removes the guess.
 #
 # SessionStart cannot block a session and its stderr never reaches the model, so
-# nothing here is allowed to fail or to ask a question. The pause below is a
-# rule the session follows rather than something a SessionStart hook can
-# enforce.
+# printing is the whole of what this script can do: it must not fail, and a
+# question it asked itself would reach nobody. The pause below is put to the
+# session as a rule to follow rather than something the hook can enforce.
 
 account="$(id -un)@$(uname -n)"
 
