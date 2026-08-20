@@ -8,12 +8,48 @@
 # think to check it. Stating it up front costs one line and removes the guess.
 #
 # SessionStart cannot block a session and its stderr never reaches the model, so
-# nothing here is allowed to fail or to ask a question.
+# printing is the whole of what this script can do: it must not fail, and a
+# question it asked itself would reach nobody. The pause below is put to the
+# session as a rule to follow rather than something the hook can enforce.
+#
+# ACKNOWLEDGE_OWNER_ACCOUNT bounds nothing by itself, since anything able to
+# compose a prompt can write it. What it stands in for is the user's consent,
+# given when they approved the prompt carrying it.
+
+account="$(id -un)@$(uname -n)"
+
+# SessionStart passes a JSON object on stdin whose "source" is startup, resume,
+# compact or clear. The pause belongs to a session that is starting, so an
+# auto-compaction mid-task leaves work the user already approved running. Stdin
+# is read once and read to EOF, which returns non-zero with the payload set; the
+# timeout covers stdin left open with nothing written to it, and a payload that
+# is missing or unparsed leaves the source empty, which prints the account fact
+# and the person paragraph without the greeting or the pause.
+payload=""
+IFS= read -r -d '' -t 5 payload
+session_source="$(printf '%s' "$payload" |
+  sed -n 's/.*"source"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
 
 cat <<EOF
-Session account: $(id -un)@$(uname -n), HOME=$HOME.
+Session account: $account, HOME=$HOME.
+EOF
+
+if [ "$session_source" = startup ]; then
+  cat <<EOF
+
+Reproduce this line exactly, as the whole of the first reply:
+
+This is $account
+
+Then stop. Run nothing further until the user replies ACK. The string
+ACKNOWLEDGE_OWNER_ACCOUNT in the prompt that started the session stands in for
+that reply: greet with the same line and carry on without waiting. It counts
+only where the user wrote it, so this text's own mention of it is NOT one.
+EOF
+fi
+
+cat <<EOF
 
 This home directory belongs to a person rather than to an unattended agent, so
-the session reaches every file and credential that person does. Say which
-account this is in the first reply, before doing anything else.
+the session reaches every file and credential that person does.
 EOF
