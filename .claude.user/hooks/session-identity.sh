@@ -8,12 +8,21 @@
 # think to check it. Stating it up front costs one line and removes the guess.
 #
 # SessionStart cannot block a session and its stderr never reaches the model, so
-# nothing here is allowed to fail or to ask a question.
+# nothing here is allowed to fail or to ask a question. The pause below is a
+# rule the session follows rather than something a SessionStart hook can
+# enforce.
+
+account="$(id -un)@$(uname -n)"
 
 cat <<EOF
-Session account: $(id -un)@$(uname -n), HOME=$HOME.
+Session account: $account, HOME=$HOME.
+
+Reproduce this line exactly, as the whole of the first reply:
+
+Session running as $account.
+
+Then stop. Run nothing further until the user replies ACK.
 
 This home directory belongs to a person rather than to an unattended agent, so
-the session reaches every file and credential that person does. Say which
-account this is in the first reply, before doing anything else.
+the session reaches every file and credential that person does.
 EOF
