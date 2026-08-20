@@ -366,12 +366,29 @@ came with. `CONTRIBUTING.md` says which of these the gate checks; assume none.
   are the whole check, and neither is optional before amending, resetting or
   rebasing.
 
+## Say what will be read
+
+Reading the repository and its GitHub is the work itself and needs no ask.
+Reading the machine is a different act: describe it and wait for a yes -- system
+configuration, service state, package state, devices, another account's files,
+anything under a home directory.
+
+- Name the commands and the paths, and say what each is expected to settle.
+- One description covers one batch. What it does not cover is the read the first
+  batch's output suggests next, which is a fresh description.
+- A question naming a file, a command or a path carries the yes already, and so
+  does a procedure the user asked for, over the reads that procedure names.
+- What this session wrote itself is its own to read back, a disposable test
+  under a scratchpad included.
+- A sweep of the machine spends the owner's attention on output they did not ask
+  for and buries the answer they did.
+
 ## Running commands
 
 - **A command line in guidance is one way to satisfy the rule above it.** What
   binds is the property -- the tree is clean, the pull request says it merged.
-- Detect what the host allows before branching on it: `sudo -n true`,
-  `ssh-add -l`, network egress.
+- Detect what the host allows before branching on it -- `sudo -n true`,
+  `ssh-add -l`, network egress -- once that read has been described and agreed.
 - **Filtered egress rarely announces itself as a refusal**, so an unreachable
   host reads as whatever the filter's own failure looks like. Suspect the policy
   before the far side.
@@ -402,7 +419,8 @@ can open a device usually needs no privilege to configure, reset or erase it,
 and the change outlives the machine. Ask first, and do not read a command that
 runs without prompting as one that was permitted.
 
-Reading a device is free.
+**Reading a device changes nothing**, and "Say what will be read" covers
+describing it first.
 
 ## Writing to the outside world
 
