@@ -3,7 +3,7 @@
 [core]
 	editor = emacsclient.sh -c
 	longpaths = true
-	preloadindex = true
+	preloadIndex = true
 	fscache = true
 	; work around https://github.com/git-for-windows/git/issues/5517
 	symlinks = false
