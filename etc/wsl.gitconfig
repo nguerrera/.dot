@@ -7,10 +7,6 @@
 [alias]
 	dd = difftool --no-symlinks --dir-diff
 	dt = difftool --no-symlinks -y
-[url "__DO_NOT_PUSH__/"]
-	pushinsteadof = https://github.com/
-[url "https://github.com/nguerrera/"]
-	pushinsteadof = https://github.com/nguerrera/
 [credential "dev.azure.com"]
 	useHttpPath = true
 [credential "visualstudio.com"]

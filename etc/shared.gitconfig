@@ -30,3 +30,7 @@
 	defaultBranch = main
 [submodule]
 	recurse = true
+[url "__DO_NOT_PUSH__/"]
+	pushInsteadOf = https://github.com/
+[url "https://github.com/nguerrera/"]
+	pushInsteadOf = https://github.com/nguerrera/
