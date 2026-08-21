@@ -1,8 +1,12 @@
 [include]
 	path = shared.gitconfig
+[credential "https://github.com"]
+	helper =
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !gh auth git-credential
 [url "__DO_NOT_PUSH__/"]
 	pushinsteadof = https://github.com/
-[url "git@github.com:nguerrera/"]
+[url "https://github.com/nguerrera/"]
 	pushinsteadof = https://github.com/nguerrera/
-[url "git@github.com:"]
-	insteadof = https://github.com/
