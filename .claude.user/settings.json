@@ -1,19 +1,15 @@
 {
+  "attribution": {
+    "pr": ""
+  },
   "permissions": {
     "ask": [
       "mcp__claude-in-chrome",
       "mcp__claude-in-chrome__*"
     ]
   },
-  "model": "opus[1m]",
+  "model": "claude-fable-5[1m]",
   "disableClaudeAiConnectors": true,
-  "tui": "default",
-  "skipWorkflowUsageWarning": true,
-  "theme": "auto",
-  "agentPushNotifEnabled": true,
-  "attribution": {
-    "pr": ""
-  },
   "hooks": {
     "SessionStart": [
       {
@@ -25,5 +21,9 @@
         ]
       }
     ]
-  }
+  },
+  "tui": "default",
+  "skipWorkflowUsageWarning": true,
+  "theme": "auto",
+  "agentPushNotifEnabled": true
 }
