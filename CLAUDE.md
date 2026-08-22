@@ -51,8 +51,19 @@ omission, with the text that would land in the option preview.
 
 ## The code review
 
-`/code-review` is the harness's code review named in `AGENTS.md`'s checklist;
-treat what it returns as review comments.
+- `/code-review` is the harness's code review named in `AGENTS.md`'s checklist;
+  treat what it returns as review comments.
+
+- Launch it with the range spelled out and the fan-out turned off:
+
+  ```
+  /code-review medium origin/main...HEAD -- no subagents or background
+  verifiers; verify inline in one context; read-only; end with the findings
+  list, empty where nothing survived
+  ```
+
+- Treat a run that ends on a progress remark with no findings list as a stall:
+  stop it and relaunch the same way. An empty list is a clean review.
 
 ## Handing a privileged command to the user
 
