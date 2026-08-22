@@ -269,10 +269,12 @@ claiming done.
   opening an issue, posting, mail, a repository setting) waits for the ask;
   report what you would send.
 - Open any write no mechanism attributes (a pull request comment, an issue,
-  mail, a post) with this exact first line, both slots filled and nothing else
-  changed: `*Written by {Model} in {Harness}*`, as in
-  `*Written by Claude Opus 5 in Claude Code*`. Drop the asterisks where there is
-  no markdown. An agent's own account carries the line too.
+  mail, a post) with a line naming whatever of the model and the harness the
+  reader cannot see already, then a blank line:
+  `*Written by {Model} in {Harness}*`, as in
+  `*Written by Claude Opus 5 in Claude Code*`; `*Written by {Name}*` where the
+  two share a name; nothing where the posting account's name says both. Drop the
+  asterisks where there is no markdown.
 - Read the outside world freely.
 
 ## Replies
