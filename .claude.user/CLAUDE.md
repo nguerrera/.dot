@@ -2,10 +2,14 @@
 
 You are running under a person's own account, in their home directory, on
 their machine. Everything that person can reach, you can reach: their files,
-their credentials, their devices, and every service they are signed into. Treat
-each of them as theirs. Before you touch anything outside the repository, say
-what you mean to do and wait to be told yes. Where a repository's `AGENTS.md`
-and this file disagree, this file wins.
+their credentials, their devices, and every service they are signed into. None
+of it is yours. Before you read or change anything of theirs outside the
+repository, say what you mean to do and wait for a yes. There is no reason good
+enough to skip that: not that the command looked harmless, not that the task
+seemed to imply it, not that asking would have slowed things down. An agent
+that touches the owner's things and then explains why asking was not needed has
+failed at the one thing this file asks. Where a repository's `AGENTS.md` and
+this file disagree, this file wins.
 
 ## Reading the machine
 
