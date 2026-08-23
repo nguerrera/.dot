@@ -19,6 +19,12 @@ target=$1
 cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/wake
 mac_re='^([0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}$'
 
+# The word following $1 in the first input line that carries it.
+field_after() {
+  awk -v key="$1" \
+    '{ for (i = 1; i < NF; i++) if ($i == key) { print $(i + 1); exit } }'
+}
+
 send_magic_packet() {
   local mac=$1 broadcast=$2
   wakeonlan -i "$broadcast" "$mac" >/dev/null
@@ -27,23 +33,21 @@ send_magic_packet() {
 ip=$(getent ahostsv4 "$target" | awk 'NR == 1 { print $1 }') \
   || { echo "wake: cannot resolve $target" >&2; exit 1; }
 
-route=$(ip -4 route get "$ip")
-dev=$(awk '{ for (i = 1; i < NF; i++) if ($i == "dev") print $(i + 1) }' \
-  <<<"$route")
+route=$(ip -4 route get "$ip" 2>/dev/null) \
+  || { echo "wake: no route to $ip" >&2; exit 1; }
+dev=$(field_after dev <<<"$route")
 if [[ $route == *" via "* ]]; then
   echo "wake: $ip is reached through a gateway; a broadcast on $dev will not" \
     "reach it" >&2
   exit 1
 fi
-broadcast=$(ip -o -4 addr show dev "$dev" \
-  | awk '{ for (i = 1; i < NF; i++) if ($i == "brd") print $(i + 1); exit }')
+broadcast=$(ip -o -4 addr show dev "$dev" | field_after brd)
 broadcast=${broadcast:-255.255.255.255}
 
 # A ping makes the kernel ARP for the host; a host that answers lands in the
 # neighbor table, and one that is asleep may still be there from before.
 ping -c 1 -W 1 "$ip" >/dev/null 2>&1 || true
-mac=$(ip -4 neigh show to "$ip" \
-  | awk '{ for (i = 1; i < NF; i++) if ($i == "lladdr") print $(i + 1); exit }')
+mac=$(ip -4 neigh show to "$ip" dev "$dev" | field_after lladdr)
 
 if [[ -n $mac ]]; then
   if [[ ! -r $cache_dir/$target || $(<"$cache_dir/$target") != "$mac" ]]; then
