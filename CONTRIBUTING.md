@@ -2,9 +2,10 @@
 
 `tools/check` is the gate a change has to pass, and it needs nothing installed.
 It reads every tracked `.md` file for a line over 80 columns, a non-ASCII
-character, and a relative link that does not resolve, and every tracked file of
-any kind for one the ignore rules say should not be tracked at all. CI runs it
-on every push and every pull request.
+character, and a relative link that does not resolve, every tracked file of
+any kind for one the ignore rules say should not be tracked at all, and every
+section of `.claude.user/CLAUDE.md` against the `AGENTS.md` section of the same
+name. CI runs it on every push and every pull request.
 
 ## Rough edges
 

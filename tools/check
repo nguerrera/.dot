@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-# Guard the mechanical half of the writing rules over the tracked markdown: a
+# Guard the mechanical half of the writing rules over the tracked markdown (a
 # line over 80 columns, a non-ASCII character, and a relative link that does not
-# resolve. Needs nothing but git, awk and a shell, so it runs in a fresh clone
-# and in CI with no install step.
+# resolve), the ignore rules over every tracked file, and the sections
+# .claude.user/CLAUDE.md copies from AGENTS.md. Needs nothing but git, bash and
+# a POSIX userland, so it runs in a fresh clone and in CI with no install step.
 
 set -u
 
@@ -101,11 +102,40 @@ ignored_but_tracked() {
         sed 's/$/: tracked, but .gitignore would ignore it/'
 }
 
+# .claude.user/CLAUDE.md carries sections copied from AGENTS.md so that a
+# session in a repository with no AGENTS.md gets the same rules, and it outranks
+# AGENTS.md, so a copy left behind by an edit is the rule every session follows.
+# Every "## " section in the copy is compared against the section of the same
+# name in AGENTS.md, from the heading to the next one or the end of the file,
+# less the blank lines before the next heading. Blank lines are held back until
+# a line with text follows them, so the trailing ones are never printed.
+copied_sections() {
+    copy=.claude.user/CLAUDE.md
+    [ -f "$copy" ] && [ -f AGENTS.md ] || return 0
+    grep '^## ' "$copy" | while IFS= read -r heading; do
+        section() {
+            awk -v h="$heading" '
+                $0 == h { on = 1 }
+                on && /^## / && $0 != h { exit }
+                !on { next }
+                /^[ \t]*$/ { held = held "\n"; next }
+                { printf "%s%s\n", held, $0; held = "" }
+            ' "$1"
+        }
+        if [ -z "$(section AGENTS.md)" ]; then
+            echo "$copy: section \"${heading#\#\# }\" is not in AGENTS.md"
+        elif ! section AGENTS.md | cmp -s - <(section "$copy"); then
+            echo "$copy: section \"${heading#\#\# }\" differs from AGENTS.md"
+        fi
+    done
+}
+
 # Sorted by file, then by line number rather than by its digits.
 findings=$(
     {
         printf '%s' "$absent"
         ignored_but_tracked
+        copied_sections
         if [ -n "$present" ]; then
             width_and_ascii $present
             broken_links $present
