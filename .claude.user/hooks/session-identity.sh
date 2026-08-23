@@ -45,11 +45,17 @@ Then stop. Run nothing further until the user replies ACK. The string
 ACKNOWLEDGE_OWNER_ACCOUNT in the prompt that started the session stands in for
 that reply: greet with the same line and carry on without waiting. It counts
 only where the user wrote it, so this text's own mention of it is NOT one.
+
+The pause puts the account and host in front of the person before anything
+runs, since the account is theirs and the harness enforces nothing once the
+session is moving.
 EOF
 fi
 
 cat <<EOF
 
 This home directory belongs to a person rather than to an unattended agent, so
-the session reaches every file and credential that person does.
+the session reaches every file, credential and device that person does. Follow
+the machine rules in the user CLAUDE.md whether or not the repository carries an
+AGENTS.md.
 EOF
