@@ -1,66 +1,247 @@
-#!/usr/bin/env bash
-# wake - send a Wake-on-LAN magic packet to a host on the local network.
-# Linux only: it needs ip, getent and wakeonlan.
-#
-# Usage: wake <hostname|ip>
-#
-# The name is resolved to an address, the address to a MAC through the
-# kernel's neighbor (ARP) table, and the MAC is saved under
-# $XDG_CACHE_HOME/wake so the host can be woken after the table forgets it.
-set -euo pipefail
+#!/usr/bin/env python3
+"""Send a Wake-on-LAN magic packet to a host on the local network.
 
-usage() {
-  echo "Usage: wake <hostname|ip>" >&2
-  exit 2
-}
+Usage: wake <hostname|ip>
 
-[[ $# -eq 1 ]] || usage
-target=$1
-cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/wake
-mac_re='^([0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}$'
+The name is resolved to an address, the address to a MAC through the
+kernel's neighbor (ARP) table, and the MAC is saved under
+$XDG_CACHE_HOME/wake so the host can be woken after the table forgets
+it.
 
-# The word following $1 in the first input line that carries it.
-field_after() {
-  awk -v key="$1" \
-    '{ for (i = 1; i < NF; i++) if ($i == key) { print $(i + 1); exit } }'
-}
+Only the neighbor table needs anything outside the standard library, and
+what it needs ships with the OS: /proc/net/arp on Linux, arp(8) on
+macOS. The interface and its broadcast address come from getifaddrs(3)
+through ctypes, and the packet goes out on a plain UDP socket.
+"""
 
-send_magic_packet() {
-  local mac=$1 broadcast=$2
-  wakeonlan -i "$broadcast" "$mac" >/dev/null
-}
+import ctypes
+import ctypes.util
+import ipaddress
+import os
+import re
+import socket
+import struct
+import subprocess
+import sys
+import time
+from pathlib import Path
 
-ip=$(getent ahostsv4 "$target" | awk 'NR == 1 { print $1 }') \
-  || { echo "wake: cannot resolve $target" >&2; exit 1; }
+# The port a magic packet is conventionally addressed to. Nothing listens
+# on it; a wakeable card matches the payload below the UDP layer.
+WOL_PORT = 9
 
-route=$(ip -4 route get "$ip" 2>/dev/null) \
-  || { echo "wake: no route to $ip" >&2; exit 1; }
-dev=$(field_after dev <<<"$route")
-if [[ $route == *" via "* ]]; then
-  echo "wake: $ip is reached through a gateway; a broadcast on $dev will not" \
-    "reach it" >&2
-  exit 1
-fi
-broadcast=$(ip -o -4 addr show dev "$dev" | field_after brd)
-broadcast=${broadcast:-255.255.255.255}
+IFF_BROADCAST = 0x2
 
-# A ping makes the kernel ARP for the host; a host that answers lands in the
-# neighbor table, and one that is asleep may still be there from before.
-ping -c 1 -W 1 "$ip" >/dev/null 2>&1 || true
-mac=$(ip -4 neigh show to "$ip" dev "$dev" | field_after lladdr)
+# How long to let the kernel finish resolving an address that answers.
+RESOLVE_TIMEOUT = 1.0
 
-if [[ -n $mac ]]; then
-  if [[ ! -r $cache_dir/$target || $(<"$cache_dir/$target") != "$mac" ]]; then
-    mkdir -p "$cache_dir"
-    echo "$mac" >"$cache_dir/$target"
-  fi
-elif [[ -r $cache_dir/$target && $(<"$cache_dir/$target") =~ $mac_re ]]; then
-  mac=$(<"$cache_dir/$target")
-  echo "wake: $ip is not in the neighbor table; using cached $mac" >&2
-else
-  echo "wake: no MAC known for $target ($ip); run wake while it is up once" >&2
-  exit 1
-fi
+MAC_TEXT = re.compile(r"^[0-9a-fA-F]{1,2}(?:[:-][0-9a-fA-F]{1,2}){5}$")
 
-send_magic_packet "$mac" "$broadcast"
-echo "Sent magic packet for $target ($ip, $mac) to $broadcast via $dev"
+
+class Ifaddrs(ctypes.Structure):
+    pass
+
+
+Ifaddrs._fields_ = [
+    ("ifa_next", ctypes.POINTER(Ifaddrs)),
+    ("ifa_name", ctypes.c_char_p),
+    ("ifa_flags", ctypes.c_uint),
+    ("ifa_addr", ctypes.c_void_p),
+    ("ifa_netmask", ctypes.c_void_p),
+    ("ifa_broadaddr", ctypes.c_void_p),
+    ("ifa_data", ctypes.c_void_p),
+]
+
+
+def fail(message):
+    raise SystemExit(f"wake: {message}")
+
+
+def sockaddr_ipv4(pointer):
+    """The dotted quad in a sockaddr, or None where it holds none.
+
+    BSD keeps a length in the first byte and stores a sockaddr no longer
+    than it has to be, so a netmask can stop partway through its address
+    bytes; the bytes past the length are zero.
+    """
+    if not pointer:
+        return None
+    header = ctypes.string_at(pointer, 2)
+    if sys.platform == "darwin":
+        length, family = header[0], header[1]
+    else:
+        length, family = 8, struct.unpack("=H", header)[0]
+    if family != socket.AF_INET or length <= 4:
+        return None
+    octets = ctypes.string_at(pointer, min(length, 8))[4:]
+    return socket.inet_ntoa(octets.ljust(4, b"\0"))
+
+
+def broadcast_interfaces():
+    """Each IPv4 interface that can broadcast, as name, network, address."""
+    libc = ctypes.CDLL(ctypes.util.find_library("c"), use_errno=True)
+    libc.getifaddrs.argtypes = [ctypes.POINTER(ctypes.POINTER(Ifaddrs))]
+    libc.getifaddrs.restype = ctypes.c_int
+    libc.freeifaddrs.argtypes = [ctypes.POINTER(Ifaddrs)]
+
+    head = ctypes.POINTER(Ifaddrs)()
+    if libc.getifaddrs(ctypes.byref(head)) != 0:
+        code = ctypes.get_errno()
+        fail(f"cannot list interfaces: {os.strerror(code)}")
+    try:
+        found = []
+        entry = head
+        while entry:
+            item = entry.contents
+            entry = item.ifa_next
+            if not item.ifa_flags & IFF_BROADCAST:
+                continue
+            address = sockaddr_ipv4(item.ifa_addr)
+            netmask = sockaddr_ipv4(item.ifa_netmask)
+            broadcast = sockaddr_ipv4(item.ifa_broadaddr)
+            if not (address and netmask and broadcast):
+                continue
+            network = ipaddress.IPv4Interface(f"{address}/{netmask}").network
+            found.append((item.ifa_name.decode(), network, broadcast))
+        return found
+    finally:
+        libc.freeifaddrs(head)
+
+
+def normalize_mac(text):
+    """A MAC in canonical form, or None where the text is not one.
+
+    macOS prints an octet below 0x10 as a single digit, so the parts are
+    padded rather than matched at a fixed width.
+    """
+    if not text or not MAC_TEXT.match(text):
+        return None
+    mac = ":".join(f"{int(part, 16):02x}" for part in re.split("[:-]", text))
+    # An address of all zeroes is how a table spells an entry it never
+    # resolved.
+    return None if mac == "00:00:00:00:00:00" else mac
+
+
+def neighbor_mac_linux(ip, device):
+    # Columns: address, HW type, flags, HW address, mask, device.
+    try:
+        table = Path("/proc/net/arp").read_text()
+    except OSError as error:
+        fail(f"cannot read /proc/net/arp: {error.strerror}")
+    for line in table.splitlines()[1:]:
+        fields = line.split()
+        if len(fields) >= 6 and fields[0] == ip and fields[5] == device:
+            return normalize_mac(fields[3])
+    return None
+
+
+def neighbor_mac_bsd(ip, device):
+    # "? (10.0.0.2) at 0:11:22:aa:bb:cc on en0 ifscope [ethernet]", with
+    # "(incomplete)" in place of the address for a request still out.
+    try:
+        listing = subprocess.run(
+            ["arp", "-n", ip], capture_output=True, text=True
+        ).stdout
+    except OSError as error:
+        fail(f"cannot run arp: {error.strerror}")
+    for line in listing.splitlines():
+        fields = line.split()
+        if "at" not in fields or "on" not in fields:
+            continue
+        at, on = fields.index("at"), fields.index("on")
+        if fields[on + 1:on + 2] == [device]:
+            return normalize_mac(fields[at + 1])
+    return None
+
+
+def neighbor_mac(ip, device):
+    if sys.platform == "darwin":
+        return neighbor_mac_bsd(ip, device)
+    return neighbor_mac_linux(ip, device)
+
+
+def resolve_neighbor(ip, device):
+    """The MAC for an address, after asking the kernel to go and find it.
+
+    A datagram to a host makes the kernel resolve its address first, so
+    one that is up lands in the table; one that is asleep may be there
+    already from before it went down.
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as probe:
+        try:
+            probe.sendto(b"", (ip, WOL_PORT))
+        except OSError:
+            pass
+    deadline = time.monotonic() + RESOLVE_TIMEOUT
+    while True:
+        mac = neighbor_mac(ip, device)
+        if mac or time.monotonic() >= deadline:
+            return mac
+        time.sleep(0.1)
+
+
+def send_magic_packet(mac, broadcast):
+    payload = b"\xff" * 6 + bytes.fromhex(mac.replace(":", "")) * 16
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sender:
+        sender.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        sender.sendto(payload, (broadcast, WOL_PORT))
+
+
+def remember(cache, mac):
+    if cache.is_file() and cache.read_text().strip() == mac:
+        return
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cache.write_text(mac + "\n")
+
+
+def recall(cache):
+    try:
+        return normalize_mac(cache.read_text().strip())
+    except OSError:
+        return None
+
+
+def main(argv):
+    if len(argv) != 2:
+        print("Usage: wake <hostname|ip>", file=sys.stderr)
+        return 2
+    target = argv[1]
+
+    try:
+        ip = socket.getaddrinfo(
+            target, None, socket.AF_INET, socket.SOCK_DGRAM
+        )[0][4][0]
+    except socket.gaierror:
+        fail(f"cannot resolve {target}")
+
+    address = ipaddress.IPv4Address(ip)
+    for device, network, broadcast in broadcast_interfaces():
+        if address in network:
+            break
+    else:
+        fail(f"{ip} is on no directly attached network; a broadcast will "
+             f"not reach it")
+
+    cache = Path(
+        os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache"
+    ) / "wake" / target
+
+    mac = resolve_neighbor(ip, device)
+    if mac:
+        remember(cache, mac)
+    else:
+        mac = recall(cache)
+        if not mac:
+            fail(f"no MAC known for {target} ({ip}); run wake while it is "
+                 f"up once")
+        print(f"wake: {ip} is not in the neighbor table; using cached {mac}",
+              file=sys.stderr)
+
+    send_magic_packet(mac, broadcast)
+    print(f"Sent magic packet for {target} ({ip}, {mac}) to {broadcast} "
+          f"via {device}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
