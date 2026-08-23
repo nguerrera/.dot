@@ -25,5 +25,6 @@
   "tui": "default",
   "skipWorkflowUsageWarning": true,
   "theme": "auto",
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "outputStyle": "Concise"
 }
