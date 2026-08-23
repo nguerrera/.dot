@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # wake - send a Wake-on-LAN magic packet to a host on the local network.
-# Linux only: it needs ip, getent and python3.
+# Linux only: it needs ip, getent and wakeonlan.
 #
 # Usage: wake <hostname|ip|mac>
 #
@@ -21,14 +21,7 @@ mac_re='^([0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}$'
 
 send_magic_packet() {
   local mac=$1 broadcast=$2
-  python3 - "$mac" "$broadcast" <<'PY'
-import socket, sys
-mac = bytes.fromhex(sys.argv[1].replace(":", "").replace("-", ""))
-packet = b"\xff" * 6 + mac * 16
-with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    s.sendto(packet, (sys.argv[2], 9))
-PY
+  wakeonlan -i "$broadcast" "$mac" >/dev/null
 }
 
 # A bare MAC names no interface, so the packet goes out every one that has a
