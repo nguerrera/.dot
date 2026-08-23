@@ -5,11 +5,7 @@ every repository. This home directory belongs to a person rather than to an
 unattended agent, so a session reaches every file, credential and device that
 person does, and nothing in the harness stops it once it is moving.
 
-- Where a repository's `AGENTS.md` and this file disagree, this file wins.
-- The sections below are a verbatim copy of the `AGENTS.md` sections of the
-  same names, so a repository with no `AGENTS.md` gets the same rules. Read
-  "this repository" in them as the repository the session is in, and "a skill
-  here" as a skill the session has.
+Where a repository's `AGENTS.md` and this file disagree, this file wins.
 
 ## Reading the machine
 
