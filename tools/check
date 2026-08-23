@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-# Guard the mechanical half of the writing rules over the tracked markdown: a
+# Guard the mechanical half of the writing rules over the tracked markdown (a
 # line over 80 columns, a non-ASCII character, and a relative link that does not
-# resolve. Needs nothing but git, awk and a shell, so it runs in a fresh clone
-# and in CI with no install step.
+# resolve), the ignore rules over every tracked file, and the sections
+# .claude.user/CLAUDE.md copies from AGENTS.md. Needs nothing but git, awk and a
+# shell, so it runs in a fresh clone and in CI with no install step.
 
 set -u
 
