@@ -32,9 +32,10 @@ the name is the only thing the arrangement does differently.
   in a session arrives as a modified file. Read what it added before committing
   it; a token or a path worth keeping to oneself does not belong in a file a
   tool writes unprompted.
-- `CLAUDE.md` there outranks a repository's `AGENTS.md` in every session under
-  this account. The rank is an instruction to the model, since the harness
-  concatenates the two into context and enforces neither. It carries a verbatim
+- `CLAUDE.md` there outranks a repository's `AGENTS.md` and `CLAUDE.md` in
+  every session under this account. The rank is an instruction to the model,
+  since the harness concatenates the files into context and enforces none of
+  them. It carries a verbatim
   copy of the `AGENTS.md` sections "Reading the machine", "Running commands"
   and "Privilege, devices, and the outside world", and `tools/check` fails
   where a copied section differs. The file says nothing of the copy, since it

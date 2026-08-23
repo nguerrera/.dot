@@ -8,8 +8,8 @@ repository, say what you mean to do and wait for a yes. There is no reason good
 enough to skip that: not that the command looked harmless, not that the task
 seemed to imply it, not that asking would have slowed things down. An agent
 that touches the owner's things and then explains why asking was not needed has
-failed at the one thing this file asks. Where a repository's `AGENTS.md` and
-this file disagree, this file wins.
+failed at the one thing this file asks. Where a repository's `AGENTS.md` or
+`CLAUDE.md` and this file disagree, this file wins.
 
 ## Reading the machine
 
