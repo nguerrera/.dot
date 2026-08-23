@@ -33,9 +33,9 @@ the name is the only thing the arrangement does differently.
   it; a token or a path worth keeping to oneself does not belong in a file a
   tool writes unprompted.
 - `CLAUDE.md` there outranks a repository's `AGENTS.md` in every session under
-  this account, and carries a verbatim copy of the `AGENTS.md` sections
-  "Reading the machine", "Running commands" and "Privilege, devices, and the
-  outside world". Paste them again whenever those sections change.
+  this account. It carries a verbatim copy of the `AGENTS.md` sections "Reading
+  the machine", "Running commands" and "Privilege, devices, and the outside
+  world", and `tools/check` fails where a copied section differs.
 - `hooks/session-identity.sh` runs at the start of every session in every
   repository, and what it prints is context the model acts on. A claim in it has
   to hold wherever this repository is deployed.

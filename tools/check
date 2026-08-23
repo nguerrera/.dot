@@ -101,11 +101,37 @@ ignored_but_tracked() {
         sed 's/$/: tracked, but .gitignore would ignore it/'
 }
 
+# .claude.user/CLAUDE.md carries sections copied from AGENTS.md so that a
+# session in a repository with no AGENTS.md gets the same rules, and it outranks
+# AGENTS.md, so a copy left behind by an edit is the rule every session follows.
+# Every "## " section in the copy is compared against the section of the same
+# name in AGENTS.md, from the heading to the next one or the end of the file,
+# less the blank lines before the next heading.
+copied_sections() {
+    copy=.claude.user/CLAUDE.md
+    [ -f "$copy" ] && [ -f AGENTS.md ] || return 0
+    grep '^## ' "$copy" | while IFS= read -r heading; do
+        section() {
+            awk -v h="$heading" '
+                $0 == h { on = 1 }
+                on && /^## / && $0 != h { exit }
+                on { print }
+            ' "$1" | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}'
+        }
+        if [ -z "$(section AGENTS.md)" ]; then
+            echo "$copy: section \"${heading#\#\# }\" is not in AGENTS.md"
+        elif ! section AGENTS.md | cmp -s - <(section "$copy"); then
+            echo "$copy: section \"${heading#\#\# }\" differs from AGENTS.md"
+        fi
+    done
+}
+
 # Sorted by file, then by line number rather than by its digits.
 findings=$(
     {
         printf '%s' "$absent"
         ignored_but_tracked
+        copied_sections
         if [ -n "$present" ]; then
             width_and_ascii $present
             broken_links $present

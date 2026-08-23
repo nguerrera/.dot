@@ -2,7 +2,8 @@
 
 # A Claude Code SessionStart hook. Its stdout is added to the session as context
 # the model can see and act on, which is what lets a fact reach every repository
-# a session is started in; a CLAUDE.md reaches only the project it sits in.
+# a session is started in, as the user CLAUDE.md beside it does, where a
+# repository's CLAUDE.md reaches only the project it sits in.
 #
 # The account a session runs as decides what it may touch, and a session has to
 # think to check it. Stating it up front costs one line and removes the guess.
@@ -15,6 +16,10 @@
 # ACKNOWLEDGE_OWNER_ACCOUNT bounds nothing by itself, since anything able to
 # compose a prompt can write it. What it stands in for is the user's consent,
 # given when they approved the prompt carrying it.
+#
+# That the home directory belongs to a person, and the rules that follow from
+# it, are in the user CLAUDE.md beside this hook, which the harness loads into
+# every session; the hook prints only what that file cannot know, the account.
 
 account="$(id -un)@$(uname -n)"
 
@@ -24,7 +29,7 @@ account="$(id -un)@$(uname -n)"
 # is read once and read to EOF, which returns non-zero with the payload set; the
 # timeout covers stdin left open with nothing written to it, and a payload that
 # is missing or unparsed leaves the source empty, which prints the account fact
-# and the person paragraph without the greeting or the pause.
+# without the greeting or the pause.
 payload=""
 IFS= read -r -d '' -t 5 payload
 session_source="$(printf '%s' "$payload" |
@@ -51,11 +56,3 @@ runs, since the account is theirs and the harness enforces nothing once the
 session is moving.
 EOF
 fi
-
-cat <<EOF
-
-This home directory belongs to a person rather than to an unattended agent, so
-the session reaches every file, credential and device that person does. Follow
-the machine rules in the user CLAUDE.md whether or not the repository carries an
-AGENTS.md.
-EOF
