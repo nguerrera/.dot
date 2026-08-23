@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# wake - send a Wake-on-LAN magic packet to a host on the local network.
+# Linux only: it needs ip, getent and wakeonlan.
+#
+# Usage: wake <hostname|ip>
+#
+# The name is resolved to an address, the address to a MAC through the
+# kernel's neighbor (ARP) table, and the MAC is saved under
+# $XDG_CACHE_HOME/wake so the host can be woken after the table forgets it.
+set -euo pipefail
+
+usage() {
+  echo "Usage: wake <hostname|ip>" >&2
+  exit 2
+}
+
+[[ $# -eq 1 ]] || usage
+target=$1
+cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/wake
+mac_re='^([0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}$'
+
+# The word following $1 in the first input line that carries it.
+field_after() {
+  awk -v key="$1" \
+    '{ for (i = 1; i < NF; i++) if ($i == key) { print $(i + 1); exit } }'
+}
+
+send_magic_packet() {
+  local mac=$1 broadcast=$2
+  wakeonlan -i "$broadcast" "$mac" >/dev/null
+}
+
+ip=$(getent ahostsv4 "$target" | awk 'NR == 1 { print $1 }') \
+  || { echo "wake: cannot resolve $target" >&2; exit 1; }
+
+route=$(ip -4 route get "$ip" 2>/dev/null) \
+  || { echo "wake: no route to $ip" >&2; exit 1; }
+dev=$(field_after dev <<<"$route")
+if [[ $route == *" via "* ]]; then
+  echo "wake: $ip is reached through a gateway; a broadcast on $dev will not" \
+    "reach it" >&2
+  exit 1
+fi
+broadcast=$(ip -o -4 addr show dev "$dev" | field_after brd)
+broadcast=${broadcast:-255.255.255.255}
+
+# A ping makes the kernel ARP for the host; a host that answers lands in the
+# neighbor table, and one that is asleep may still be there from before.
+ping -c 1 -W 1 "$ip" >/dev/null 2>&1 || true
+mac=$(ip -4 neigh show to "$ip" dev "$dev" | field_after lladdr)
+
+if [[ -n $mac ]]; then
+  if [[ ! -r $cache_dir/$target || $(<"$cache_dir/$target") != "$mac" ]]; then
+    mkdir -p "$cache_dir"
+    echo "$mac" >"$cache_dir/$target"
+  fi
+elif [[ -r $cache_dir/$target && $(<"$cache_dir/$target") =~ $mac_re ]]; then
+  mac=$(<"$cache_dir/$target")
+  echo "wake: $ip is not in the neighbor table; using cached $mac" >&2
+else
+  echo "wake: no MAC known for $target ($ip); run wake while it is up once" >&2
+  exit 1
+fi
+
+send_magic_packet "$mac" "$broadcast"
+echo "Sent magic packet for $target ($ip, $mac) to $broadcast via $dev"
