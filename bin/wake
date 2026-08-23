@@ -26,9 +26,11 @@ import sys
 import time
 from pathlib import Path
 
-# The port a magic packet is conventionally addressed to. Nothing listens
-# on it; a wakeable card matches the payload below the UDP layer.
-WOL_PORT = 9
+# The discard port, which is where a magic packet is conventionally
+# addressed: a wakeable card matches the payload below the UDP layer, so
+# no port has to be listening, and a datagram sent only to be sent has
+# nowhere better to go either.
+DISCARD_PORT = 9
 
 IFF_BROADCAST = 0x2
 
@@ -78,7 +80,7 @@ def sockaddr_ipv4(pointer):
 
 
 def broadcast_interfaces():
-    """Each IPv4 interface that can broadcast, as name, network, address."""
+    """Each broadcasting IPv4 interface: name, network, broadcast address."""
     libc = ctypes.CDLL(ctypes.util.find_library("c"), use_errno=True)
     libc.getifaddrs.argtypes = [ctypes.POINTER(ctypes.POINTER(Ifaddrs))]
     libc.getifaddrs.restype = ctypes.c_int
@@ -169,7 +171,7 @@ def resolve_neighbor(ip, device):
     """
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as probe:
         try:
-            probe.sendto(b"", (ip, WOL_PORT))
+            probe.sendto(b"", (ip, DISCARD_PORT))
         except OSError:
             pass
     deadline = time.monotonic() + RESOLVE_TIMEOUT
@@ -184,7 +186,7 @@ def send_magic_packet(mac, broadcast):
     payload = b"\xff" * 6 + bytes.fromhex(mac.replace(":", "")) * 16
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sender:
         sender.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        sender.sendto(payload, (broadcast, WOL_PORT))
+        sender.sendto(payload, (broadcast, DISCARD_PORT))
 
 
 def remember(cache, mac):
