@@ -57,8 +57,10 @@ mac=$(ip -4 neigh show to "$ip" \
   | awk '{ for (i = 1; i < NF; i++) if ($i == "lladdr") print $(i + 1); exit }')
 
 if [[ -n $mac ]]; then
-  mkdir -p "$cache_dir"
-  echo "$mac" >"$cache_dir/$target"
+  if [[ ! -r $cache_dir/$target || $(<"$cache_dir/$target") != "$mac" ]]; then
+    mkdir -p "$cache_dir"
+    echo "$mac" >"$cache_dir/$target"
+  fi
 elif [[ -r $cache_dir/$target && $(<"$cache_dir/$target") =~ $mac_re ]]; then
   mac=$(<"$cache_dir/$target")
   echo "wake: $ip is not in the neighbor table; using cached $mac" >&2
