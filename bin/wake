@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # wake - send a Wake-on-LAN magic packet to a host on the local network.
+# Linux only: it needs ip, getent and python3.
 #
 # Usage: wake <hostname|ip|mac>
 #
@@ -30,9 +31,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
 PY
 }
 
+# A bare MAC names no interface, so the packet goes out every one that has a
+# broadcast address.
 if [[ $target =~ $mac_re ]]; then
-  send_magic_packet "$target" 255.255.255.255
-  echo "Sent magic packet for $target"
+  for broadcast in $(ip -o -4 addr show \
+    | awk '{ for (i = 1; i < NF; i++) if ($i == "brd") print $(i + 1) }'); do
+    send_magic_packet "$target" "$broadcast"
+    echo "Sent magic packet for $target to $broadcast"
+  done
   exit
 fi
 
@@ -45,6 +51,7 @@ dev=$(awk '{ for (i = 1; i < NF; i++) if ($i == "dev") print $(i + 1) }' \
 if [[ $route == *" via "* ]]; then
   echo "wake: $ip is reached through a gateway; a broadcast on $dev will not" \
     "reach it" >&2
+  exit 1
 fi
 broadcast=$(ip -o -4 addr show dev "$dev" \
   | awk '{ for (i = 1; i < NF; i++) if ($i == "brd") print $(i + 1); exit }')
@@ -59,7 +66,7 @@ mac=$(ip -4 neigh show to "$ip" \
 if [[ -n $mac ]]; then
   mkdir -p "$cache_dir"
   echo "$mac" >"$cache_dir/$target"
-elif [[ -r $cache_dir/$target ]]; then
+elif [[ -r $cache_dir/$target && $(<"$cache_dir/$target") =~ $mac_re ]]; then
   mac=$(<"$cache_dir/$target")
   echo "wake: $ip is not in the neighbor table; using cached $mac" >&2
 else
