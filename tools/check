@@ -3,8 +3,8 @@
 # Guard the mechanical half of the writing rules over the tracked markdown (a
 # line over 80 columns, a non-ASCII character, and a relative link that does not
 # resolve), the ignore rules over every tracked file, and the sections
-# .claude.user/CLAUDE.md copies from AGENTS.md. Needs nothing but git, awk and a
-# shell, so it runs in a fresh clone and in CI with no install step.
+# .claude.user/CLAUDE.md copies from AGENTS.md. Needs nothing but git, bash and
+# a POSIX userland, so it runs in a fresh clone and in CI with no install step.
 
 set -u
 
@@ -107,7 +107,8 @@ ignored_but_tracked() {
 # AGENTS.md, so a copy left behind by an edit is the rule every session follows.
 # Every "## " section in the copy is compared against the section of the same
 # name in AGENTS.md, from the heading to the next one or the end of the file,
-# less the blank lines before the next heading.
+# less the blank lines before the next heading. Blank lines are held back until
+# a line with text follows them, so the trailing ones are never printed.
 copied_sections() {
     copy=.claude.user/CLAUDE.md
     [ -f "$copy" ] && [ -f AGENTS.md ] || return 0
@@ -116,8 +117,10 @@ copied_sections() {
             awk -v h="$heading" '
                 $0 == h { on = 1 }
                 on && /^## / && $0 != h { exit }
-                on { print }
-            ' "$1" | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}'
+                !on { next }
+                /^[ \t]*$/ { held = held "\n"; next }
+                { printf "%s%s\n", held, $0; held = "" }
+            ' "$1"
         }
         if [ -z "$(section AGENTS.md)" ]; then
             echo "$copy: section \"${heading#\#\# }\" is not in AGENTS.md"
