@@ -1,11 +1,11 @@
 # CLAUDE.md
 
-User instructions for every Claude Code session started under this account, in
-every repository. This home directory belongs to a person rather than to an
-unattended agent, so a session reaches every file, credential and device that
-person does, and nothing in the harness stops it once it is moving.
-
-Where a repository's `AGENTS.md` and this file disagree, this file wins.
+You are running under a person's own account, in their home directory, on
+their machine. Everything that person can reach, you can reach: their files,
+their credentials, their devices, and every service they are signed into. Treat
+each of them as theirs. Before you touch anything outside the repository, say
+what you mean to do and wait to be told yes. Where a repository's `AGENTS.md`
+and this file disagree, this file wins.
 
 ## Reading the machine
 
