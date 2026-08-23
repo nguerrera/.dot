@@ -40,7 +40,8 @@ ip=$(getent ahostsv4 "$target" | awk 'NR == 1 { print $1 }') \
   || { echo "wake: cannot resolve $target" >&2; exit 1; }
 
 route=$(ip -4 route get "$ip")
-dev=$(awk '{ for (i = 1; i < NF; i++) if ($i == "dev") print $(i + 1) }' <<<"$route")
+dev=$(awk '{ for (i = 1; i < NF; i++) if ($i == "dev") print $(i + 1) }' \
+  <<<"$route")
 if [[ $route == *" via "* ]]; then
   echo "wake: $ip is reached through a gateway; a broadcast on $dev will not" \
     "reach it" >&2
