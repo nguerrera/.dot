@@ -2,7 +2,7 @@
 # wake - send a Wake-on-LAN magic packet to a host on the local network.
 # Linux only: it needs ip, getent and wakeonlan.
 #
-# Usage: wake <hostname|ip|mac>
+# Usage: wake <hostname|ip>
 #
 # The name is resolved to an address, the address to a MAC through the
 # kernel's neighbor (ARP) table, and the MAC is saved under
@@ -10,7 +10,7 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: wake <hostname|ip|mac>" >&2
+  echo "Usage: wake <hostname|ip>" >&2
   exit 2
 }
 
@@ -23,17 +23,6 @@ send_magic_packet() {
   local mac=$1 broadcast=$2
   wakeonlan -i "$broadcast" "$mac" >/dev/null
 }
-
-# A bare MAC names no interface, so the packet goes out every one that has a
-# broadcast address.
-if [[ $target =~ $mac_re ]]; then
-  for broadcast in $(ip -o -4 addr show \
-    | awk '{ for (i = 1; i < NF; i++) if ($i == "brd") print $(i + 1) }'); do
-    send_magic_packet "$target" "$broadcast"
-    echo "Sent magic packet for $target to $broadcast"
-  done
-  exit
-fi
 
 ip=$(getent ahostsv4 "$target" | awk 'NR == 1 { print $1 }') \
   || { echo "wake: cannot resolve $target" >&2; exit 1; }
