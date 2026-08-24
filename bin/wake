@@ -11,11 +11,12 @@ it.
 Nothing here has to be installed. What the standard library does not
 answer for itself comes from what ships with the OS: the neighbor table
 from /proc/net/arp on Linux, arp(8) on macOS and GetIpNetTable on
-Windows, and the interface and its broadcast address from getifaddrs(3)
-on Linux and macOS and GetIpAddrTable on Windows. The three system
-calls among those go through ctypes. The interface is the one the
-kernel would send to the host from, and the packet goes out on a plain
-UDP socket.
+Windows, and the interface from getifaddrs(3) on Linux and macOS and
+GetIpAddrTable on Windows. The three system calls among those go
+through ctypes. The interface is the one the kernel would send to the
+host from, its broadcast address is the one getifaddrs(3) reports or
+the one the address and the netmask work out to on Windows, and the
+packet goes out on a plain UDP socket.
 """
 
 import ctypes
@@ -210,19 +211,24 @@ def broadcast_interfaces_windows():
     found = []
     for row in iphlpapi_table("GetIpAddrTable", MibIpAddrRow):
         address = dotted_quad(row.address)
-        # A loopback address is the one thing here with no segment to
-        # broadcast on, and a netmask of zero names no network at all.
-        if not row.netmask or ipaddress.IPv4Address(address).is_loopback:
+        # An address needs a segment to broadcast on, which a loopback
+        # address has none of, a netmask of zero names no network, and
+        # a netmask that is all ones leaves no room for.
+        if row.netmask in (0, 0xFFFFFFFF):
+            continue
+        if ipaddress.IPv4Address(address).is_loopback:
+            continue
+        try:
+            device = socket.if_indextoname(row.index)
+        except OSError:
+            # The interface went away between the table and this call.
             continue
         network = ipaddress.IPv4Interface(
             f"{address}/{dotted_quad(row.netmask)}"
         ).network
-        found.append((
-            socket.if_indextoname(row.index),
-            address,
-            network,
-            str(network.broadcast_address),
-        ))
+        found.append(
+            (device, address, network, str(network.broadcast_address))
+        )
     return found
 
 
