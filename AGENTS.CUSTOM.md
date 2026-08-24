@@ -44,5 +44,3 @@ the name is the only thing the arrangement does differently.
 - `hooks/session-identity.sh` runs at the start of every session in every
   repository, and what it prints is context the model acts on. A claim in it has
   to hold wherever this repository is deployed.
-- `deploy` covers this and `deploy.ps1` does not, so a Windows home directory
-  gets none of it.

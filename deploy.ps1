@@ -30,7 +30,9 @@ function Backup-Item([string] $path) {
         $n++
     }
     Write-Output "$path backed up to $bak"
-    Move-Item -LiteralPath $path -Destination $bak
+    # Stop on failure, as deploy's mv || exit does; carrying on would hand
+    # New-Item a still-occupied path.
+    Move-Item -LiteralPath $path -Destination $bak -ErrorAction Stop
 }
 
 # Converge a link: leave one already pointing at the target, and back up
@@ -45,7 +47,7 @@ function Set-Link([string] $link, [string] $target, [string] $itemType) {
         Backup-Item $link
     }
     Write-Output "$link -> $target"
-    New-Item -ItemType $itemType -Path $link -Target $target | Out-Null
+    New-Item -ItemType $itemType -Path $link -Target $target -ErrorAction Stop | Out-Null
 }
 
 # Converge a generated file to the given content, backing up anything else.
@@ -66,10 +68,13 @@ function Set-GeneratedFile([string] $path, [string] $content) {
 
 # Dot files
 Get-ChildItem -Path "$PSScriptRoot\.*"  | ForEach-Object {
-    # ~/.claude holds the Claude CLI's credentials, transcripts and caches.
-    # Linking it here would have the CLI write them inside this repository's
-    # checkout.
-    if (-not $_.Name.StartsWith(".git") -and $_.Name -ne ".claude") {
+    # .claude here is this repository's own skills, so the home directory's
+    # .claude is deployed from .claude.user instead, the same mapping deploy
+    # makes. The CLI's credentials, transcripts and caches land inside it,
+    # untracked.
+    if ($_.Name -eq ".claude.user") {
+        Set-Link (Join-Path -Path $env:HOME -ChildPath ".claude") $_.FullName "Junction"
+    } elseif (-not $_.Name.StartsWith(".git") -and $_.Name -ne ".claude") {
         $link = Join-Path -Path $env:HOME -ChildPath $_.Name
         $itemType = $_.PSIsContainer ? "Junction" : "SymbolicLink"
         Set-Link $link $_.FullName $itemType
