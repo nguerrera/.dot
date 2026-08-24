@@ -25,7 +25,7 @@ git config --global safe.directory "*"
 function Backup-Item([string] $path) {
     $bak = "$path.bak"
     $n = 1
-    while (Test-Path -LiteralPath $bak) {
+    while (Get-Item -LiteralPath $bak -Force -ErrorAction SilentlyContinue) {
         $bak = "$path.bak.$n"
         $n++
     }
@@ -36,8 +36,9 @@ function Backup-Item([string] $path) {
 }
 
 # Converge a link: leave one already pointing at the target, and back up
-# anything else in the way before linking. Get-Item -Force sees a link whose
-# target is gone, which Test-Path reports as absent.
+# anything else in the way before linking, a link whose target is gone
+# included. Existence probes go through Get-Item -Force, which sees such a
+# link on every PowerShell 7, where Test-Path only does on newer ones.
 function Set-Link([string] $link, [string] $target, [string] $itemType) {
     $existing = Get-Item -LiteralPath $link -Force -ErrorAction SilentlyContinue
     if ($existing) {
