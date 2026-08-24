@@ -65,6 +65,14 @@ TABLE_ATTEMPTS = 3
 # MIB_IPNETROW's type for an entry whose request has not come back.
 IPNET_TYPE_INVALID = 2
 
+# The systems the readers below are written against. One outside
+# these is refused rather than handed to the nearest reader: the Linux
+# pair looks for a /proc no BSD carries and reads a sockaddr by a
+# layout no BSD uses, which would leave a machine reporting no
+# interface able to broadcast.
+UNIX_PLATFORMS = ("linux", "darwin")
+KNOWN_PLATFORMS = UNIX_PLATFORMS + ("win32",)
+
 MAC_TEXT = re.compile(r"^[0-9a-fA-F]{1,2}(?:[:-][0-9a-fA-F]{1,2}){5}$")
 
 
@@ -115,6 +123,11 @@ class MibIpNetRow(ctypes.Structure):
 
 def fail(message):
     raise SystemExit(f"wake: {message}")
+
+
+def fail_unknown_platform():
+    fail(f"{sys.platform} has no reader here; "
+         f"{', '.join(KNOWN_PLATFORMS)} have one")
 
 
 def sockaddr_ipv4(pointer):
@@ -236,7 +249,9 @@ def broadcast_interfaces():
     """Each broadcasting IPv4 interface: name, address, network, broadcast."""
     if sys.platform == "win32":
         return broadcast_interfaces_windows()
-    return broadcast_interfaces_unix()
+    if sys.platform in UNIX_PLATFORMS:
+        return broadcast_interfaces_unix()
+    fail_unknown_platform()
 
 
 def normalize_mac(text):
@@ -302,7 +317,9 @@ def neighbor_mac(ip, device):
         return neighbor_mac_windows(ip, device)
     if sys.platform == "darwin":
         return neighbor_mac_bsd(ip, device)
-    return neighbor_mac_linux(ip, device)
+    if sys.platform == "linux":
+        return neighbor_mac_linux(ip, device)
+    fail_unknown_platform()
 
 
 def outgoing_address(ip):
