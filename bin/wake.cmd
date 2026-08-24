@@ -1,1 +1,1 @@
-@python "%~dp0wake" %*
+@py -3 "%~dp0wake" %*
