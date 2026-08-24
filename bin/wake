@@ -8,11 +8,15 @@ kernel's neighbor (ARP) table, and the MAC is saved under
 $XDG_CACHE_HOME/wake so the host can be woken after the table forgets
 it.
 
-Only the neighbor table needs anything outside the standard library, and
-what it needs ships with the OS: /proc/net/arp on Linux, arp(8) on
-macOS. The interface is the one the kernel would send to the host
-from; its broadcast address comes from getifaddrs(3) through ctypes,
-and the packet goes out on a plain UDP socket.
+Nothing here has to be installed. What the standard library does not
+answer for itself comes from what ships with the OS: the neighbor table
+from /proc/net/arp on Linux, arp(8) on macOS and GetIpNetTable on
+Windows, and the interface from getifaddrs(3) on Linux and macOS and
+GetIpAddrTable on Windows. The three system calls among those go
+through ctypes. The interface is the one the kernel would send to the
+host from, its broadcast address is the one getifaddrs(3) reports or
+the one the address and the netmask work out to on Windows, and the
+packet goes out on a plain UDP socket.
 """
 
 import ctypes
@@ -42,6 +46,33 @@ LIMITED_BROADCAST = "255.255.255.255"
 # How long to let the kernel finish resolving an address that answers.
 RESOLVE_TIMEOUT = 1.0
 
+# The length MIB_IPNETROW reserves for a hardware address, of which an
+# Ethernet MAC fills six.
+MAXLEN_PHYSADDR = 8
+
+# What an iphlpapi table call answers a buffer smaller than the table
+# with, having written the size it wants back through the same argument.
+ERROR_INSUFFICIENT_BUFFER = 122
+
+# What GetIpNetTable returns where the neighbor table is empty.
+ERROR_NO_DATA = 232
+
+# How many times to ask iphlpapi for a table: the call that reports the
+# size, the call that reads it, and one more for a table that grew in
+# between.
+TABLE_ATTEMPTS = 3
+
+# MIB_IPNETROW's type for an entry whose request has not come back.
+IPNET_TYPE_INVALID = 2
+
+# The systems the readers below are written against. One outside
+# these is refused rather than handed to the nearest reader: the Linux
+# pair looks for a /proc no BSD carries and reads a sockaddr by a
+# layout no BSD uses, which would leave a machine reporting no
+# interface able to broadcast.
+UNIX_PLATFORMS = ("linux", "darwin")
+KNOWN_PLATFORMS = UNIX_PLATFORMS + ("win32",)
+
 MAC_TEXT = re.compile(r"^[0-9a-fA-F]{1,2}(?:[:-][0-9a-fA-F]{1,2}){5}$")
 
 
@@ -60,8 +91,43 @@ Ifaddrs._fields_ = [
 ]
 
 
+class MibIpAddrRow(ctypes.Structure):
+    """A row of GetIpAddrTable: one IPv4 address on one interface."""
+
+    _fields_ = [
+        ("address", ctypes.c_uint32),
+        ("index", ctypes.c_uint32),
+        ("netmask", ctypes.c_uint32),
+        # Documented as the interface's broadcast address and in
+        # practice 1, which stands for the host bits being ones rather
+        # than naming the address they make. The address is computed
+        # from the network instead.
+        ("broadcast", ctypes.c_uint32),
+        ("reassembly_size", ctypes.c_uint32),
+        ("unused", ctypes.c_uint16),
+        ("type", ctypes.c_uint16),
+    ]
+
+
+class MibIpNetRow(ctypes.Structure):
+    """A row of GetIpNetTable: one neighbor, on one interface."""
+
+    _fields_ = [
+        ("index", ctypes.c_uint32),
+        ("physical_length", ctypes.c_uint32),
+        ("physical", ctypes.c_ubyte * MAXLEN_PHYSADDR),
+        ("address", ctypes.c_uint32),
+        ("type", ctypes.c_uint32),
+    ]
+
+
 def fail(message):
     raise SystemExit(f"wake: {message}")
+
+
+def fail_unknown_platform():
+    fail(f"{sys.platform} has no reader here; "
+         f"{', '.join(KNOWN_PLATFORMS)} have one")
 
 
 def sockaddr_ipv4(pointer):
@@ -84,8 +150,7 @@ def sockaddr_ipv4(pointer):
     return socket.inet_ntoa(octets.ljust(4, b"\0"))
 
 
-def broadcast_interfaces():
-    """Each broadcasting IPv4 interface: name, address, network, broadcast."""
+def broadcast_interfaces_unix():
     libc = ctypes.CDLL(ctypes.util.find_library("c"), use_errno=True)
     libc.getifaddrs.argtypes = [ctypes.POINTER(ctypes.POINTER(Ifaddrs))]
     libc.getifaddrs.restype = ctypes.c_int
@@ -117,6 +182,76 @@ def broadcast_interfaces():
         return found
     finally:
         libc.freeifaddrs(head)
+
+
+def dotted_quad(value):
+    """The dotted quad in a word iphlpapi returns an address in.
+
+    The word holds the four bytes in network order, which packing it in
+    the machine's order lays back out as they arrived.
+    """
+    return socket.inet_ntoa(struct.pack("=I", value))
+
+
+def iphlpapi_table(name, row_type):
+    """The rows of an iphlpapi table, into a buffer sized by asking.
+
+    Each of these tables arrives as a count and then its fixed-size
+    rows, in a buffer the caller supplies. A call handed one too small
+    reports the size it wants through the same argument, which is what
+    the first call is for.
+    """
+    function = getattr(ctypes.WinDLL("iphlpapi"), name)
+    size = ctypes.c_uint32(0)
+    for _ in range(TABLE_ATTEMPTS):
+        # The first call is handed nothing to fill, since the size a
+        # buffer would have to be is what it is being asked for.
+        buffer = None
+        if size.value:
+            buffer = ctypes.create_string_buffer(size.value)
+        code = function(buffer, ctypes.byref(size), False)
+        if code == ERROR_NO_DATA:
+            return []
+        if code == 0:
+            count = ctypes.c_uint32.from_buffer(buffer).value
+            return list((row_type * count).from_buffer(buffer, 4))
+        if code != ERROR_INSUFFICIENT_BUFFER:
+            fail(f"cannot read {name}: {ctypes.FormatError(code)}")
+    fail(f"cannot read {name}: it grew past every buffer sized for it")
+
+
+def broadcast_interfaces_windows():
+    found = []
+    for row in iphlpapi_table("GetIpAddrTable", MibIpAddrRow):
+        address = dotted_quad(row.address)
+        # An address needs a segment to broadcast on, which a loopback
+        # address has none of, a netmask of zero names no network, and
+        # a netmask that is all ones leaves no room for.
+        if row.netmask in (0, 0xFFFFFFFF):
+            continue
+        if ipaddress.IPv4Address(address).is_loopback:
+            continue
+        try:
+            device = socket.if_indextoname(row.index)
+        except OSError:
+            # The interface went away between the table and this call.
+            continue
+        network = ipaddress.IPv4Interface(
+            f"{address}/{dotted_quad(row.netmask)}"
+        ).network
+        found.append(
+            (device, address, network, str(network.broadcast_address))
+        )
+    return found
+
+
+def broadcast_interfaces():
+    """Each broadcasting IPv4 interface: name, address, network, broadcast."""
+    if sys.platform == "win32":
+        return broadcast_interfaces_windows()
+    if sys.platform in UNIX_PLATFORMS:
+        return broadcast_interfaces_unix()
+    fail_unknown_platform()
 
 
 def normalize_mac(text):
@@ -165,10 +300,26 @@ def neighbor_mac_bsd(ip, device):
     return None
 
 
+def neighbor_mac_windows(ip, device):
+    index = socket.if_nametoindex(device)
+    for row in iphlpapi_table("GetIpNetTable", MibIpNetRow):
+        if row.index != index or dotted_quad(row.address) != ip:
+            continue
+        if row.type == IPNET_TYPE_INVALID:
+            return None
+        octets = bytes(row.physical[:row.physical_length])
+        return normalize_mac(":".join(f"{octet:02x}" for octet in octets))
+    return None
+
+
 def neighbor_mac(ip, device):
+    if sys.platform == "win32":
+        return neighbor_mac_windows(ip, device)
     if sys.platform == "darwin":
         return neighbor_mac_bsd(ip, device)
-    return neighbor_mac_linux(ip, device)
+    if sys.platform == "linux":
+        return neighbor_mac_linux(ip, device)
+    fail_unknown_platform()
 
 
 def outgoing_address(ip):
