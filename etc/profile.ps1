@@ -232,8 +232,8 @@ foreach ($each in (
     }
 }
 
-# add custom bin dir to PATH
-$Env:PATH="${Env:USERPROFILE}\.dot\bin;${Env:PATH}"
+# add custom bin dir and local bin to PATH
+$Env:PATH="${Env:USERPROFILE}\.dot\bin;${Env:USERPROFILE}\.local\bin;${Env:PATH}"
 
 # add Git directory to PATH
 if (Test-Path "${Env:ProgramW6432}\Git") {
