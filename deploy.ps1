@@ -56,15 +56,16 @@ function Set-GeneratedFile([string] $path, [string] $content) {
     $existing = Get-Item -LiteralPath $path -Force -ErrorAction SilentlyContinue
     if ($existing) {
         # The interpolation turns what Get-Content -Raw returns for an empty
-        # file into "", which .Trim() accepts; a [string] cast leaves it null.
+        # file into "", which .TrimEnd() accepts; a [string] cast leaves it
+        # null.
         if (-not $existing.LinkType -and
-            "$(Get-Content -LiteralPath $path -Raw)".Trim() -eq $content) {
+            "$(Get-Content -LiteralPath $path -Raw)".TrimEnd() -eq $content) {
             return
         }
         Backup-Item $path
     }
     Write-Output "$path = $content"
-    Set-Content -Path $path -Value $content
+    Set-Content -LiteralPath $path -Value $content -ErrorAction Stop
 }
 
 # Dot files
