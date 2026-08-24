@@ -8,12 +8,14 @@ kernel's neighbor (ARP) table, and the MAC is saved under
 $XDG_CACHE_HOME/wake so the host can be woken after the table forgets
 it.
 
-Only the neighbor table needs anything outside the standard library,
-and what it needs ships with the OS: /proc/net/arp on Linux, arp(8) on
-macOS, GetIpNetTable on Windows. The interface is the one the kernel
-would send to the host from; it and its broadcast address come from
-getifaddrs(3) through ctypes, or from GetIpAddrTable on Windows, and
-the packet goes out on a plain UDP socket.
+Nothing here has to be installed. What the standard library does not
+answer for itself comes from what ships with the OS: the neighbor table
+from /proc/net/arp on Linux, arp(8) on macOS and GetIpNetTable on
+Windows, and the interface and its broadcast address from getifaddrs(3)
+on Linux and macOS and GetIpAddrTable on Windows. The three system
+calls among those go through ctypes. The interface is the one the
+kernel would send to the host from, and the packet goes out on a plain
+UDP socket.
 """
 
 import ctypes
@@ -36,6 +38,13 @@ DISCARD_PORT = 9
 
 IFF_BROADCAST = 0x2
 
+# Where a packet goes when the interface names no broadcast address of
+# its own. It reaches the local segment and no further.
+LIMITED_BROADCAST = "255.255.255.255"
+
+# How long to let the kernel finish resolving an address that answers.
+RESOLVE_TIMEOUT = 1.0
+
 # The length MIB_IPNETROW reserves for a hardware address, of which an
 # Ethernet MAC fills six.
 MAXLEN_PHYSADDR = 8
@@ -47,20 +56,13 @@ ERROR_INSUFFICIENT_BUFFER = 122
 # What GetIpNetTable returns where the neighbor table is empty.
 ERROR_NO_DATA = 232
 
-# How many times to size a table and read it. The table can grow between
-# the two calls, and one retry covers that without spinning on a table
-# that grows every time it is looked at.
+# How many times to ask iphlpapi for a table: the call that reports the
+# size, the call that reads it, and one more for a table that grew in
+# between.
 TABLE_ATTEMPTS = 3
 
 # MIB_IPNETROW's type for an entry whose request has not come back.
 IPNET_TYPE_INVALID = 2
-
-# Where a packet goes when the interface names no broadcast address of
-# its own. It reaches the local segment and no further.
-LIMITED_BROADCAST = "255.255.255.255"
-
-# How long to let the kernel finish resolving an address that answers.
-RESOLVE_TIMEOUT = 1.0
 
 MAC_TEXT = re.compile(r"^[0-9a-fA-F]{1,2}(?:[:-][0-9a-fA-F]{1,2}){5}$")
 
@@ -90,7 +92,7 @@ class MibIpAddrRow(ctypes.Structure):
         # Documented as the interface's broadcast address and in
         # practice 1, which stands for the host bits being ones rather
         # than naming the address they make. The address is computed
-        # from the network below instead.
+        # from the network instead.
         ("broadcast", ctypes.c_uint32),
         ("reassembly_size", ctypes.c_uint32),
         ("unused", ctypes.c_uint16),
@@ -169,25 +171,27 @@ def broadcast_interfaces_unix():
 
 
 def dotted_quad(value):
-    """The address in a word iphlpapi fills with one.
+    """The dotted quad in a word iphlpapi returns an address in.
 
-    The four bytes are in network order inside a word in the machine's.
+    The word holds the four bytes in network order, which packing it in
+    the machine's order lays back out as they arrived.
     """
     return socket.inet_ntoa(struct.pack("=I", value))
 
 
 def iphlpapi_table(name, row_type):
-    """The rows of an iphlpapi table, sized by asking for the size first.
+    """The rows of an iphlpapi table, into a buffer sized by asking.
 
-    Each of these tables arrives as a count and then its rows, into a
-    buffer the caller supplies and a call reports the wanted size
-    through where it finds one too small.
+    Each of these tables arrives as a count and then its fixed-size
+    rows, in a buffer the caller supplies. A call handed one too small
+    reports the size it wants through the same argument, which is what
+    the first call is for.
     """
     function = getattr(ctypes.WinDLL("iphlpapi"), name)
     size = ctypes.c_uint32(0)
     for _ in range(TABLE_ATTEMPTS):
-        # The first call is given nothing to fill, since the size a
-        # buffer has to be is what it is being asked for.
+        # The first call is handed nothing to fill, since the size a
+        # buffer would have to be is what it is being asked for.
         buffer = None
         if size.value:
             buffer = ctypes.create_string_buffer(size.value)
