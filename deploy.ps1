@@ -1,3 +1,7 @@
+# Run this from a conhost window (plain cmd), not Windows Terminal: the
+# terminal holds its settings.json open, and the file cannot be replaced from
+# under it.
+
 # Set HOME environment variable permanently. emacs uses APPDATA otherwise. Note
 # that Environment.SetEnvironmentVariable can be very slow while notifying
 # windows of the change, so we edit the registry directly.
