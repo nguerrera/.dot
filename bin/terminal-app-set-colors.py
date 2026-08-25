@@ -74,14 +74,14 @@ def apply_matrix(m, v):
 
 def f32(x):
     # macOS stores float32; matching its precision keeps diffs quiet
-    return struct.unpack("f", struct.pack("f", x))[0]
+    return struct.unpack("<f", struct.pack("<f", x))[0]
 
 
 def component_strings(hex_color):
     srgb = [int(hex_color[i:i + 2], 16) / 255 for i in (0, 2, 4)]
     lin = [srgb_linear(c) for c in srgb]
     p3 = [srgb_encode(c) for c in apply_matrix(SRGB_TO_P3, lin)]
-    generic = [max(0.0, c) ** (1 / 1.8)
+    generic = [min(1.0, max(0.0, c)) ** (1 / 1.8)
                for c in apply_matrix(P3_TO_GENERIC, apply_matrix(SRGB_TO_P3, lin))]
     components = " ".join("%.10g" % f32(c) for c in p3) + " 1"
     fallback = " ".join("%.10g" % f32(c) for c in generic)
