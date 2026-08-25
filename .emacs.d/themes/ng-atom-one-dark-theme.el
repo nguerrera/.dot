@@ -51,7 +51,7 @@
     (red           "#e06c75")
     (white         "#abb2bf")
     (yellow        "#e5c07b")
-    (brightblack   "#8d8d8d")
+    (brightblack   "#9aa0aa")
     (brightblue    "#8ac1ee")
     (brightcyan    "#8eb7bd")
     (brightgreen   "#a9ce8f")
