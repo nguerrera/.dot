@@ -41,6 +41,8 @@ Read `CONTRIBUTING.md` for this repository's commands and gate, then
   based on the one below; merging a layer lands every unmerged layer under it.
   Maintenance of the repository's own meta (guidance, skills, documentation,
   work tracking) is one concern; list every change in the body.
+- Link a stack's pull requests into a GitHub stack where a mechanism for it is
+  present; one is `gh stack link`, given the pull request numbers bottom to top.
 - Commit as often as useful inside a branch, at whatever message length the
   reasoning warrants. Never rewrite branch history.
 - Never force-push, except the restack below.
@@ -84,10 +86,13 @@ Read `CONTRIBUTING.md` for this repository's commands and gate, then
 
 ### Stacks
 
-When the layer below merges, restack before doing anything else. The squash
-makes a commit the upper layers do not descend from, and GitHub offers the
-merged work a second time; the only symptom is a changed-file count larger than
-the layer's own work:
+A linked stack rebases and retargets the layers above a merged layer on GitHub's
+side; refresh the local copy of each remaining layer from the remote before
+building on it again. For an unlinked stack, when the layer below merges,
+restack before doing anything else. Either way, the symptom of a stack gone
+wrong is a changed-file count larger than the layer's own work, and the restack
+below is the repair. The squash makes a commit the upper layers do not descend
+from, and GitHub offers the merged work a second time:
 
 ```sh
 git rebase --onto origin/main <old base tip> <branch>
