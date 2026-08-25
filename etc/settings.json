@@ -79,10 +79,10 @@
     "schemes": 
     [
         {
-            "background": "#282C34",
-            "black": "#282C34",
+            "background": "#16181D",
+            "black": "#16181D",
             "blue": "#61AFEF",
-            "brightBlack": "#8D8D8D",
+            "brightBlack": "#9AA0AA",
             "brightBlue": "#8AC1EE",
             "brightCyan": "#8EB7BD",
             "brightGreen": "#A9CE8F",

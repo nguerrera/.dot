@@ -41,9 +41,9 @@
 
 (defvar ng-atom-one-dark-colors
   '(
-    (background    "#282c34")
+    (background    "#16181d")
     (foreground    "#abb2bf")
-    (black         "#282c34")
+    (black         "#16181d")
     (blue          "#61afef")
     (cyan          "#56b6c2")
     (green         "#98c379")
@@ -51,7 +51,7 @@
     (red           "#e06c75")
     (white         "#abb2bf")
     (yellow        "#e5c07b")
-    (brightblack   "#8d8d8d")
+    (brightblack   "#9aa0aa")
     (brightblue    "#8ac1ee")
     (brightcyan    "#8eb7bd")
     (brightgreen   "#a9ce8f")
